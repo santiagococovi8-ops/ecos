@@ -112,6 +112,26 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .nota-prog{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);}
 .nota-prog-fill{height:100%;background:var(--yellow);width:0%;transition:width .06s linear;}
 
+/* ── CARRUSEL PRINCIPAL ── */
+.carrusel{position:relative;border-radius:var(--r);overflow:hidden;height:200px;flex-shrink:0;}
+.car-track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.car-slide{min-width:100%;height:100%;position:relative;cursor:pointer;flex-shrink:0;}
+.car-slide-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 8s ease-out;}
+.car-slide.active .car-slide-img{transform:scale(1.04);}
+.car-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,rgba(0,0,0,.72) 100%);}
+.car-content{position:absolute;bottom:0;left:0;right:0;padding:14px 16px 0;z-index:1;}
+.car-cat{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:8px;}
+.car-title{font-size:22px;font-weight:900;color:white;line-height:1.15;letter-spacing:-.5px;margin-bottom:0;}
+.car-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.15);padding:9px 0 12px;margin-top:10px;}
+.car-time{font-size:11px;color:rgba(255,255,255,.65);}
+.car-place{font-size:11px;color:rgba(255,255,255,.65);}
+.car-prog{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);z-index:2;}
+.car-prog-fill{height:100%;background:var(--yellow);width:0%;transition:width .06s linear;}
+.car-dots{position:absolute;bottom:10px;right:12px;display:flex;gap:5px;z-index:3;}
+.car-dot{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4);border:none;cursor:pointer;transition:width .3s,background .3s;}
+.car-dot.active{width:18px;background:white;}
+
+
 /* Ticker */
 .ticker{overflow:hidden;background:var(--blue-deep);border-radius:8px;padding:7px 0;}
 .ticker-inner{display:flex;gap:14px;white-space:nowrap;animation:tick 20s linear infinite;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow);padding-left:100%;}
@@ -431,18 +451,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <div style="font-size:10px;font-weight:800;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase;">EC☀S</div>
     </div>
 
-    <div class="nota-main" onclick="abrirNota(0)">
-      <div class="nota-main-bg" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);"></div>
-      <div class="nota-main-overlay"></div>
-      <div class="nota-main-content">
-        <div class="nota-cat" style="background:var(--yellow);color:var(--gray-900);">Actividad</div>
-        <div class="nota-main-title">Asamblea estudiantil<br>15 de mayo</div>
-        <div class="nota-main-footer">
-          <span class="nota-main-time">🕐 Hace 2 horas</span>
-          <span class="nota-main-place">Aula Magna</span>
-        </div>
-      </div>
-      <div class="nota-prog"><div class="nota-prog-fill" id="npf"></div></div>
+    <!-- CARRUSEL PRINCIPAL -->
+    <div class="carrusel" id="carrusel">
+      <div class="car-track" id="car-track"></div>
+      <div class="car-dots" id="car-dots"></div>
     </div>
 
     <div class="ticker">
@@ -872,12 +884,130 @@ function enterApp(){
   if(el)el.textContent=dias[d.getDay()]+' '+d.getDate()+' de '+meses[d.getMonth()]+' '+d.getFullYear();
 })();
 
-// ── PROG NOTA MAIN ──
-function startProg(){
-  const f=document.getElementById('npf');if(!f)return;
-  let p=0;
-  setInterval(()=>{p=p>=100?0:p+(100/(8000/60));f.style.width=Math.min(p,100)+'%';},60);
+// ── NOTICIAS DESTACADAS (carrusel) ──
+// Para el panel de admin: editá este array para cambiar las noticias del carrusel.
+// Cada entrada tiene: id (referencia a NOTICIAS), cat, catBg, catTxt, titulo,
+// fecha, lugar, y bg (color de fondo o URL de imagen).
+const DESTACADAS = [
+  {
+    notaId: 0,
+    cat: 'ACTIVIDAD',
+    catBg: '#F59E0B', catTxt: '#0F172A',
+    titulo: 'Asamblea estudiantil\n15 de mayo',
+    fecha: 'Hace 2 horas',
+    lugar: 'Aula Magna',
+    // bg: puede ser una URL de imagen o un gradiente CSS
+    bg: 'linear-gradient(135deg,#0F2E54 0%,#1E4D8C 50%,#2563EB 100%)',
+    // imgUrl: '' // ← acá va la URL de la foto cuando tengas imágenes reales
+  },
+  {
+    notaId: 1,
+    cat: 'COMUNICADO',
+    catBg: '#FFFFFF', catTxt: '#2563EB',
+    titulo: 'Posición de ECOS sobre el recorte presupuestario',
+    fecha: 'Hace 3 días',
+    lugar: 'ECOS · JurSoc',
+    bg: 'linear-gradient(135deg,#0F172A 0%,#1E293B 60%,#334155 100%)',
+    // imgUrl: ''
+  },
+  {
+    notaId: 3,
+    cat: 'CONVOCATORIA',
+    catBg: '#0F172A', catTxt: '#FFFFFF',
+    titulo: 'Sumate a ECOS — buscamos colaboradores para prensa',
+    fecha: 'Esta semana',
+    lugar: 'ECOS · JurSoc',
+    bg: 'linear-gradient(135deg,#78350F 0%,#B45309 50%,#D97706 100%)',
+    // imgUrl: ''
+  },
+];
+
+// ── CARRUSEL ──
+let carIdx = 0, carTimer = null, carElapsed = 0, carPaused = false;
+const CAR_DURATION = 5000;
+const CAR_TICK = 60;
+
+function initCarrusel() {
+  const track = document.getElementById('car-track');
+  const dots  = document.getElementById('car-dots');
+  if (!track) return;
+
+  // Renderizar slides
+  track.innerHTML = DESTACADAS.map((n, i) => `
+    <div class="car-slide${i===0?' active':''}" onclick="abrirNota(${n.notaId})" id="car-slide-${i}">
+      <div class="car-slide-img" id="car-img-${i}" style="background:${n.imgUrl ? 'url('+n.imgUrl+') center/cover' : n.bg};"></div>
+      <div class="car-overlay"></div>
+      <div class="car-content">
+        <div class="car-cat" style="background:${n.catBg};color:${n.catTxt};">${n.cat}</div>
+        <div class="car-title">${n.titulo.replace('\n','<br>')}</div>
+        <div class="car-footer">
+          <span class="car-time">🕐 ${n.fecha}</span>
+          <span class="car-place">${n.lugar}</span>
+        </div>
+      </div>
+      <div class="car-prog"><div class="car-prog-fill" id="car-pf-${i}"></div></div>
+    </div>
+  `).join('');
+
+  // Renderizar dots
+  dots.innerHTML = DESTACADAS.map((_,i) =>
+    `<button class="car-dot${i===0?' active':''}" onclick="carGoTo(${i});event.stopPropagation();" aria-label="Noticia ${i+1}"></button>`
+  ).join('');
+
+  carStartProgress();
+
+  // Pausar al tocar
+  const car = document.getElementById('carrusel');
+  car.addEventListener('touchstart', () => carPaused = true, {passive:true});
+  car.addEventListener('touchend',   () => { setTimeout(() => carPaused = false, 1500); }, {passive:true});
+  car.addEventListener('mouseenter', () => carPaused = true);
+  car.addEventListener('mouseleave', () => carPaused = false);
 }
+
+function carGoTo(idx) {
+  clearInterval(carTimer);
+  // Limpiar barra anterior
+  const prevFill = document.getElementById('car-pf-'+carIdx);
+  if (prevFill) prevFill.style.width = '0%';
+  // Quitar active del slide anterior
+  const prevSlide = document.getElementById('car-slide-'+carIdx);
+  if (prevSlide) prevSlide.classList.remove('active');
+  const prevDot = document.querySelectorAll('.car-dot')[carIdx];
+  if (prevDot) prevDot.classList.remove('active');
+
+  carIdx = idx;
+  carElapsed = 0;
+
+  // Mover track
+  document.getElementById('car-track').style.transform = `translateX(-${carIdx * 100}%)`;
+
+  // Activar nuevo slide
+  const newSlide = document.getElementById('car-slide-'+carIdx);
+  if (newSlide) newSlide.classList.add('active');
+  const newDot = document.querySelectorAll('.car-dot')[carIdx];
+  if (newDot) newDot.classList.add('active');
+
+  carStartProgress();
+}
+
+function carStartProgress() {
+  const fill = document.getElementById('car-pf-'+carIdx);
+  carTimer = setInterval(() => {
+    if (carPaused) return;
+    carElapsed += CAR_TICK;
+    const pct = Math.min((carElapsed / CAR_DURATION) * 100, 100);
+    if (fill) fill.style.width = pct + '%';
+    if (carElapsed >= CAR_DURATION) {
+      clearInterval(carTimer);
+      if (fill) fill.style.width = '0%';
+      carGoTo((carIdx + 1) % DESTACADAS.length);
+    }
+  }, CAR_TICK);
+}
+
+// Mantener startProg para compatibilidad (ya no se usa la barra vieja)
+function startProg() { initCarrusel(); }
+
 
 // ── NOTICIAS ──
 function abrirNota(id){
