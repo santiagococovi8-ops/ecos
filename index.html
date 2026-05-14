@@ -1322,12 +1322,13 @@ async function doRegister() {
     }
     // Guardar en tabla usuarios
     await SB.upsert('usuarios', [{ legajo, nombre, email, fecha: new Date().toLocaleDateString('es-AR') }]);
-    // Login automático
-    if (data.access_token) {
-      sessionStorage.setItem('sb_token', data.access_token);
+    // Login automático — el token puede venir en data o en data.session
+    const token = data.access_token || (data.session && data.session.access_token);
+    if (token) {
+      sessionStorage.setItem('sb_token', token);
       sessionStorage.setItem('sb_email', email);
     } else {
-      // Si requiere confirmación, intentar login igual
+      // Sin token en signup → hacer login explícito
       await SB.login(email, pass);
     }
     _currentUser = { legajo, nombre, email };
