@@ -1600,9 +1600,12 @@ function switchTab(tab){
 function addCart(id, esCod){
   const _CODIGOS=window.CODIGOS||CODIGOS;
   const _APUNTES=window.APUNTES||APUNTES;
+  console.log('addCart id:', id, 'tipo:', typeof id, 'esCod:', esCod);
+  console.log('APUNTES ids:', _APUNTES.map(a=>a.id+'/'+typeof a.id));
   const item=esCod
     ? _CODIGOS.find(c=>String(c.id)===String(id))
     : _APUNTES.find(a=>String(a.id)===String(id));
+  console.log('item encontrado:', item);
   if(!item)return;
   const nombre=esCod?item.nombre+' — '+item.subtitulo:item.materia;
   const key=String(id);
