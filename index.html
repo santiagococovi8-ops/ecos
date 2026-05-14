@@ -127,7 +127,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .car-place{font-size:11px;color:rgba(255,255,255,.65);}
 .car-prog{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);z-index:2;}
 .car-prog-fill{height:100%;background:var(--yellow);width:0%;transition:width .06s linear;}
-.car-dots{position:absolute;bottom:10px;right:12px;display:flex;gap:5px;z-index:3;}
+.car-dots{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:3;}
 .car-dot{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4);border:none;cursor:pointer;transition:width .3s,background .3s;}
 .car-dot.active{width:18px;background:white;}
 
@@ -152,11 +152,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .mini-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
 
 /* ── ARTÍCULO ── */
-.art-hero{padding:18px 16px 16px;}
+.art-hero{padding:18px 16px 16px;position:relative;overflow:hidden;min-height:200px;}
 .art-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em;}
 .art-title{font-size:23px;font-weight:900;color:white;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px;}
 .art-meta{font-size:11px;color:rgba(255,255,255,.55);display:flex;gap:10px;flex-wrap:wrap;}
-.art-body{padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px;}
+.art-body{padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px;background:var(--bg);}
 .art-lead{font-size:15px;font-weight:600;color:var(--gray-800);line-height:1.6;border-left:3px solid var(--yellow);padding-left:14px;}
 .art-text{font-size:14px;color:var(--gray-600);line-height:1.75;}
 .art-sub{font-size:16px;font-weight:800;color:var(--blue-deep);letter-spacing:-.3px;}
@@ -1220,14 +1220,15 @@ const DESTACADAS = [
 let carIdx = 0, carTimer = null, carElapsed = 0, carPaused = false;
 const CAR_DURATION = 5000;
 const CAR_TICK = 60;
+let _DEST = []; // variable de módulo para que carGoTo la pueda usar
 
 function initCarrusel() {
   const track = document.getElementById('car-track');
   const dots  = document.getElementById('car-dots');
   if (!track) return;
 
-  // Renderizar slides
-  const _DEST = window.DESTACADAS && window.DESTACADAS.length ? window.DESTACADAS : DESTACADAS;
+  // Actualizar _DEST con datos actuales (Supabase o locales)
+  _DEST = window.DESTACADAS && window.DESTACADAS.length ? window.DESTACADAS : DESTACADAS;
   track.innerHTML = _DEST.map((n, i) => `
     <div class="car-slide${i===0?' active':''}" onclick="abrirNota(${n.notaId})" id="car-slide-${i}">
       <div class="car-slide-img" id="car-img-${i}" style="background:${n.imgUrl ? 'url('+n.imgUrl+') center/cover' : n.bg};"></div>
@@ -1251,10 +1252,27 @@ function initCarrusel() {
 
   carStartProgress();
 
-  // Pausar al tocar
+  // Pausar al tocar + swipe para cambiar slide
   const car = document.getElementById('carrusel');
-  car.addEventListener('touchstart', () => carPaused = true, {passive:true});
-  car.addEventListener('touchend',   () => { setTimeout(() => carPaused = false, 1500); }, {passive:true});
+  let _touchX = null;
+  car.addEventListener('touchstart', (e) => {
+    carPaused = true;
+    _touchX = e.touches[0].clientX;
+  }, {passive:true});
+  car.addEventListener('touchmove', (e) => {
+    // no hacer nada, solo capturar
+  }, {passive:true});
+  car.addEventListener('touchend', (e) => {
+    if (_touchX !== null) {
+      const dx = e.changedTouches[0].clientX - _touchX;
+      if (Math.abs(dx) > 40) { // umbral 40px
+        if (dx < 0) carGoTo((carIdx + 1) % _DEST.length);       // swipe izquierda → siguiente
+        else        carGoTo((carIdx - 1 + _DEST.length) % _DEST.length); // swipe derecha → anterior
+      }
+      _touchX = null;
+    }
+    setTimeout(() => carPaused = false, 1500);
+  }, {passive:true});
   car.addEventListener('mouseenter', () => carPaused = true);
   car.addEventListener('mouseleave', () => carPaused = false);
 }
@@ -1320,7 +1338,7 @@ function abrirNota(id){
 
   document.getElementById('art-hero').style.cssText = bgStyle;
   document.getElementById('art-hero').innerHTML=`
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.65));pointer-events:none;"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15) 0%,rgba(0,0,0,.55) 60%,rgba(0,0,0,.75) 100%);pointer-events:none;"></div>
     <div style="position:relative;z-index:1;">
       <button class="art-back" onclick="goTo('inicio',true)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>Volver
