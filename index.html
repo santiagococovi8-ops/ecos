@@ -1507,7 +1507,7 @@ function renderTree(lista){
       </div>
       <div class="year-materias" id="${yid}">`;
     items.forEach(a=>{
-      const inCart=cart[a.id]?cart[a.id].qty:0;
+      const inCart=cart[String(a.id)]?cart[String(a.id)].qty:0;
       html+=`<div class="mat-folder">
         <div class="mat-header" onclick="toggleMat('mat-${a.id}')">
           <span class="mat-name">${a.materia}</span>
@@ -1568,7 +1568,7 @@ function renderCodigos(){
   const _CODIGOS=window.CODIGOS||CODIGOS;
   let html='';
   _CODIGOS.forEach(cd=>{
-    const inCart=cart[cd.id]?cart[cd.id].qty:0;
+    const inCart=cart[String(cd.id)]?cart[String(cd.id)].qty:0;
     const _bg=cd.badgeBg||cd.badge_bg||'#EFF6FF';const _badge=cd.badge||'📘';
     html+=`<div class="codigo-card">
       <div class="codigo-header">
@@ -1600,13 +1600,16 @@ function switchTab(tab){
 function addCart(id, esCod){
   const _CODIGOS=window.CODIGOS||CODIGOS;
   const _APUNTES=window.APUNTES||APUNTES;
-  const item=esCod?_CODIGOS.find(c=>c.id===id):_APUNTES.find(a=>a.id===id);
+  const item=esCod
+    ? _CODIGOS.find(c=>String(c.id)===String(id))
+    : _APUNTES.find(a=>String(a.id)===String(id));
   if(!item)return;
   const nombre=esCod?item.nombre+' — '+item.subtitulo:item.materia;
-  if(cart[id])cart[id].qty++;else cart[id]={id,nombre,precio:item.precio,qty:1};
+  const key=String(id);
+  if(cart[key])cart[key].qty++;else cart[key]={id:key,nombre,precio:item.precio,qty:1};
   updateCartUI();
   const btn=document.getElementById('ba-'+id);
-  if(btn){btn.textContent='✓ '+cart[id].qty;btn.classList.add('added');}
+  if(btn){btn.textContent='✓ '+cart[key].qty;btn.classList.add('added');}
   if(esCod)renderCodigos();
 }
 
@@ -1652,9 +1655,12 @@ function renderPedido(){
 }
 
 function chgQty(id,d){
-  if(!cart[id])return;
-  cart[id].qty+=d;
-  if(cart[id].qty<=0){delete cart[id];}
+  const key=String(id);
+  if(!cart[key])return;
+  cart[key].qty+=d;
+  if(cart[key].qty<=0){delete cart[key];}
+  updateCartUI();renderPedido();renderTree(window.APUNTES||APUNTES);
+}
   updateCartUI();renderPedido();renderTree(window.APUNTES||APUNTES);
 }
 
