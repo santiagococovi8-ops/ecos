@@ -972,9 +972,9 @@ async function seedSupabase() {
   }
   if (c.length === 0) {
     await SB.upsert('codigos',[
-      {id:'101',nombre:'Código Civil y Comercial',subtitulo:'de la Nación',badge:'📘',badge_bg:'#EFF6FF',edicion:'Edición 2024 · Tapa blanda',desc:'Indispensable para Derecho Civil, Comercial y Sucesiones.',precio:8500,stock:true},
-      {id:'102',nombre:'Código Penal',subtitulo:'de la Nación Argentina',badge:'📕',badge_bg:'#FEF2F2',edicion:'Edición 2024 · Tapa blanda',desc:'Texto oficial con todas las reformas vigentes.',precio:6500,stock:true},
-      {id:'103',nombre:'Constitución Nacional',subtitulo:'Argentina',badge:'📗',badge_bg:'#ECFDF5',edicion:'Edición 2024 · Formato bolsillo',desc:'Texto completo con la reforma de 1994.',precio:3500,stock:true},
+      {id:'101',nombre:'Código Civil y Comercial',subtitulo:'de la Nación',badge:'📘',badge_bg:'#EFF6FF',edicion:'Edición 2024 · Tapa blanda',descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones.',precio:8500,stock:true},
+      {id:'102',nombre:'Código Penal',subtitulo:'de la Nación Argentina',badge:'📕',badge_bg:'#FEF2F2',edicion:'Edición 2024 · Tapa blanda',descripcion:'Texto oficial con todas las reformas vigentes.',precio:6500,stock:true},
+      {id:'103',nombre:'Constitución Nacional',subtitulo:'Argentina',badge:'📗',badge_bg:'#ECFDF5',edicion:'Edición 2024 · Formato bolsillo',descripcion:'Texto completo con la reforma de 1994.',precio:3500,stock:true},
     ]);
   }
 }
@@ -1010,14 +1010,25 @@ async function iniciarApp() {
     window.NOTICIAS = docsN;
     window.APUNTES  = aps.map(normA);
     window.CODIGOS  = cods.map(normC);
+    // Actualizar feed y carrusel siempre (estén o no iniciados)
     actualizarDestacadas(docsN);
     actualizarFeed(docsN);
-    if (window._appLista) { renderTree(window.APUNTES); renderCodigos(); }
+    if (window._appLista)       { renderTree(window.APUNTES); renderCodigos(); }
     if (window._carruselIniciado) initCarrusel();
     // Realtime
-    SB.subscribe('noticias', () => SB.select('noticias','order=orden.asc').then(r=>{ const d=r.map(normN); window.NOTICIAS=d; actualizarDestacadas(d); actualizarFeed(d); if(window._carruselIniciado)initCarrusel(); }));
-    SB.subscribe('apuntes',  () => SB.select('apuntes','order=id.asc').then(r=>{ window.APUNTES=r.map(normA); if(window._appLista)renderTree(window.APUNTES); }));
-    SB.subscribe('codigos',  () => SB.select('codigos','order=id.asc').then(r=>{ window.CODIGOS=r.map(normC); if(window._appLista)renderCodigos(); }));
+    SB.subscribe('noticias', () => SB.select('noticias','order=orden.asc').then(r=>{
+      const d=r.map(normN); window.NOTICIAS=d;
+      actualizarDestacadas(d); actualizarFeed(d);
+      if(window._carruselIniciado) initCarrusel();
+    }));
+    SB.subscribe('apuntes', () => SB.select('apuntes','order=id.asc').then(r=>{
+      window.APUNTES=r.map(normA);
+      if(window._appLista) renderTree(window.APUNTES);
+    }));
+    SB.subscribe('codigos', () => SB.select('codigos','order=id.asc').then(r=>{
+      window.CODIGOS=r.map(normC);
+      if(window._appLista) renderCodigos();
+    }));
     window._sbListo = true;
     console.log('Supabase conectado ✓');
   } catch(err) {
@@ -1048,9 +1059,9 @@ const APUNTES = [
 ];
 
 const CODIGOS = [
-  { id:101, nombre:'Código Civil y Comercial', subtitulo:'de la Nación', badge:'📘', badgeBg:'#EFF6FF', edicion:'Edición 2024 · Tapa blanda', desc:'Indispensable para Derecho Civil, Comercial y Sucesiones. Incluye fe de erratas y normas complementarias actualizadas.', precio:8500 },
-  { id:102, nombre:'Código Penal',             subtitulo:'de la Nación Argentina', badge:'📕', badgeBg:'#FEF2F2', edicion:'Edición 2024 · Tapa blanda', desc:'Texto oficial con todas las reformas vigentes. Necesario para Derecho Penal I y II y Procesal Penal.', precio:6500 },
-  { id:103, nombre:'Constitución Nacional',    subtitulo:'Argentina', badge:'📗', badgeBg:'#ECFDF5', edicion:'Edición 2024 · Formato bolsillo', desc:'Texto completo con la reforma de 1994. Útil desde primer año para todas las materias del programa.', precio:3500 },
+  { id:101, nombre:'Código Civil y Comercial', subtitulo:'de la Nación', badge:'📘', badgeBg:'#EFF6FF', edicion:'Edición 2024 · Tapa blanda', descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones. Incluye fe de erratas y normas complementarias actualizadas.', precio:8500 },
+  { id:102, nombre:'Código Penal',             subtitulo:'de la Nación Argentina', badge:'📕', badgeBg:'#FEF2F2', edicion:'Edición 2024 · Tapa blanda', descripcion:'Texto oficial con todas las reformas vigentes. Necesario para Derecho Penal I y II y Procesal Penal.', precio:6500 },
+  { id:103, nombre:'Constitución Nacional',    subtitulo:'Argentina', badge:'📗', badgeBg:'#ECFDF5', edicion:'Edición 2024 · Formato bolsillo', descripcion:'Texto completo con la reforma de 1994. Útil desde primer año para todas las materias del programa.', precio:3500 },
 ];
 
 const NOTICIAS = [
@@ -1146,9 +1157,19 @@ function goTo(name, back=false){
 function enterApp(){
   document.getElementById('landing').classList.add('out');
   setTimeout(()=>document.getElementById('landing').style.display='none',580);
-  renderTree(window.APUNTES || APUNTES);
   window._appLista = true;
+  // Renderizar con datos de Supabase si ya llegaron, sino con locales
+  renderTree(window.APUNTES || APUNTES);
+  renderCodigos();
   startProg();
+  window._carruselIniciado = true;
+  // Si Supabase ya cargó, re-renderizar con datos reales
+  if (window._sbListo) {
+    if (window.APUNTES)  renderTree(window.APUNTES);
+    if (window.CODIGOS)  renderCodigos();
+    if (window.DESTACADAS && window.DESTACADAS.length) initCarrusel();
+    actualizarFeed(window.NOTICIAS || NOTICIAS);
+  }
   setTimeout(()=>{
     try{if(!localStorage.getItem('ecos_install')){document.getElementById('install-banner').classList.add('on');localStorage.setItem('ecos_install','1');}}catch(e){document.getElementById('install-banner').classList.add('on');}
   },3000);
@@ -1415,12 +1436,13 @@ function renderCodigos(){
   let html='';
   _CODIGOS.forEach(cd=>{
     const inCart=cart[cd.id]?cart[cd.id].qty:0;
+    const _bg=cd.badgeBg||cd.badge_bg||'#EFF6FF';const _badge=cd.badge||'📘';
     html+=`<div class="codigo-card">
       <div class="codigo-header">
-        <div class="codigo-badge" style="background:${cd.badgeBg};">${cd.badge}</div>
-        <div><div class="codigo-name">${cd.nombre}</div><div class="codigo-sub">${cd.subtitulo}</div><div class="codigo-ed">${cd.edicion}</div></div>
+        <div class="codigo-badge" style="background:${_bg};">${_badge}</div>
+        <div><div class="codigo-name">${cd.nombre||''}</div><div class="codigo-sub">${cd.subtitulo||''}</div><div class="codigo-ed">${cd.edicion||''}</div></div>
       </div>
-      <div class="codigo-desc">${cd.desc}</div>
+      <div class="codigo-desc">${cd.descripcion||''}</div>
       <div class="codigo-footer">
         <div><div class="codigo-price">$${cd.precio.toLocaleString('es-AR')}</div><div class="codigo-price-lbl">Precio solidario ECOS</div></div>
         <div style="display:flex;gap:6px;align-items:center;">
