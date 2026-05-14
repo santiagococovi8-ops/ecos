@@ -1527,7 +1527,7 @@ function renderTree(lista){
               <span class="apunte-price">$${a.precio.toLocaleString('es-AR')}</span>
               <div style="display:flex;gap:5px;">
                 <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
-                <button class="btn-add${inCart>0?' added':''}" id="ba-${a.id}" onclick="addCart(${a.id},false)">${inCart>0?'✓ '+inCart:'Agregar'}</button>
+                <button class="btn-add${inCart>0?' added':''}" id="ba-${a.id}" onclick="addCart('${a.id}',false)">${inCart>0?'✓ '+inCart:'Agregar'}</button>
               </div>
             </div>
           </div>
@@ -1580,7 +1580,7 @@ function renderCodigos(){
         <div><div class="codigo-price">$${cd.precio.toLocaleString('es-AR')}</div><div class="codigo-price-lbl">Precio solidario ECOS</div></div>
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="btn-ver" onclick="window.open('https://www.instagram.com/ecosjursoc/','_blank')">Consultar</button>
-          <button class="btn-add${inCart>0?' added':''}" id="ba-${cd.id}" onclick="addCart(${cd.id},true)">${inCart>0?'✓ '+inCart:'Agregar'}</button>
+          <button class="btn-add${inCart>0?' added':''}" id="ba-${cd.id}" onclick="addCart('${cd.id}',true)">${inCart>0?'✓ '+inCart:'Agregar'}</button>
         </div>
       </div>
     </div>`;
@@ -1600,12 +1600,10 @@ function switchTab(tab){
 function addCart(id, esCod){
   const _CODIGOS=window.CODIGOS||CODIGOS;
   const _APUNTES=window.APUNTES||APUNTES;
-  console.log('addCart id:', id, 'tipo:', typeof id, 'esCod:', esCod);
-  console.log('APUNTES ids:', _APUNTES.map(a=>a.id+'/'+typeof a.id));
+
   const item=esCod
     ? _CODIGOS.find(c=>String(c.id)===String(id))
     : _APUNTES.find(a=>String(a.id)===String(id));
-  console.log('item encontrado:', item);
   if(!item)return;
   const nombre=esCod?item.nombre+' — '+item.subtitulo:item.materia;
   const key=String(id);
