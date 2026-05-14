@@ -1010,16 +1010,17 @@ async function iniciarApp() {
     window.NOTICIAS = docsN;
     window.APUNTES  = aps.map(normA);
     window.CODIGOS  = cods.map(normC);
-    // Actualizar feed y carrusel siempre (estén o no iniciados)
     actualizarDestacadas(docsN);
     actualizarFeed(docsN);
-    if (window._appLista)       { renderTree(window.APUNTES); renderCodigos(); }
-    if (window._carruselIniciado) initCarrusel();
+    if (window._appLista)  { renderTree(window.APUNTES); renderCodigos(); }
+    // Reiniciar carrusel siempre que haya datos, esté o no iniciado
+    initCarrusel();
+    window._carruselIniciado = true;
     // Realtime
     SB.subscribe('noticias', () => SB.select('noticias','order=orden.asc').then(r=>{
       const d=r.map(normN); window.NOTICIAS=d;
       actualizarDestacadas(d); actualizarFeed(d);
-      if(window._carruselIniciado) initCarrusel();
+      initCarrusel();
     }));
     SB.subscribe('apuntes', () => SB.select('apuntes','order=id.asc').then(r=>{
       window.APUNTES=r.map(normA);
@@ -1158,18 +1159,11 @@ function enterApp(){
   document.getElementById('landing').classList.add('out');
   setTimeout(()=>document.getElementById('landing').style.display='none',580);
   window._appLista = true;
-  // Renderizar con datos de Supabase si ya llegaron, sino con locales
+  window._carruselIniciado = true;
   renderTree(window.APUNTES || APUNTES);
   renderCodigos();
-  startProg();
-  window._carruselIniciado = true;
-  // Si Supabase ya cargó, re-renderizar con datos reales
-  if (window._sbListo) {
-    if (window.APUNTES)  renderTree(window.APUNTES);
-    if (window.CODIGOS)  renderCodigos();
-    if (window.DESTACADAS && window.DESTACADAS.length) initCarrusel();
-    actualizarFeed(window.NOTICIAS || NOTICIAS);
-  }
+  actualizarFeed(window.NOTICIAS || NOTICIAS);
+  initCarrusel(); // usa window.DESTACADAS si ya cargó, sino DESTACADAS local
   setTimeout(()=>{
     try{if(!localStorage.getItem('ecos_install')){document.getElementById('install-banner').classList.add('on');localStorage.setItem('ecos_install','1');}}catch(e){document.getElementById('install-banner').classList.add('on');}
   },3000);
@@ -1233,7 +1227,8 @@ function initCarrusel() {
   if (!track) return;
 
   // Renderizar slides
-  track.innerHTML = DESTACADAS.map((n, i) => `
+  const _DEST = window.DESTACADAS && window.DESTACADAS.length ? window.DESTACADAS : DESTACADAS;
+  track.innerHTML = _DEST.map((n, i) => `
     <div class="car-slide${i===0?' active':''}" onclick="abrirNota(${n.notaId})" id="car-slide-${i}">
       <div class="car-slide-img" id="car-img-${i}" style="background:${n.imgUrl ? 'url('+n.imgUrl+') center/cover' : n.bg};"></div>
       <div class="car-overlay"></div>
@@ -1250,7 +1245,7 @@ function initCarrusel() {
   `).join('');
 
   // Renderizar dots
-  dots.innerHTML = DESTACADAS.map((_,i) =>
+  dots.innerHTML = _DEST.map((_,i) =>
     `<button class="car-dot${i===0?' active':''}" onclick="carGoTo(${i});event.stopPropagation();" aria-label="Noticia ${i+1}"></button>`
   ).join('');
 
@@ -1300,7 +1295,7 @@ function carStartProgress() {
     if (carElapsed >= CAR_DURATION) {
       clearInterval(carTimer);
       if (fill) fill.style.width = '0%';
-      carGoTo((carIdx + 1) % DESTACADAS.length);
+      carGoTo((carIdx + 1) % _DEST.length);
     }
   }, CAR_TICK);
 }
