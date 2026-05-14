@@ -152,11 +152,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .mini-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
 
 /* ── ARTÍCULO ── */
-.art-hero{padding:18px 16px 16px;position:relative;overflow:hidden;min-height:200px;}
+.art-hero{position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;}
 .art-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em;}
 .art-title{font-size:23px;font-weight:900;color:white;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px;}
 .art-meta{font-size:11px;color:rgba(255,255,255,.55);display:flex;gap:10px;flex-wrap:wrap;}
-.art-body{padding:16px 16px 80px;display:flex;flex-direction:column;gap:14px;background:var(--bg);}
+.art-body{padding:20px 16px 80px;display:flex;flex-direction:column;gap:14px;background:var(--bg);border-radius:16px 16px 0 0;margin-top:-16px;position:relative;z-index:2;}
 .art-lead{font-size:15px;font-weight:600;color:var(--gray-800);line-height:1.6;border-left:3px solid var(--yellow);padding-left:14px;}
 .art-text{font-size:14px;color:var(--gray-600);line-height:1.75;}
 .art-sub{font-size:16px;font-weight:800;color:var(--blue-deep);letter-spacing:-.3px;}
@@ -466,36 +466,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       </div>
     </div>
 
-    <div class="grid">
-      <div class="nota-card nota-full" style="background:#1E293B;" onclick="abrirNota(1)">
-        <div class="nota-cat" style="background:white;color:var(--blue);">Comunicado</div>
-        <div class="nota-title" style="color:white;">Posición de ECOS sobre el recorte presupuestario</div>
-        <div class="nota-footer-lt">Hace 3 días</div>
-      </div>
-      <div class="nota-card nota-half" style="background:white;border:1.5px solid var(--gray-200);" onclick="abrirNota(2)">
-        <div class="nota-cat" style="background:var(--blue);color:white;">Apuntes</div>
-        <div class="nota-title" style="color:var(--blue-deep);font-size:13px;">Procesal Civil — nuevos apuntes</div>
-        <div style="margin-top:auto;padding-top:8px;font-size:11px;color:var(--gray-400);">Ayer · $1.600</div>
-      </div>
-      <div class="nota-card nota-half" style="background:#FEF3C7;" onclick="abrirNota(3)">
-        <div class="nota-cat" style="background:var(--blue-deep);color:white;">Convoc.</div>
-        <div class="nota-title" style="color:var(--blue-deep);font-size:13px;">Sumate al área de prensa</div>
-        <div style="margin-top:auto;padding-top:8px;font-size:11px;color:var(--yellow-d);">Esta semana</div>
-      </div>
-      <div class="nota-card nota-full" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);" onclick="goTo('vuelta-segura')">
-        <div class="nota-cat" style="background:white;color:#6D28D9;">Frente de Mujeres</div>
-        <div class="nota-title" style="color:white;">Vuelta Segura disponible todas las noches 🌙</div>
-        <div class="nota-footer-lt">Frente de Mujeres · ECOS →</div>
-      </div>
-      <div class="nota-card nota-full" style="background:var(--blue-deep);" onclick="abrirNota(4)">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div>
-            <div class="nota-cat" style="background:var(--yellow);color:var(--gray-900);margin-bottom:8px;">Mesita</div>
-            <div class="nota-title" style="color:white;font-size:15px;">Hall de entrada · Lun a vie 9–18hs</div>
-          </div>
-          <span style="font-size:34px;opacity:.4;margin-top:4px;">📍</span>
-        </div>
-      </div>
+    <div class="grid" id="noticias-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:24px 0;color:var(--gray-400);font-size:13px;">Cargando noticias...</div>
     </div>
   </div>
 </div>
@@ -985,18 +957,20 @@ function actualizarDestacadas(docs) {
   window.DESTACADAS = dest.map(n => ({notaId:n.id,cat:n.cat,catBg:n.catBg,catTxt:n.catTxt,titulo:n.titulo,fecha:n.fecha,lugar:n.lugar,bg:n.heroBg||'linear-gradient(135deg,#1E3A5F,#2563EB)',imgUrl:n.imgUrl||''}));
 }
 function actualizarFeed(docs) {
-  const grid = document.querySelector('.grid'); if (!grid || !docs.length) return;
-  const noC = docs.filter(n => !n.enCarrusel); if (!noC.length) return;
+  const grid = document.getElementById('noticias-grid') || document.querySelector('.grid');
+  if (!grid) return;
+  if (!docs || !docs.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px 0;color:var(--gray-400);font-size:13px;">Sin noticias</div>'; return; }
+  const noC = docs.filter(n => !n.enCarrusel);
+  if (!noC.length) { grid.innerHTML = ''; return; }
   const cats={ACTIVIDAD:'#2563EB',COMUNICADO:'#1E293B',APUNTES:'#0F172A',CONVOCATORIA:'#F59E0B',MESITA:'#0F172A'};
   const styles=[{bg:'#1E293B',cs:'background:white;color:var(--blue)',cls:'nota-full'},{bg:'white;border:1.5px solid var(--gray-200)',cs:'background:var(--blue);color:white',cls:'nota-half'},{bg:'#FEF3C7',cs:'background:var(--blue-deep);color:white',cls:'nota-half'},{bg:'linear-gradient(135deg,#4C1D95,#6D28D9)',cs:'background:white;color:#6D28D9',cls:'nota-full'},{bg:'var(--blue-deep)',cs:'background:var(--yellow);color:var(--gray-900)',cls:'nota-full'}];
   let html='';
-  docs.forEach((n,i)=>{
-    if(n.enCarrusel)return;
+  noC.forEach((n,i)=>{
     const s=styles[i%styles.length];const isMesita=n.cat==='MESITA';
     if(isMesita){html+=`<div class="nota-card ${s.cls}" style="background:${s.bg||cats[n.cat]||'#1E293B'};" onclick="abrirNota('${n.id}')"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div class="nota-cat" style="${s.cs||''};margin-bottom:8px;">${n.cat}</div><div class="nota-title" style="color:white;font-size:15px;">${n.titulo}</div></div><span style="font-size:34px;opacity:.4;margin-top:4px;">📍</span></div></div>`;}
     else{const iL=s.bg&&(s.bg.includes('white')||s.bg.includes('FEF'));html+=`<div class="nota-card ${s.cls}" style="background:${s.bg||cats[n.cat]||'#1E293B'};" onclick="abrirNota('${n.id}')"><div class="nota-cat" style="${s.cs||''}">${n.cat}</div><div class="nota-title" style="color:${iL?'var(--blue-deep)':'white'};font-size:${s.cls==='nota-half'?'13px':'14px'}">${n.titulo}</div><div style="margin-top:auto;padding-top:8px;font-size:11px;color:${iL?'var(--gray-400)':'rgba(255,255,255,.6)'};">${n.fecha}</div></div>`;}
   });
-  if(html)grid.innerHTML=html;
+  grid.innerHTML = html;
 }
 
 async function iniciarApp() {
@@ -1252,27 +1226,6 @@ function initCarrusel() {
 
   carStartProgress();
 
-  // Pausar al tocar + swipe para cambiar slide
-  const car = document.getElementById('carrusel');
-  let _touchX = null;
-  car.addEventListener('touchstart', (e) => {
-    carPaused = true;
-    _touchX = e.touches[0].clientX;
-  }, {passive:true});
-  car.addEventListener('touchmove', (e) => {
-    // no hacer nada, solo capturar
-  }, {passive:true});
-  car.addEventListener('touchend', (e) => {
-    if (_touchX !== null) {
-      const dx = e.changedTouches[0].clientX - _touchX;
-      if (Math.abs(dx) > 40) { // umbral 40px
-        if (dx < 0) carGoTo((carIdx + 1) % _DEST.length);       // swipe izquierda → siguiente
-        else        carGoTo((carIdx - 1 + _DEST.length) % _DEST.length); // swipe derecha → anterior
-      }
-      _touchX = null;
-    }
-    setTimeout(() => carPaused = false, 1500);
-  }, {passive:true});
   car.addEventListener('mouseenter', () => carPaused = true);
   car.addEventListener('mouseleave', () => carPaused = false);
 }
@@ -1318,6 +1271,31 @@ function carStartProgress() {
   }, CAR_TICK);
 }
 
+
+// ── SWIPE carrusel (registrado una sola vez) ──
+(function() {
+  let _touchX = null;
+  document.addEventListener('DOMContentLoaded', () => {
+    const car = document.getElementById('carrusel');
+    if (!car) return;
+    car.addEventListener('touchstart', (e) => {
+      carPaused = true;
+      _touchX = e.touches[0].clientX;
+    }, {passive:true});
+    car.addEventListener('touchend', (e) => {
+      if (_touchX !== null) {
+        const dx = e.changedTouches[0].clientX - _touchX;
+        if (Math.abs(dx) > 40) {
+          if (dx < 0) carGoTo((carIdx + 1) % (_DEST.length || 1));
+          else        carGoTo((carIdx - 1 + (_DEST.length || 1)) % (_DEST.length || 1));
+        }
+        _touchX = null;
+      }
+      setTimeout(() => carPaused = false, 800);
+    }, {passive:true});
+  });
+})();
+
 // Mantener startProg para compatibilidad (ya no se usa la barra vieja)
 function startProg() { initCarrusel(); }
 
@@ -1336,14 +1314,14 @@ function abrirNota(id){
     ? `background:url('${n.imgUrl}') center/cover no-repeat; background-color:${n.heroBg||'#0F172A'}`
     : `background:${n.heroBg||'#0F172A'}`;
 
-  document.getElementById('art-hero').style.cssText = bgStyle;
+  document.getElementById('art-hero').style.cssText = bgStyle + ';padding:0;';
   document.getElementById('art-hero').innerHTML=`
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15) 0%,rgba(0,0,0,.55) 60%,rgba(0,0,0,.75) 100%);pointer-events:none;"></div>
-    <div style="position:relative;z-index:1;">
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1) 0%,rgba(0,0,0,.5) 55%,rgba(0,0,0,.8) 100%);pointer-events:none;z-index:0;"></div>
+    <div style="position:relative;z-index:1;padding:16px 16px 24px;">
       <button class="art-back" onclick="goTo('inicio',true)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>Volver
       </button>
-      <div style="display:inline-block;background:${n.catBg||'#F59E0B'};color:${n.catTxt||'#0F172A'};font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:12px;">${n.cat}</div>
+      <div style="display:inline-block;background:${n.catBg||'#F59E0B'};color:${n.catTxt||'#0F172A'};font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:10px;">${n.cat}</div>
       <div class="art-title">${n.titulo}</div>
       <div class="art-meta"><span>🕐 ${n.fecha}</span><span>📍 ${n.lugar}</span></div>
     </div>`;
