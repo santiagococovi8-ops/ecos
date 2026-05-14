@@ -1025,7 +1025,9 @@ async function iniciarApp() {
     window._sbListo = false;
   }
 }
-seedSupabase().then(iniciarApp).catch(e=>{ console.warn(e); iniciarApp(); });
+// Iniciar: seed opcional, app siempre arranca
+iniciarApp();
+seedSupabase().catch(e => console.warn('Seed omitido:', e.message));
 </script>
 <script>
 // ── DATA ──
@@ -1397,7 +1399,8 @@ function toggleMat(id){
 }
 
 function filtrar(q){
-  const filtered=APUNTES.filter(a=>a.materia.toLowerCase().includes(q.toLowerCase())||a.año.toLowerCase().includes(q.toLowerCase()));
+  const _APUNTES=window.APUNTES||APUNTES;
+  const filtered=_APUNTES.filter(a=>a.materia.toLowerCase().includes(q.toLowerCase())||a.año.toLowerCase().includes(q.toLowerCase()));
   renderTree(filtered);
   if(q){
     document.querySelectorAll('.year-materias').forEach(el=>{el.classList.add('open');const id=el.id;const ch=document.getElementById('chev-'+id);if(ch)ch.classList.add('open');});
@@ -1408,8 +1411,9 @@ function filtrar(q){
 // ── CODIGOS ──
 function renderCodigos(){
   const c=document.getElementById('codigos-container');if(!c)return;
+  const _CODIGOS=window.CODIGOS||CODIGOS;
   let html='';
-  CODIGOS.forEach(cd=>{
+  _CODIGOS.forEach(cd=>{
     const inCart=cart[cd.id]?cart[cd.id].qty:0;
     html+=`<div class="codigo-card">
       <div class="codigo-header">
@@ -1439,7 +1443,9 @@ function switchTab(tab){
 
 // ── CART ──
 function addCart(id, esCod){
-  const item=esCod?CODIGOS.find(c=>c.id===id):APUNTES.find(a=>a.id===id);
+  const _CODIGOS=window.CODIGOS||CODIGOS;
+  const _APUNTES=window.APUNTES||APUNTES;
+  const item=esCod?_CODIGOS.find(c=>c.id===id):_APUNTES.find(a=>a.id===id);
   if(!item)return;
   const nombre=esCod?item.nombre+' — '+item.subtitulo:item.materia;
   if(cart[id])cart[id].qty++;else cart[id]={id,nombre,precio:item.precio,qty:1};
@@ -1494,7 +1500,7 @@ function chgQty(id,d){
   if(!cart[id])return;
   cart[id].qty+=d;
   if(cart[id].qty<=0){delete cart[id];}
-  updateCartUI();renderPedido();renderTree(APUNTES);
+  updateCartUI();renderPedido();renderTree(window.APUNTES||APUNTES);
 }
 
 function confirmar(){
@@ -1558,7 +1564,7 @@ function resetPedido(){
   document.getElementById('ped-success').style.display='none';
   document.getElementById('ped-empty').style.display='flex';
   document.getElementById('ped-content').style.display='none';
-  renderTree(APUNTES);
+  renderTree(window.APUNTES||APUNTES);
 }
 
 // ── CALENDARIO ──
