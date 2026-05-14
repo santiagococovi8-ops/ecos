@@ -928,8 +928,8 @@ window._sb = SB;
 <script>
 // ── SUPABASE: normalizar filas (snake_case → camelCase) ──
 function normN(r){ return {...r, catBg:r.cat_bg||r.catBg||'#F59E0B', catTxt:r.cat_txt||r.catTxt||'#0F172A', heroBg:r.hero_bg||r.heroBg||'#0F172A', imgUrl:r.img_url||r.imgUrl||'', enCarrusel:r.en_carrusel!==undefined?r.en_carrusel:r.enCarrusel}; }
-function normA(r){ return {...r, año:r.anio||r.año}; }
-function normC(r){ return {...r, badgeBg:r.badge_bg||r.badgeBg}; }
+function normA(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0}; }
+function normC(r){ return {...r, badgeBg:r.badge_bg||r.badgeBg, precio:Number(r.precio)||0, stock:r.stock===true||r.stock==='true'||r.stock===1}; }
 
 // ── SEED datos iniciales si las tablas están vacías ──
 async function seedSupabase() {
