@@ -1171,6 +1171,15 @@ function goTo(name, back=false){
   tEl.style.opacity='0';tEl.style.transform='translateY(4px)';
   setTimeout(()=>{tEl.textContent=TITLES[name]!==undefined?TITLES[name]:name;tEl.style.opacity='1';tEl.style.transform='translateY(0)';},120);
   currentScreen=name;
+  // Pausar carrusel al salir de inicio, retomar al volver
+  if (name === 'inicio') {
+    carPaused = false;
+    if (!carTimer && _DEST.length) carStartProgress();
+  } else {
+    carPaused = true;
+    clearInterval(carTimer);
+    carTimer = null;
+  }
   if(name==='pedido')renderPedido();
   if(name==='calendario'){if(!calInited){calInit();calInited=true;}else calRender();}
 }
@@ -1242,14 +1251,23 @@ let carIdx = 0, carTimer = null, carElapsed = 0, carPaused = false;
 const CAR_DURATION = 6000;
 const CAR_TICK = 60;
 let _DEST = []; // variable de módulo para que carGoTo la pueda usar
+let _carMouseBound = false; // flag para registrar mouse listeners una sola vez
 
 function initCarrusel() {
   const track = document.getElementById('car-track');
   const dots  = document.getElementById('car-dots');
   if (!track) return;
 
+  // Cancelar timer anterior SIEMPRE antes de arrancar uno nuevo
+  clearInterval(carTimer);
+  carTimer = null;
+  carElapsed = 0;
+  carIdx = 0;
+
   // Actualizar _DEST con datos actuales (Supabase o locales)
   _DEST = window.DESTACADAS && window.DESTACADAS.length ? window.DESTACADAS : DESTACADAS;
+  if (!_DEST.length) return;
+
   track.innerHTML = _DEST.map((n, i) => `
     <div class="car-slide${i===0?' active':''}" onclick="abrirNota(${n.notaId})" id="car-slide-${i}">
       <div class="car-slide-img" id="car-img-${i}" style="background:${n.imgUrl ? 'url('+n.imgUrl+') center/cover' : n.bg};"></div>
@@ -1271,10 +1289,17 @@ function initCarrusel() {
     `<button class="car-dot${i===0?' active':''}" onclick="carGoTo(${i});event.stopPropagation();" aria-label="Noticia ${i+1}"></button>`
   ).join('');
 
-  carStartProgress();
+  // Registrar mouse listeners UNA sola vez
+  if (!_carMouseBound) {
+    const car = document.getElementById('carrusel');
+    if (car) {
+      car.addEventListener('mouseenter', () => carPaused = true);
+      car.addEventListener('mouseleave', () => carPaused = false);
+      _carMouseBound = true;
+    }
+  }
 
-  car.addEventListener('mouseenter', () => carPaused = true);
-  car.addEventListener('mouseleave', () => carPaused = false);
+  carStartProgress();
 }
 
 function carGoTo(idx) {
