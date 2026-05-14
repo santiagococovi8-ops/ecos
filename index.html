@@ -1239,7 +1239,7 @@ const DESTACADAS = [
 
 // ── CARRUSEL ──
 let carIdx = 0, carTimer = null, carElapsed = 0, carPaused = false;
-const CAR_DURATION = 5000;
+const CAR_DURATION = 6000;
 const CAR_TICK = 60;
 let _DEST = []; // variable de módulo para que carGoTo la pueda usar
 
@@ -1345,7 +1345,7 @@ function carStartProgress() {
 
 // ── PULL TO REFRESH ──
 (function() {
-  const THRESHOLD = 70; // px para activar
+  const THRESHOLD = 110; // px para activar
   let startY = 0, pulling = false, canPull = false, refreshing = false;
 
   function getScreen() { return document.getElementById('screen-inicio'); }
@@ -1370,7 +1370,7 @@ function carStartProgress() {
     const txt  = document.getElementById('ptr-text');
     if (!ind) return;
     ind.classList.add('visible');
-    ind.style.height = Math.min(dy * 0.5, 58) + 'px';
+    ind.style.height = Math.min(dy * 0.35, 58) + 'px';
     if (dy >= THRESHOLD) {
       arr.className  = 'ptr-arrow release';
       txt.textContent = 'Soltá para actualizar';
