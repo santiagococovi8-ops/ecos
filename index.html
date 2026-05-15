@@ -1409,6 +1409,8 @@ function doLogout() {
   SB.logout();
   _currentUser = null;
   localStorage.removeItem('ecos_user');
+  localStorage.removeItem('sb_token');
+  localStorage.removeItem('sb_email');
   // Volver a pantalla auth
   const authScreen = document.getElementById('auth-screen');
   authScreen.classList.remove('out');
