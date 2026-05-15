@@ -493,44 +493,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
   </div>
 </div>
 
-    <!-- LOGIN -->
-    <form class="auth-form" id="form-login" onsubmit="return false;">
-      <div class="auth-field">
-        <label class="auth-label">Legajo</label>
-        <input class="auth-input" id="li-legajo" type="text" inputmode="numeric" placeholder="Ej: 12345/6" autocomplete="username">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Contraseña</label>
-        <input class="auth-input" id="li-pass" type="password" placeholder="Tu contraseña" autocomplete="current-password">
-      </div>
-      <div class="auth-err" id="li-err"></div>
-      <button class="btn-auth" id="li-btn" onclick="doLogin()">Ingresar</button>
-    </form>
-
-    <!-- REGISTRO -->
-    <form class="auth-form hidden" id="form-reg" onsubmit="return false;">
-      <div class="auth-field">
-        <label class="auth-label">Nombre completo</label>
-        <input class="auth-input" id="ri-nombre" type="text" placeholder="Tu nombre y apellido" autocomplete="name">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Legajo</label>
-        <input class="auth-input" id="ri-legajo" type="text" inputmode="numeric" placeholder="Ej: 12345/6" autocomplete="username">
-        <span class="auth-hint">Este será tu usuario para ingresar</span>
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Contraseña</label>
-        <input class="auth-input" id="ri-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Confirmar contraseña</label>
-        <input class="auth-input" id="ri-pass2" type="password" placeholder="Repetí la contraseña" autocomplete="new-password">
-      </div>
-      <div class="auth-err" id="ri-err"></div>
-      <button class="btn-auth" id="ri-btn" onclick="doRegister()">Crear cuenta</button>
-    </form>
-  </div>
-</div>
 
 <div id="landing">
   <div class="l-bg">
