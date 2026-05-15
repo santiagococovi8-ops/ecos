@@ -1919,9 +1919,9 @@ function renderTree(lista){
               <div style="display:flex;gap:5px;align-items:center;">
                 <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
                 <div style="display:flex;align-items:center;gap:4px;">
-                  <button class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)" ${inCart===0?'disabled':''}>−</button>
-                  <span style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
-                  <button class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',1,false)">+</button>
+                  <button id="qtm-${a.id}" class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)" ${inCart===0?'disabled':''}>−</button>
+                  <span id="qts-${a.id}" style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
+                  <button id="qtp-${a.id}" class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',1,false)">+</button>
                 </div>
               </div>
             </div>
@@ -1976,9 +1976,9 @@ function renderCodigos(){
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="btn-ver" onclick="window.open('https://www.instagram.com/ecosjursoc/','_blank')">Consultar</button>
           <div style="display:flex;align-items:center;gap:4px;">
-            <button class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="chgQtyTienda('${cd.id}',-1,true)" ${inCart===0?'disabled':''}>−</button>
-            <span style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
-            <button class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="chgQtyTienda('${cd.id}',1,true)">+</button>
+            <button id="qtm-${cd.id}" class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="chgQtyTienda('${cd.id}',-1,true)" ${inCart===0?'disabled':''}>−</button>
+            <span id="qts-${cd.id}" style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
+            <button id="qtp-${cd.id}" class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="chgQtyTienda('${cd.id}',1,true)">+</button>
           </div>
         </div>
       </div>
@@ -2064,15 +2064,42 @@ function chgQty(id,d){
 
 function chgQtyTienda(id,d,esCod){
   const key=String(id);
+  // Actualizar carrito
   if(!cart[key]){
-    if(d>0) addCart(id,esCod);
-    return;
+    if(d<=0) return;
+    const _CODIGOS=window.CODIGOS||CODIGOS;
+    const _APUNTES=window.APUNTES||APUNTES;
+    const item=esCod?_CODIGOS.find(c=>String(c.id)===String(id)):_APUNTES.find(a=>String(a.id)===String(id));
+    if(!item) return;
+    const nombre=esCod?item.nombre+' — '+item.subtitulo:item.materia;
+    cart[key]={id:key,nombre,precio:item.precio,qty:1};
+  } else {
+    cart[key].qty+=d;
+    if(cart[key].qty<=0){delete cart[key];}
   }
-  cart[key].qty+=d;
-  if(cart[key].qty<=0){delete cart[key];}
   updateCartUI();
-  renderTree(window.APUNTES||APUNTES);
-  renderCodigos();
+
+  // Actualizar solo el contador y estados de botones en el DOM, sin re-renderizar
+  const qty=cart[key]?cart[key].qty:0;
+
+  // Buscar el span del contador (el que está entre los dos qty-btn del item)
+  // Usamos data-qid para identificarlos de forma segura
+  const qtySpan=document.getElementById('qts-'+id);
+  const btnMinus=document.getElementById('qtm-'+id);
+  const btnPlus=document.getElementById('qtp-'+id);
+
+  if(qtySpan){
+    qtySpan.textContent=qty;
+    qtySpan.style.color=qty>0?'var(--blue)':'var(--gray-400)';
+  }
+  if(btnMinus){
+    btnMinus.disabled=qty<=0;
+    btnMinus.style.opacity=qty<=0?'.35':'1';
+    btnMinus.style.cursor=qty<=0?'default':'pointer';
+  }
+
+  // También actualizar el carrito/pedido si está abierto
+  renderPedido();
 }
 
 function confirmar(){
