@@ -1918,7 +1918,11 @@ function renderTree(lista){
               <span class="apunte-price">$${a.precio.toLocaleString('es-AR')}</span>
               <div style="display:flex;gap:5px;align-items:center;">
                 <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
-                ${inCart>0?`<div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)">−</button><span style="font-size:13px;font-weight:700;min-width:16px;text-align:center;">${inCart}</span><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',1,false)">+</button></div>`:`<button class="btn-add" id="ba-${a.id}" onclick="addCart('${a.id}',false)">Agregar</button>`}
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <button class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)" ${inCart===0?'disabled':''}>−</button>
+                  <span style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
+                  <button class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',1,false)">+</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1971,7 +1975,11 @@ function renderCodigos(){
         <div><div class="codigo-price">$${cd.precio.toLocaleString('es-AR')}</div><div class="codigo-price-lbl">Precio solidario ECOS</div></div>
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="btn-ver" onclick="window.open('https://www.instagram.com/ecosjursoc/','_blank')">Consultar</button>
-          ${inCart>0?`<div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="chgQtyTienda('${cd.id}',-1,true)">−</button><span style="font-size:13px;font-weight:700;min-width:16px;text-align:center;">${inCart}</span><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="chgQtyTienda('${cd.id}',1,true)">+</button></div>`:`<button class="btn-add" id="ba-${cd.id}" onclick="addCart('${cd.id}',true)">Agregar</button>`}
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="chgQtyTienda('${cd.id}',-1,true)" ${inCart===0?'disabled':''}>−</button>
+            <span style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
+            <button class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="chgQtyTienda('${cd.id}',1,true)">+</button>
+          </div>
         </div>
       </div>
     </div>`;
