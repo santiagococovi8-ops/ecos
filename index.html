@@ -261,7 +261,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 
 /* Materia folder */
 .mat-folder{border-top:1px solid var(--gray-100);}
-.mat-header{display:flex;align-items:center;justify-content:space-between;padding:11px 16px 11px 58px;cursor:pointer;background:var(--gray-50);}
+.mat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 14px 58px;cursor:pointer;background:var(--gray-50);}
 .mat-name{font-size:13px;font-weight:600;color:var(--gray-700);}
 .mat-count{font-size:11px;color:var(--gray-400);}
 .mat-chevron{font-size:14px;color:var(--gray-400);transition:transform .25s;}
@@ -270,7 +270,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .mat-apuntes.open{display:flex;}
 
 /* Apunte item */
-.apunte-item{display:flex;align-items:center;gap:12px;padding:11px 16px 11px 58px;border-top:1px solid var(--gray-100);background:white;transition:background .12s;}
+.apunte-item{display:flex;align-items:center;gap:12px;padding:15px 16px 15px 58px;border-top:1px solid var(--gray-100);background:white;transition:background .12s;}
 .apunte-item:active{background:var(--gray-50);}
 .apunte-icon{width:36px;height:36px;background:var(--gray-100);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
 .apunte-info{flex:1;min-width:0;}
@@ -289,15 +289,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .search-box input::placeholder{color:var(--gray-400);}
 
 /* Código card */
-.codigo-card{background:white;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:transform .13s;}
+.codigo-card{background:white;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:transform .13s;margin-bottom:6px;}
 .codigo-card:active{transform:scale(.98);}
-.codigo-header{padding:14px 16px 0;display:flex;gap:12px;}
+.codigo-header{padding:16px 16px 0;display:flex;gap:12px;}
 .codigo-badge{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
 .codigo-name{font-size:15px;font-weight:800;color:var(--blue-deep);}
 .codigo-sub{font-size:13px;color:var(--gray-600);font-weight:500;}
 .codigo-ed{font-size:11px;color:var(--gray-400);margin-top:2px;}
 .codigo-desc{font-size:12px;color:var(--gray-600);line-height:1.6;padding:10px 16px 12px;border-top:1px solid var(--gray-100);margin-top:10px;}
-.codigo-footer{padding:10px 16px;background:var(--gray-50);display:flex;align-items:center;justify-content:space-between;}
+.codigo-footer{padding:14px 16px;background:var(--gray-50);display:flex;align-items:center;justify-content:space-between;}
 .codigo-price{font-size:18px;font-weight:900;color:var(--blue);}
 .codigo-price-lbl{font-size:10px;color:var(--gray-400);}
 
@@ -1721,31 +1721,44 @@ function carStartProgress() {
 
 // ── SWIPE carrusel (registrado una sola vez) ──
 (function() {
-  let _touchX = null;
+  let _sx = null, _sy = null, _dragging = false;
   document.addEventListener('DOMContentLoaded', () => {
     const car = document.getElementById('carrusel');
     if (!car) return;
     car.addEventListener('touchstart', (e) => {
+      _sx = e.touches[0].clientX;
+      _sy = e.touches[0].clientY;
+      _dragging = false;
       carPaused = true;
-      _touchX = e.touches[0].clientX;
+    }, {passive:true});
+    car.addEventListener('touchmove', (e) => {
+      if (_sx === null) return;
+      const dx = e.touches[0].clientX - _sx;
+      const dy = e.touches[0].clientY - _sy;
+      // Solo activar swipe si el movimiento es más horizontal que vertical
+      if (!_dragging && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+        _dragging = true;
+      }
     }, {passive:true});
     car.addEventListener('touchend', (e) => {
-      if (_touchX !== null) {
-        const dx = e.changedTouches[0].clientX - _touchX;
-        if (Math.abs(dx) > 40) {
+      if (_sx !== null) {
+        const dx = e.changedTouches[0].clientX - _sx;
+        const dy = e.changedTouches[0].clientY - _sy;
+        // Solo swipe si fue principalmente horizontal y suficiente distancia
+        if (_dragging && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
           if (dx < 0) carGoTo((carIdx + 1) % (_DEST.length || 1));
           else        carGoTo((carIdx - 1 + (_DEST.length || 1)) % (_DEST.length || 1));
         }
-        _touchX = null;
+        _sx = null; _sy = null; _dragging = false;
       }
-      setTimeout(() => carPaused = false, 800);
+      setTimeout(() => carPaused = false, 600);
     }, {passive:true});
   });
 })();
 
 // ── PULL TO REFRESH ──
 (function() {
-  const THRESHOLD = 110; // px para activar
+  const THRESHOLD = 160; // px para activar — más alto = menos sensible
   let startY = 0, pulling = false, canPull = false, refreshing = false;
 
   function getScreen() { return document.getElementById('screen-inicio'); }
@@ -1753,16 +1766,19 @@ function carStartProgress() {
   document.addEventListener('touchstart', (e) => {
     const screen = getScreen();
     if (!screen || currentScreen !== 'inicio') return;
-    if (screen.scrollTop === 0) {
+    // Solo habilitar PTR si el scroll está exactamente en 0
+    if (screen.scrollTop <= 0) {
       startY   = e.touches[0].clientY;
       canPull  = true;
+    } else {
+      canPull = false;
     }
   }, {passive:true});
 
   document.addEventListener('touchmove', (e) => {
     if (!canPull || refreshing) return;
     const dy = e.touches[0].clientY - startY;
-    if (dy <= 0) { pulling = false; return; }
+    if (dy <= 12) { pulling = false; return; } // ignorar micro-movimientos
     pulling = true;
     const pct  = Math.min(dy / THRESHOLD, 1);
     const ind  = document.getElementById('ptr-indicator');
@@ -1900,9 +1916,9 @@ function renderTree(lista){
             </div>
             <div class="apunte-r">
               <span class="apunte-price">$${a.precio.toLocaleString('es-AR')}</span>
-              <div style="display:flex;gap:5px;">
+              <div style="display:flex;gap:5px;align-items:center;">
                 <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
-                <button class="btn-add${inCart>0?' added':''}" id="ba-${a.id}" onclick="addCart('${a.id}',false)">${inCart>0?'✓ '+inCart:'Agregar'}</button>
+                ${inCart>0?`<div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)">−</button><span style="font-size:13px;font-weight:700;min-width:16px;text-align:center;">${inCart}</span><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',1,false)">+</button></div>`:`<button class="btn-add" id="ba-${a.id}" onclick="addCart('${a.id}',false)">Agregar</button>`}
               </div>
             </div>
           </div>
@@ -1955,7 +1971,7 @@ function renderCodigos(){
         <div><div class="codigo-price">$${cd.precio.toLocaleString('es-AR')}</div><div class="codigo-price-lbl">Precio solidario ECOS</div></div>
         <div style="display:flex;gap:6px;align-items:center;">
           <button class="btn-ver" onclick="window.open('https://www.instagram.com/ecosjursoc/','_blank')">Consultar</button>
-          <button class="btn-add${inCart>0?' added':''}" id="ba-${cd.id}" onclick="addCart('${cd.id}',true)">${inCart>0?'✓ '+inCart:'Agregar'}</button>
+          ${inCart>0?`<div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="chgQtyTienda('${cd.id}',-1,true)">−</button><span style="font-size:13px;font-weight:700;min-width:16px;text-align:center;">${inCart}</span><button class="qty-btn" style="width:24px;height:24px;font-size:13px;" onclick="chgQtyTienda('${cd.id}',1,true)">+</button></div>`:`<button class="btn-add" id="ba-${cd.id}" onclick="addCart('${cd.id}',true)">Agregar</button>`}
         </div>
       </div>
     </div>`;
@@ -2035,7 +2051,20 @@ function chgQty(id,d){
   if(!cart[key])return;
   cart[key].qty+=d;
   if(cart[key].qty<=0){delete cart[key];}
-  updateCartUI();renderPedido();renderTree(window.APUNTES||APUNTES);
+  updateCartUI();renderPedido();renderTree(window.APUNTES||APUNTES);renderCodigos();
+}
+
+function chgQtyTienda(id,d,esCod){
+  const key=String(id);
+  if(!cart[key]){
+    if(d>0) addCart(id,esCod);
+    return;
+  }
+  cart[key].qty+=d;
+  if(cart[key].qty<=0){delete cart[key];}
+  updateCartUI();
+  renderTree(window.APUNTES||APUNTES);
+  renderCodigos();
 }
 
 function confirmar(){
