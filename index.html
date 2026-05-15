@@ -120,6 +120,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .auth-user-name{font-size:12px;font-weight:600;color:white;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .auth-logout-btn{font-size:11px;color:rgba(255,255,255,.55);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;}
 .auth-logout-btn:hover{color:white;}
+/* ── USER BOTTOM SHEET ── */
+#user-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8000;opacity:0;pointer-events:none;transition:opacity .25s;}
+#user-sheet-overlay.on{opacity:1;pointer-events:auto;}
+#user-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:white;border-radius:20px 20px 0 0;z-index:8001;padding:0 0 32px;box-shadow:0 -4px 32px rgba(0,0,0,.18);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+#user-sheet.on{transform:translateX(-50%) translateY(0);}
+.us-handle{width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0;}
+.us-avatar{width:56px;height:56px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:white;margin:20px auto 8px;}
+.us-name{font-size:17px;font-weight:700;color:var(--gray-900);text-align:center;}
+.us-legajo{font-size:12px;color:#94a3b8;text-align:center;margin-top:2px;margin-bottom:20px;}
+.us-divider{height:1px;background:#f1f5f9;margin:0 20px 16px;}
+.us-btn{display:flex;align-items:center;gap:12px;width:100%;padding:13px 24px;background:none;border:none;font-family:var(--font);font-size:15px;font-weight:500;color:var(--gray-800);cursor:pointer;transition:background .15s;}
+.us-btn:active{background:#f8fafc;}
+.us-btn-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.us-btn-logout{color:#ef4444;}
+.us-btn-logout .us-btn-icon{background:#fff5f5;}
 
 
 /* ── PULL TO REFRESH ── */
@@ -493,6 +508,20 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
   </div>
 </div>
 
+
+<!-- USER BOTTOM SHEET -->
+<div id="user-sheet-overlay" onclick="closeUserSheet()"></div>
+<div id="user-sheet">
+  <div class="us-handle"></div>
+  <div class="us-avatar" id="us-av">?</div>
+  <div class="us-name" id="us-name">—</div>
+  <div class="us-legajo" id="us-legajo">—</div>
+  <div class="us-divider"></div>
+  <button class="us-btn us-btn-logout" onclick="closeUserSheet();doLogout();">
+    <div class="us-btn-icon">🚪</div>
+    Cerrar sesión
+  </button>
+</div>
 
 <div id="landing">
   <div class="l-bg">
@@ -1359,11 +1388,18 @@ function onLoginSuccess() {
 // Menú de usuario
 function showUserMenu() {
   if (!_currentUser) return;
-  const name = _currentUser.nombre;
-  const legajo = _currentUser.legajo;
-  if (confirm(`${name}\nLegajo: ${legajo}\n\n¿Cerrar sesión?`)) {
-    doLogout();
-  }
+  const name = _currentUser.nombre || _currentUser.legajo || '—';
+  const legajo = _currentUser.legajo || '—';
+  document.getElementById('us-av').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('us-name').textContent = name;
+  document.getElementById('us-legajo').textContent = 'Legajo: ' + legajo;
+  document.getElementById('user-sheet-overlay').classList.add('on');
+  document.getElementById('user-sheet').classList.add('on');
+}
+
+function closeUserSheet() {
+  document.getElementById('user-sheet-overlay').classList.remove('on');
+  document.getElementById('user-sheet').classList.remove('on');
 }
 
 // Logout
@@ -1376,6 +1412,7 @@ function doLogout() {
   // Volver a pantalla auth
   const authScreen = document.getElementById('auth-screen');
   authScreen.classList.remove('out');
+  authScreen.style.display = 'flex';
   document.getElementById('user-pill').style.display = 'none';
   document.getElementById('li-legajo').value = '';
   document.getElementById('li-pass').value = '';
