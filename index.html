@@ -951,18 +951,18 @@ const SB = {
       throw new Error(e.error_description || e.msg || 'Login incorrecto');
     }
     const data = await res.json();
-    sessionStorage.setItem('sb_token', data.access_token);
-    sessionStorage.setItem('sb_email', email);
+    localStorage.setItem('sb_token', data.access_token);
+    localStorage.setItem('sb_email', email);
     return data;
   },
 
   logout() {
-    sessionStorage.removeItem('sb_token');
-    sessionStorage.removeItem('sb_email');
+    localStorage.removeItem('sb_token');
+    localStorage.removeItem('sb_email');
   },
 
   getToken() {
-    return sessionStorage.getItem('sb_token');
+    return localStorage.getItem('sb_token');
   },
 
   // Auth-fetch: para operaciones que requieren estar logueado
@@ -1260,7 +1260,7 @@ async function doLogin() {
     const rows = await SB.select('usuarios', `legajo=eq.${encodeURIComponent(legajo)}&limit=1`);
     const nombre = rows.length ? rows[0].nombre : legajo;
     _currentUser = { legajo, nombre, email };
-    sessionStorage.setItem('ecos_user', JSON.stringify(_currentUser));
+    localStorage.setItem('ecos_user', JSON.stringify(_currentUser));
     onLoginSuccess();
   } catch(e) {
     const msg = e.message || '';
@@ -1325,14 +1325,14 @@ async function doRegister() {
     // Login automático — el token puede venir en data o en data.session
     const token = data.access_token || (data.session && data.session.access_token);
     if (token) {
-      sessionStorage.setItem('sb_token', token);
-      sessionStorage.setItem('sb_email', email);
+      localStorage.setItem('sb_token', token);
+      localStorage.setItem('sb_email', email);
     } else {
       // Sin token en signup → hacer login explícito
       await SB.login(email, pass);
     }
     _currentUser = { legajo, nombre, email };
-    sessionStorage.setItem('ecos_user', JSON.stringify(_currentUser));
+    localStorage.setItem('ecos_user', JSON.stringify(_currentUser));
     onLoginSuccess();
   } catch(e) {
     errEl.textContent = 'Error al crear la cuenta. Intentá de nuevo.';
@@ -1408,7 +1408,7 @@ function showUserMenu() {
 function doLogout() {
   SB.logout();
   _currentUser = null;
-  sessionStorage.removeItem('ecos_user');
+  localStorage.removeItem('ecos_user');
   // Volver a pantalla auth
   const authScreen = document.getElementById('auth-screen');
   authScreen.classList.remove('out');
@@ -1427,8 +1427,8 @@ function doLogout() {
 // Verificar si ya hay sesión guardada al cargar
 (function checkSession() {
   try {
-    const token = sessionStorage.getItem('sb_token');
-    const saved = sessionStorage.getItem('ecos_user');
+    const token = localStorage.getItem('sb_token');
+    const saved = localStorage.getItem('ecos_user');
     if (token && saved) {
       _currentUser = JSON.parse(saved);
       onLoginSuccess();
