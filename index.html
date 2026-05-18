@@ -2117,23 +2117,28 @@ function renderTree(lista){
               </div>
               <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
             </div>
-            <!-- Selector de hojas -->
-            <div style="background:#EEF4FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;border:1.5px solid #DBEAFE;">
+            <!-- Selector de rango de hojas -->
+            <div style="background:#EEF4FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:9px;border:1.5px solid #DBEAFE;">
               <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;">¿Cuántas hojas imprimís?</span>
+                <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;">Rango de hojas a imprimir</span>
                 <span style="font-size:11px;color:#94A3B8;">$10 por hoja doble faz</span>
               </div>
-              <!-- Rangos rápidos -->
+              <!-- Atajos rápidos -->
               <div style="display:flex;gap:5px;flex-wrap:wrap;" id="rng-${a.id}">${getRangosHojas(Math.ceil(a.paginas/2),a.id)}</div>
-              <!-- Input personalizado + precio en tiempo real -->
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:12px;color:#64748B;">Hojas:</span>
-                <input type="number" id="hoj-${a.id}" min="1" max="${Math.ceil(a.paginas/2)}" value="${hojasSelCart(a.id)||Math.ceil(a.paginas/2)}"
-                  style="width:58px;padding:5px 7px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
-                  oninput="selHojas('${a.id}',${Math.ceil(a.paginas/2)},+this.value)">
+              <!-- Desde / Hasta -->
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:12px;color:#64748B;white-space:nowrap;">Hoja</span>
+                <input type="number" id="hoj-desde-${a.id}" min="1" max="${Math.ceil(a.paginas/2)}" value="${getRangoCart(a.id,'desde',Math.ceil(a.paginas/2))}"
+                  style="width:52px;padding:5px 6px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
+                  oninput="selRango('${a.id}',${Math.ceil(a.paginas/2)})">
+                <span style="font-size:12px;color:#64748B;">hasta</span>
+                <input type="number" id="hoj-hasta-${a.id}" min="1" max="${Math.ceil(a.paginas/2)}" value="${getRangoCart(a.id,'hasta',Math.ceil(a.paginas/2))}"
+                  style="width:52px;padding:5px 6px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
+                  oninput="selRango('${a.id}',${Math.ceil(a.paginas/2)})">
                 <span style="font-size:12px;color:#94A3B8;">de ${Math.ceil(a.paginas/2)}</span>
-                <span style="margin-left:auto;font-size:15px;font-weight:800;color:var(--blue);" id="pr-${a.id}">$${ (hojasSelCart(a.id)||Math.ceil(a.paginas/2)) * 10 }</span>
+                <span style="margin-left:auto;font-size:15px;font-weight:800;color:var(--blue);" id="pr-${a.id}">$${ getRangoCart(a.id,'precio',Math.ceil(a.paginas/2)) }</span>
               </div>
+              <div style="font-size:11px;color:#64748B;" id="lbl-${a.id}">${getRangoCart(a.id,'label',Math.ceil(a.paginas/2))}</div>
             </div>
             <!-- Botón agregar -->
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;">
@@ -2218,79 +2223,110 @@ function switchTab(tab){
 
 // ── CART ──
 
-// ── Selector de hojas por apunte ──────────────────────────
-let cartHojas = {}; // { apunte_id: hojas_elegidas }
+// ── Selector de rango de hojas por apunte ───────────────────
+let cartRango = {}; // { apunte_id: { desde, hasta } }
 
-function hojasSelCart(id) {
-  return cartHojas[String(id)] || null;
+function getRangoCart(id, campo, maxH) {
+  const r = cartRango[String(id)];
+  const desde = r ? r.desde : 1;
+  const hasta = r ? r.hasta : maxH;
+  const hojas = Math.max(1, hasta - desde + 1);
+  if (campo === 'desde')  return desde;
+  if (campo === 'hasta')  return hasta;
+  if (campo === 'precio') return (hojas * 10).toLocaleString('es-AR');
+  if (campo === 'label')  return hojas + ' hoja' + (hojas!==1?'s':'') + ' · $' + (hojas*10).toLocaleString('es-AR');
+  return hojas;
 }
 
-function selHojas(id, maxH, val) {
-  let v = Math.max(1, Math.min(Number(val)||1, maxH));
-  cartHojas[String(id)] = v;
-  const pr = document.getElementById('pr-'+id);
-  if (pr) pr.textContent = '$' + (v * 10).toLocaleString('es-AR');
-  const inp = document.getElementById('hoj-'+id);
-  if (inp && inp.value != v) inp.value = v;
-  // Resaltar botón de rango activo
-  const cont = document.getElementById('rng-'+id);
-  if (cont) {
-    cont.querySelectorAll('.rng-btn').forEach(b => {
-      const bv = Number(b.dataset.val);
-      b.style.background = bv === v ? 'var(--blue)' : '#DBEAFE';
-      b.style.color = bv === v ? 'white' : 'var(--blue)';
-      b.style.fontWeight = bv === v ? '700' : '600';
-    });
-  }
+function selRango(id, maxH) {
+  const inpD = document.getElementById('hoj-desde-' + id);
+  const inpH = document.getElementById('hoj-hasta-' + id);
+  if (!inpD || !inpH) return;
+  let desde = Math.max(1, Math.min(Number(inpD.value)||1, maxH));
+  let hasta  = Math.max(desde, Math.min(Number(inpH.value)||maxH, maxH));
+  // Si el usuario editó "desde" y quedó > hasta, ajustar hasta
+  if (desde > hasta) hasta = desde;
+  cartRango[String(id)] = { desde, hasta };
+  const hojas = hasta - desde + 1;
+  const pr = document.getElementById('pr-' + id);
+  if (pr) pr.textContent = '$' + (hojas * 10).toLocaleString('es-AR');
+  const lbl = document.getElementById('lbl-' + id);
+  if (lbl) lbl.textContent = hojas + ' hoja' + (hojas!==1?'s':'') + ' · $' + (hojas * 10).toLocaleString('es-AR');
+  // Desmarcar atajos rápidos si el rango no coincide con ninguno
+  _actualizarRngBtns(id, maxH, desde, hasta);
+}
+
+function _actualizarRngBtns(id, maxH, desde, hasta) {
+  const cont = document.getElementById('rng-' + id);
+  if (!cont) return;
+  cont.querySelectorAll('.rng-btn').forEach(b => {
+    const bd = Number(b.dataset.desde);
+    const bh = Number(b.dataset.hasta);
+    const activo = (bd === desde && bh === hasta);
+    b.style.background  = activo ? 'var(--blue)' : '#DBEAFE';
+    b.style.color       = activo ? 'white'        : 'var(--blue)';
+    b.style.fontWeight  = activo ? '700'          : '600';
+  });
 }
 
 function getRangosHojas(maxH, id) {
-  // Hasta 4 rangos proporcionales + opción "Todo"
-  const opciones = [];
+  // Atajos: Inicio (1→25%), Medio (25%→75%), Final (75%→100%), Todo
+  const q1 = Math.ceil(maxH * 0.25);
+  const q3 = Math.ceil(maxH * 0.75);
+  let opciones;
   if (maxH <= 4) {
-    for (let i = 1; i <= maxH; i++) opciones.push({ label: i+' hj.', val: i });
+    opciones = [{ label: 'Todo', desde: 1, hasta: maxH }];
   } else {
-    const cuartos = [
-      { label: '25%', val: Math.ceil(maxH*0.25) },
-      { label: '50%', val: Math.ceil(maxH*0.5)  },
-      { label: '75%', val: Math.ceil(maxH*0.75) },
-      { label: 'Todo', val: maxH                 },
+    opciones = [
+      { label: 'Inicio', sub: '1-'+q1,       desde: 1,    hasta: q1   },
+      { label: 'Medio',  sub: (q1+1)+'-'+q3, desde: q1+1, hasta: q3   },
+      { label: 'Final',  sub: (q3+1)+'-'+maxH,desde: q3+1,hasta: maxH },
+      { label: 'Todo',   sub: '1-'+maxH,      desde: 1,    hasta: maxH },
     ];
-    // Deduplicar por val
-    const seen = new Set();
-    cuartos.forEach(o => { if(!seen.has(o.val)){ seen.add(o.val); opciones.push(o); } });
+    // Si q1+1 > q3 (apunte muy corto), simplificar
+    opciones = opciones.filter(o => o.desde <= o.hasta && o.desde <= maxH);
   }
-  const selVal = cartHojas[String(id)] || maxH;
+  const r = cartRango[String(id)];
+  const selD = r ? r.desde : 1;
+  const selH = r ? r.hasta : maxH;
   return opciones.map(o => {
-    const activo = o.val === selVal;
-    return `<button class="rng-btn" data-val="${o.val}"
-      style="padding:4px 10px;border-radius:20px;border:1.5px solid #BFDBFE;font-size:11px;font-weight:${activo?'700':'600'};cursor:pointer;
+    const activo = (o.desde === selD && o.hasta === selH);
+    return `<button class="rng-btn" data-desde="${o.desde}" data-hasta="${o.hasta}"
+      style="padding:4px 9px;border-radius:20px;border:1.5px solid #BFDBFE;font-size:11px;
+             font-weight:${activo?'700':'600'};cursor:pointer;line-height:1.4;
              background:${activo?'var(--blue)':'#DBEAFE'};color:${activo?'white':'var(--blue)'};transition:all .15s;"
-      onclick="event.stopPropagation();selHojas('${id}',${maxH},${o.val});document.getElementById('hoj-${id}').value=${o.val};">
-      ${o.label}<br><span style="font-size:10px;font-weight:400;">${o.val} hj.</span>
+      onclick="event.stopPropagation();
+               cartRango['${id}']={desde:${o.desde},hasta:${o.hasta}};
+               document.getElementById('hoj-desde-${id}').value=${o.desde};
+               document.getElementById('hoj-hasta-${id}').value=${o.hasta};
+               selRango('${id}',${maxH});">
+      ${o.label}<br><span style="font-size:10px;font-weight:400;">hjs.${o.sub}</span>
     </button>`;
   }).join('');
 }
 
+// hojasSelCart y selHojas se mantienen por compatibilidad
+function hojasSelCart(id) { const r=cartRango[String(id)]; return r?r.hasta-r.desde+1:null; }
+function selHojas(id,maxH,val){ selRango(id,maxH); }
+
 function agregarApunte(id, maxHojas) {
-  const hojas = cartHojas[String(id)] || maxHojas;
+  const r = cartRango[String(id)];
+  const desde = r ? r.desde : 1;
+  const hasta  = r ? r.hasta  : maxHojas;
+  const hojas = Math.max(1, hasta - desde + 1);
   const precio = hojas * 10;
-  // Buscar el apunte en DATA
-  const apunte = (DATA.copias||[]).find(a=>String(a.id)===String(id));
+  const apunte = (DATA.copias||[]).find(a => String(a.id) === String(id));
   if (!apunte) return;
-  // Agregar al carrito con paginas proporcionales
-  const paginasEquiv = hojas * 2;
   const itemIdx = cart.findIndex(c => c.id === String(id) && !c.esCod);
   if (itemIdx >= 0) {
     cart[itemIdx].qty += 1;
   } else {
     cart.push({ id: String(id), nombre: apunte.materia, precio, qty: 1,
-                esCod: false, paginas: paginasEquiv, hojas });
+                esCod: false, paginas: hojas*2, hojas, desde, hasta });
   }
   renderCart();
-  // Actualizar contador en la tarjeta
-  const qts = document.getElementById('qts-'+id);
-  const inC = cart.filter(c=>c.id===String(id)&&!c.esCod).reduce((s,c)=>s+c.qty,0);
+  const qts = document.getElementById('qts-' + id);
+  const inC = cart.filter(c => c.id===String(id) && !c.esCod).reduce((s,c)=>s+c.qty,0);
   if (qts) { qts.textContent = inC; qts.style.color = 'var(--blue)'; }
   toast('Agregado al pedido ✓');
 }
@@ -2445,7 +2481,32 @@ function confirmar(){
   const _p=document.getElementById('fp').value;
   const _no=document.getElementById('fno')?.value.trim()||'';
   const _it=Object.values(cart);
-  SB.upsert('pedidos',[{nombre:_n,wsp:_w,items:_it.map(i=>`${i.nombre} x${i.qty}`).join(', '),total:_it.reduce((s,i)=>s+i.precio*i.qty,0),pago:_p,nota:_no||null,fecha:new Date().toLocaleDateString('es-AR'),estado:'pendiente'}]).catch(e=>console.warn('No se pudo guardar pedido:',e.message));
+  const _itemsDetalle = _it.map(i => ({
+    id: i.id,
+    nombre: i.nombre,
+    qty: i.qty,
+    precio_unit: i.precio,
+    subtotal: i.precio * i.qty,
+    esCod: i.esCod || false,
+    hojas: i.hojas || null,
+    desde: i.desde || null,
+    hasta: i.hasta || null,
+    paginas: i.paginas || null,
+  }));
+  const _total = _it.reduce((s,i)=>s+i.precio*i.qty,0);
+  const _legajo = SB._currentUser?.user_metadata?.legajo || localStorage.getItem('ecos_legajo') || null;
+  SB.upsert('pedidos',[{
+    nombre: _n,
+    legajo: _legajo,
+    wsp: _w,
+    pago: _p,
+    nota: _no || null,
+    items: JSON.stringify(_itemsDetalle),
+    items_resumen: _it.map(i=>i.esCod?`${i.nombre} x${i.qty}`:`${i.nombre} (hjs.${i.desde||1}-${i.hasta||i.hojas||'?'}) x${i.qty}`).join(' · '),
+    total: _total,
+    estado: 'pendiente',
+    fecha: new Date().toISOString(),
+  }]).catch(e=>console.warn('No se pudo guardar pedido:',e.message));
   // Número de WhatsApp de ECOS (sin +, sin espacios)
   const ECOS_WSP = '5492214000000';
 
@@ -2474,9 +2535,11 @@ function confirmar(){
 *CopyECOS — Apuntes:*
 `;
       apuntesItems.forEach(i=>{
-        const hojas=Math.ceil((i.paginas||1)/2);
-        msg+=`• ${i.nombre} x${i.qty} (${i.paginas} págs. = ${hojas} hojas doble faz) — $${(i.precio*i.qty).toLocaleString('es-AR')}
-`;
+        const hojas=i.hojas||Math.ceil((i.paginas||1)/2);
+        const rangoStr=(i.desde&&i.hasta&&!(i.desde===1&&i.hasta===hojas))
+          ?`hojas ${i.desde} a ${i.hasta} (${hojas} hjs.)`
+          :`${hojas} hojas doble faz`;
+        msg+=`• ${i.nombre} x${i.qty} — ${rangoStr} — $${(i.precio*i.qty).toLocaleString('es-AR')}\n`;
       });
     }
     if(codigosItems.length>0){
