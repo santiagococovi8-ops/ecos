@@ -498,7 +498,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <div class="auth-field">
         <label class="auth-label">Legajo</label>
         <input class="auth-input" id="li-legajo" type="text" inputmode="numeric" placeholder="Solo los 7 dígitos" maxlength="8" autocomplete="username" oninput="fmtLegajo(this)">
-        <span class="auth-hint">La barra se agrega automáticamente</span>
+        <span class="auth-hint">Usá tu Gmail, Hotmail o cualquier correo personal</span>
       </div>
       <div class="auth-field">
         <label class="auth-label">Contraseña</label>
@@ -520,9 +520,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
         <span class="auth-hint">La barra se agrega automáticamente</span>
       </div>
       <div class="auth-field">
-        <label class="auth-label">Email institucional</label>
-        <input class="auth-input" id="ri-email" type="email" placeholder="tucorreo@jursoc.unlp.edu.ar" autocomplete="email">
-        <span class="auth-hint">Vas a recibir un link de verificación</span>
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="ri-email" type="email" placeholder="tucorreo@gmail.com" autocomplete="email">
+        <span class="auth-hint">Usá tu Gmail, Hotmail o cualquier correo</span>
       </div>
       <div class="auth-field">
         <label class="auth-label">Contraseña</label>
@@ -2107,21 +2107,43 @@ function renderTree(lista){
           </div>
         </div>
         <div class="mat-apuntes" id="mat-${a.id}">
-          <div class="apunte-item">
-            <div class="apunte-icon">📄</div>
-            <div class="apunte-info">
-              <div class="apunte-name">${a.materia}</div>
-              <div class="apunte-meta">${a.paginas} págs. · Apunte completo</div>
+          <div class="apunte-item" style="flex-direction:column;align-items:stretch;gap:0;">
+            <!-- Fila superior: ícono, info, botón Ver -->
+            <div style="display:flex;align-items:center;gap:12px;padding:2px 0 8px;">
+              <div class="apunte-icon">📄</div>
+              <div class="apunte-info" style="flex:1;">
+                <div class="apunte-name">${a.materia}</div>
+                <div class="apunte-meta">${a.paginas} págs. · ${Math.ceil(a.paginas/2)} hojas máx.</div>
+              </div>
+              <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
             </div>
-            <div class="apunte-r">
-              <span class="apunte-price">$${a.precio.toLocaleString('es-AR')}</span>
-              <div style="display:flex;gap:5px;align-items:center;">
-                <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
-                <div style="display:flex;align-items:center;gap:4px;">
-                  <button id="qtm-${a.id}" class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)" ${inCart===0?'disabled':''}>−</button>
-                  <span id="qts-${a.id}" style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
-                  <button id="qtp-${a.id}" class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',1,false)">+</button>
-                </div>
+            <!-- Selector de hojas -->
+            <div style="background:#EEF4FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;border:1.5px solid #DBEAFE;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;">¿Cuántas hojas imprimís?</span>
+                <span style="font-size:11px;color:#94A3B8;">$10 por hoja doble faz</span>
+              </div>
+              <!-- Rangos rápidos -->
+              <div style="display:flex;gap:5px;flex-wrap:wrap;" id="rng-${a.id}">${getRangosHojas(Math.ceil(a.paginas/2),a.id)}</div>
+              <!-- Input personalizado + precio en tiempo real -->
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:#64748B;">Hojas:</span>
+                <input type="number" id="hoj-${a.id}" min="1" max="${Math.ceil(a.paginas/2)}" value="${hojasSelCart(a.id)||Math.ceil(a.paginas/2)}"
+                  style="width:58px;padding:5px 7px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
+                  oninput="selHojas('${a.id}',${Math.ceil(a.paginas/2)},+this.value)">
+                <span style="font-size:12px;color:#94A3B8;">de ${Math.ceil(a.paginas/2)}</span>
+                <span style="margin-left:auto;font-size:15px;font-weight:800;color:var(--blue);" id="pr-${a.id}">$${ (hojasSelCart(a.id)||Math.ceil(a.paginas/2)) * 10 }</span>
+              </div>
+            </div>
+            <!-- Botón agregar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;">
+              <span style="font-size:11px;color:#94A3B8;">En pedido: <b id="qts-${a.id}" style="color:${inCart>0?'var(--blue)':'#94A3B8'}">${inCart}</b></span>
+              <div style="display:flex;gap:6px;align-items:center;">
+                ${inCart>0?`<button class="qty-btn" style="width:28px;height:28px;font-size:15px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)">−</button>`:''}
+                <button class="qty-btn" style="background:var(--blue);border-color:var(--blue);color:white;padding:6px 16px;border-radius:9px;font-size:12px;font-weight:700;width:auto;height:auto;"
+                  onclick="event.stopPropagation();agregarApunte('${a.id}',${Math.ceil(a.paginas/2)})">
+                  ${inCart>0?'+ Agregar otra':'Agregar al pedido'}
+                </button>
               </div>
             </div>
           </div>
@@ -2195,6 +2217,84 @@ function switchTab(tab){
 }
 
 // ── CART ──
+
+// ── Selector de hojas por apunte ──────────────────────────
+let cartHojas = {}; // { apunte_id: hojas_elegidas }
+
+function hojasSelCart(id) {
+  return cartHojas[String(id)] || null;
+}
+
+function selHojas(id, maxH, val) {
+  let v = Math.max(1, Math.min(Number(val)||1, maxH));
+  cartHojas[String(id)] = v;
+  const pr = document.getElementById('pr-'+id);
+  if (pr) pr.textContent = '$' + (v * 10).toLocaleString('es-AR');
+  const inp = document.getElementById('hoj-'+id);
+  if (inp && inp.value != v) inp.value = v;
+  // Resaltar botón de rango activo
+  const cont = document.getElementById('rng-'+id);
+  if (cont) {
+    cont.querySelectorAll('.rng-btn').forEach(b => {
+      const bv = Number(b.dataset.val);
+      b.style.background = bv === v ? 'var(--blue)' : '#DBEAFE';
+      b.style.color = bv === v ? 'white' : 'var(--blue)';
+      b.style.fontWeight = bv === v ? '700' : '600';
+    });
+  }
+}
+
+function getRangosHojas(maxH, id) {
+  // Hasta 4 rangos proporcionales + opción "Todo"
+  const opciones = [];
+  if (maxH <= 4) {
+    for (let i = 1; i <= maxH; i++) opciones.push({ label: i+' hj.', val: i });
+  } else {
+    const cuartos = [
+      { label: '25%', val: Math.ceil(maxH*0.25) },
+      { label: '50%', val: Math.ceil(maxH*0.5)  },
+      { label: '75%', val: Math.ceil(maxH*0.75) },
+      { label: 'Todo', val: maxH                 },
+    ];
+    // Deduplicar por val
+    const seen = new Set();
+    cuartos.forEach(o => { if(!seen.has(o.val)){ seen.add(o.val); opciones.push(o); } });
+  }
+  const selVal = cartHojas[String(id)] || maxH;
+  return opciones.map(o => {
+    const activo = o.val === selVal;
+    return `<button class="rng-btn" data-val="${o.val}"
+      style="padding:4px 10px;border-radius:20px;border:1.5px solid #BFDBFE;font-size:11px;font-weight:${activo?'700':'600'};cursor:pointer;
+             background:${activo?'var(--blue)':'#DBEAFE'};color:${activo?'white':'var(--blue)'};transition:all .15s;"
+      onclick="event.stopPropagation();selHojas('${id}',${maxH},${o.val});document.getElementById('hoj-${id}').value=${o.val};">
+      ${o.label}<br><span style="font-size:10px;font-weight:400;">${o.val} hj.</span>
+    </button>`;
+  }).join('');
+}
+
+function agregarApunte(id, maxHojas) {
+  const hojas = cartHojas[String(id)] || maxHojas;
+  const precio = hojas * 10;
+  // Buscar el apunte en DATA
+  const apunte = (DATA.copias||[]).find(a=>String(a.id)===String(id));
+  if (!apunte) return;
+  // Agregar al carrito con paginas proporcionales
+  const paginasEquiv = hojas * 2;
+  const itemIdx = cart.findIndex(c => c.id === String(id) && !c.esCod);
+  if (itemIdx >= 0) {
+    cart[itemIdx].qty += 1;
+  } else {
+    cart.push({ id: String(id), nombre: apunte.materia, precio, qty: 1,
+                esCod: false, paginas: paginasEquiv, hojas });
+  }
+  renderCart();
+  // Actualizar contador en la tarjeta
+  const qts = document.getElementById('qts-'+id);
+  const inC = cart.filter(c=>c.id===String(id)&&!c.esCod).reduce((s,c)=>s+c.qty,0);
+  if (qts) { qts.textContent = inC; qts.style.color = 'var(--blue)'; }
+  toast('Agregado al pedido ✓');
+}
+// ──────────────────────────────────────────────────────────
 function calcPrecioHojas(paginas){
   // $10 por hoja doble faz (cada hoja = 2 páginas)
   const hojas=Math.ceil((paginas||1)/2);
