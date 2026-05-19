@@ -2557,41 +2557,42 @@ function confirmar(){
     const apuntesItems=items.filter(i=>i.paginas!=null);
     const codigosItems=items.filter(i=>i.paginas==null);
 
-    let msg=`Hola ECOS! Nuevo pedido 📚
+    const total=items.reduce((s,i)=>s+i.precio*i.qty,0);
+    const nota=document.getElementById('fno')?.value.trim();
+    const pagoEmoji=pago==='efectivo'?'💵':'🏦';
 
-`;
-    msg+=`*Alumno:* ${nombre}
-*WhatsApp:* ${wsp}
-*Pago:* ${pagoLbl}
-`;
+    // ── Encabezado ──
+    let msg='🛒 *Nuevo pedido — EC☀️S*\n';
+    msg+='━━━━━━━━━━━━━━━━━━━━\n';
+    msg+=`👤 *Alumno:* ${nombre}\n`;
+    msg+=`📱 *WhatsApp:* ${wsp}\n`;
+    msg+=`${pagoEmoji} *Pago:* ${pagoLbl}\n`;
+
+    // ── Productos ──
+    msg+='━━━━━━━━━━━━━━━━━━━━\n';
+    msg+='📦 *Productos:*\n';
 
     if(apuntesItems.length>0){
-      msg+=`
-*CopyECOS — Apuntes:*
-`;
       apuntesItems.forEach(i=>{
         const hojas=i.hojas||Math.ceil((i.paginas||1)/2);
         const rangoStr=(i.desde&&i.hasta&&!(i.desde===1&&i.hasta===hojas))
-          ?`hojas ${i.desde} a ${i.hasta} (${hojas} hjs.)`
-          :`${hojas} hojas doble faz`;
-        msg+=`• ${i.nombre} x${i.qty} — ${rangoStr} — $${(i.precio*i.qty).toLocaleString('es-AR')}\n`;
+          ?` — hojas ${i.desde} al ${i.hasta} (${hojas} hjs.)`
+          :` — ${hojas} hojas doble faz`;
+        msg+=`   🖨️ ${i.nombre} ×${i.qty}${rangoStr} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
       });
     }
     if(codigosItems.length>0){
-      msg+=`
-*ECódigos:*
-`;
-      codigosItems.forEach(i=>{msg+=`• ${i.nombre} x${i.qty} — $${(i.precio*i.qty).toLocaleString('es-AR')}
-`;});
+      codigosItems.forEach(i=>{
+        msg+=`   📘 ${i.nombre} ×${i.qty} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
+      });
     }
 
-    const total=items.reduce((s,i)=>s+i.precio*i.qty,0);
-    msg+=`
-*Total: $${total.toLocaleString('es-AR')}*`;
-    const nota=document.getElementById('fno')?.value.trim();
-    if(nota)msg+=`
-
-*Nota del alumno:* ${nota}`;
+    // ── Total y nota ──
+    msg+='━━━━━━━━━━━━━━━━━━━━\n';
+    msg+=`💰 *Total: $${total.toLocaleString('es-AR')}*\n`;
+    if(nota) msg+=`\n📝 *Nota:* ${nota}\n`;
+    msg+='━━━━━━━━━━━━━━━━━━━━\n';
+    msg+='✅ Pedido confirmado desde la app ECOS.';
 
     // Abrir WSP a ECOS automáticamente al confirmar
     const wspUrl='https://wa.me/'+ECOS_WSP+'?text='+encodeURIComponent(msg);
