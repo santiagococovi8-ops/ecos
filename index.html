@@ -295,6 +295,20 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .btn-add:active{transform:scale(.93);}
 .btn-add.added{background:var(--green);}
 
+.hist-section-lbl{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.08em;padding:2px 0 4px;}
+.hist-card{background:#FAFCFF;border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:8px;}
+.hist-card-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.hist-card-titulo{font-size:13px;font-weight:700;color:var(--gray-800);}
+.hist-card-fecha{font-size:11px;color:var(--gray-400);white-space:nowrap;}
+.hist-card-items{font-size:12px;color:var(--gray-600);line-height:1.6;}
+.hist-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.hist-card-total{font-size:14px;font-weight:800;color:var(--blue);}
+.hist-estado{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.hist-estado.pendiente{background:#FEF3C7;color:#92400E;}
+.hist-estado.en_proceso{background:#DBEAFE;color:#1E40AF;}
+.hist-estado.listo{background:#D1FAE5;color:#065F46;}
+.hist-estado.entregado{background:#F1F5F9;color:#475569;}
+
 /* Buscar */
 .search-box{background:#FAFCFF;border-radius:var(--r);display:flex;align-items:center;gap:8px;padding:0 14px;box-shadow:var(--sh);}
 .search-box input{flex:1;border:none;background:transparent;padding:12px 0;font-size:14px;font-family:var(--font);color:var(--gray-800);outline:none;}
@@ -400,6 +414,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .prog-tag{font-size:12px;color:var(--gray-400);margin-top:1px;}
 .prog-body{font-size:13px;color:var(--gray-600);line-height:1.6;padding:0 16px 12px;border-top:1px solid var(--gray-100);padding-top:10px;}
 .prog-action{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--gray-50);font-size:13px;font-weight:700;}
+
+/* ── MIS PEDIDOS ── */
+.mis-ped-title{font-size:10px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.08em;padding:2px 0 8px;}
+.mis-ped-card{background:#FAFCFF;border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);margin-bottom:8px;}
+.mis-ped-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.mis-ped-fecha{font-size:11px;color:var(--gray-400);}
+.mis-ped-estado{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.mis-ped-items{font-size:12px;color:var(--gray-600);line-height:1.6;margin-bottom:4px;}
+.mis-ped-total{font-size:13px;font-weight:800;color:var(--blue);}
 
 /* ── VUELTA SEGURA ── */
 .vs-hero{border-radius:var(--r);padding:20px 16px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;background:linear-gradient(135deg,#4C1D95,#6D28D9);}
@@ -719,6 +742,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <small style="font-size:12px;color:var(--gray-400);">Agregá apuntes desde la Tienda</small>
       <button class="btn-confirm" style="margin-top:8px;width:auto;padding:12px 24px;" onclick="goTo('apuntes')">Ir a la Tienda →</button>
     </div>
+    <!-- Historial de pedidos anteriores -->
+    <div id="ped-historial" style="width:100%;margin-top:8px;"></div>
   </div>
   <div id="ped-content" class="sp" style="display:none;"></div>
   <div id="ped-success" class="sp" style="display:none;"></div>
@@ -1787,7 +1812,7 @@ function goTo(name, back=false){
     clearInterval(carTimer);
     carTimer = null;
   }
-  if(name==='pedido')renderPedido();
+  if(name==='pedido'){ renderPedido(); cargarMisPedidos(); }
   if(name==='calendario'){if(!calInited){calInit();calInited=true;}else calRender();}
 }
 
@@ -2350,19 +2375,25 @@ function agregarApunte(id, maxHojas) {
   const hasta  = r ? r.hasta  : maxHojas;
   const hojas = Math.max(1, hasta - desde + 1);
   const precio = hojas * 10;
-  const apunte = (DATA.copias||[]).find(a => String(a.id) === String(id));
-  if (!apunte) return;
-  const itemIdx = cart.findIndex(c => c.id === String(id) && !c.esCod);
-  if (itemIdx >= 0) {
-    cart[itemIdx].qty += 1;
+  const _APUNTES = window.APUNTES || APUNTES;
+  const apunte = _APUNTES.find(a => String(a.id) === String(id));
+  if (!apunte) { console.warn('agregarApunte: id no encontrado', id); return; }
+  const key = String(id);
+  if (cart[key]) {
+    cart[key].qty += 1;
+    cart[key].desde = desde;
+    cart[key].hasta = hasta;
+    cart[key].hojas = hojas;
+    cart[key].precio = precio;
+    cart[key].paginas = hojas * 2;
+    cart[key].esCod = false;
   } else {
-    cart.push({ id: String(id), nombre: apunte.materia, precio, qty: 1,
-                esCod: false, paginas: hojas*2, hojas, desde, hasta });
+    cart[key] = { id: key, nombre: apunte.materia, precio, qty: 1,
+                  esCod: false, paginas: hojas*2, hojas, desde, hasta };
   }
-  renderCart();
-  const qts = document.getElementById('qts-' + id);
-  const inC = cart.filter(c => c.id===String(id) && !c.esCod).reduce((s,c)=>s+c.qty,0);
-  if (qts) { qts.textContent = inC; qts.style.color = 'var(--blue)'; }
+  updateCartUI();
+  const qtsEl = document.getElementById('qts-' + id);
+  if (qtsEl) { qtsEl.textContent = cart[key].qty; qtsEl.style.color = 'var(--blue)'; }
   toast('Agregado al pedido ✓');
 }
 // ──────────────────────────────────────────────────────────
@@ -2418,6 +2449,109 @@ function initPushNotifications() {
       console.warn('OneSignal init error:', e.message);
     }
   });
+}
+
+// ── HISTORIAL DE PEDIDOS ─────────────────────────────────────────────────
+async function renderHistorial() {
+  const cont = document.getElementById('ped-historial');
+  if (!cont) return;
+
+  // Solo mostrar si el carrito está vacío (coexiste con ped-empty)
+  const legajo = _currentUser?.legajo;
+  if (!legajo) { cont.innerHTML = ''; return; }
+
+  try {
+    const rows = await SB.select(
+      'pedidos',
+      `legajo=eq.${encodeURIComponent(legajo)}&order=fecha.desc&limit=10`
+    );
+    if (!rows || rows.length === 0) { cont.innerHTML = ''; return; }
+
+    const estadoMap = {
+      pendiente:  ['⏳ Pendiente',  'pendiente'],
+      en_proceso: ['🔄 En proceso', 'en_proceso'],
+      listo:      ['✅ Listo',       'listo'],
+      entregado:  ['📦 Entregado',  'entregado'],
+    };
+
+    let html = '<p class="hist-section-lbl" style="margin-top:24px;">Mis pedidos anteriores</p>';
+    rows.forEach(p => {
+      const fecha = p.fecha
+        ? new Date(p.fecha).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })
+        : '—';
+      const [estadoLbl, estadoCls] = estadoMap[p.estado] || ['—', 'pendiente'];
+
+      // Parsear items
+      let items = [];
+      try { items = typeof p.items === 'string' ? JSON.parse(p.items) : (p.items || []); } catch(e) {}
+      const itemsHtml = items.length > 0
+        ? items.map(i => {
+            const rango = (i.desde && i.hasta) ? ` hjs. ${i.desde}–${i.hasta}` : '';
+            const emoji = i.esCod ? '📘' : '🖨️';
+            return `${emoji} ${esc(i.nombre)}${rango} ×${i.qty}`;
+          }).join('<br>')
+        : esc(p.items_resumen || '—');
+
+      html += `
+        <div class="hist-card">
+          <div class="hist-card-header">
+            <span class="hist-card-titulo">${esc(p.nombre || '—')}</span>
+            <span class="hist-card-fecha">${fecha}</span>
+          </div>
+          <div class="hist-card-items">${itemsHtml}</div>
+          <div class="hist-card-footer">
+            <span class="hist-card-total">$${Number(p.total||0).toLocaleString('es-AR')}</span>
+            <span class="hist-estado ${estadoCls}">${estadoLbl}</span>
+          </div>
+        </div>`;
+    });
+    cont.innerHTML = html;
+  } catch(e) {
+    cont.innerHTML = '';
+  }
+}
+
+// Carga y muestra el historial de pedidos del usuario logueado
+async function cargarMisPedidos() {
+  const cont = document.getElementById('ped-historial');
+  if (!cont || !_currentUser) return;
+  const legajo = _currentUser.legajo;
+  if (!legajo) return;
+  try {
+    const rows = await SB.select('pedidos',
+      `legajo=eq.${encodeURIComponent(legajo)}&order=fecha.desc&limit=10`);
+    if (!rows || rows.length === 0) { cont.innerHTML = ''; return; }
+    const estadoStyle = {
+      pendiente:  { bg:'#FEF3C7', color:'#92400E', lbl:'⏳ Pendiente'  },
+      en_proceso: { bg:'#DBEAFE', color:'#1E40AF', lbl:'🔄 En proceso' },
+      listo:      { bg:'#D1FAE5', color:'#065F46', lbl:'✅ Listo'       },
+      entregado:  { bg:'#F3F4F6', color:'#374151', lbl:'📦 Entregado'  },
+    };
+    let html = '<div class="mis-ped-title">Mis pedidos anteriores</div>';
+    rows.forEach(p => {
+      const est = estadoStyle[p.estado] || estadoStyle.pendiente;
+      const fecha = p.fecha
+        ? new Date(p.fecha).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit' })
+        : '—';
+      let items = [];
+      try { items = typeof p.items === 'string' ? JSON.parse(p.items) : (p.items||[]); } catch(e){}
+      const itemsStr = items.length > 0
+        ? items.map(i => `${esc(i.nombre)} ×${i.qty}`).join(', ')
+        : esc(p.items_resumen || '—');
+      html += `
+        <div class="mis-ped-card">
+          <div class="mis-ped-head">
+            <span class="mis-ped-fecha">${fecha}</span>
+            <span class="mis-ped-estado" style="background:${est.bg};color:${est.color};">${est.lbl}</span>
+          </div>
+          <div class="mis-ped-items">${itemsStr}</div>
+          <div class="mis-ped-total">$${Number(p.total||0).toLocaleString('es-AR')}</div>
+        </div>`;
+    });
+    cont.innerHTML = html;
+  } catch(e) {
+    cont.innerHTML = '';
+  }
 }
 
 function renderPedido(){
@@ -2529,10 +2663,12 @@ function confirmar(){
     paginas: i.paginas || null,
   }));
   const _total = _it.reduce((s,i)=>s+i.precio*i.qty,0);
-  const _legajo = SB._currentUser?.user_metadata?.legajo || localStorage.getItem('ecos_legajo') || null;
+  const _legajo = _currentUser?.legajo || null;
+  const _email  = _currentUser?.email  || null;
   SB.upsert('pedidos',[{
     nombre: _n,
     legajo: _legajo,
+    email: _email,
     wsp: _w,
     pago: _p,
     nota: _no || null,
@@ -2623,6 +2759,7 @@ function resetPedido(){
   document.getElementById('ped-empty').style.display='flex';
   document.getElementById('ped-content').style.display='none';
   renderTree(window.APUNTES||APUNTES);
+  renderHistorial();
 }
 
 // ── CALENDARIO ──
