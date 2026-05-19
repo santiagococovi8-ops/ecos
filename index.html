@@ -1355,16 +1355,18 @@ async function doLogin() {
 
   btn.disabled = true; btn.textContent = 'Ingresando...';
   try {
-    // Intentar login: primero buscar si el usuario tiene email real registrado
+    // Buscar el email del usuario en public.usuarios por legajo.
+    // Usuarios nuevos: tienen email real. Usuarios legacy: tienen legajoEmail.
+    // En ambos casos usamos lo que está guardado en la tabla, con fallback.
     let rows = [];
     try { rows = await SB.select('usuarios', `legajo=eq.${encodeURIComponent(legajo)}&limit=1`); } catch(e2){}
     const userRow = rows.length ? rows[0] : null;
-    // Si tiene email real, usarlo; sino usar el legajo-email legacy
-    const email = (userRow && userRow.email && !userRow.email.includes('@ecos.unlp')) ? userRow.email : legajoToEmail(legajo);
+    const email = (userRow && userRow.email) ? userRow.email : legajoToEmail(legajo);
     await SB.login(email, pass);
     // Verificar si el email está confirmado
     const userObj = await SB.getUser();
-    if (userObj && !userObj.email_confirmed_at && !email.includes('ecoslegajo')) {
+    // Saltar verificación solo para emails ficticios legacy (@ecos.unlp.edu.ar)
+    if (userObj && !userObj.email_confirmed_at && !email.endsWith('@ecos.unlp.edu.ar')) {
       // Email no verificado → mostrar pantalla de verificación
       localStorage.setItem('ecos_pending_email', email);
       if (userRow) {
@@ -1430,33 +1432,40 @@ async function doRegister() {
 
   btn.disabled = true; btn.textContent = 'Creando cuenta...';
   try {
-    const email = legajoToEmail(legajo);
-    // Registrar en Supabase Auth (sin confirmación de email)
+    // FIX: registrar en Auth con el email real del estudiante.
+    // Antes se usaba un email fabricado (legajoToEmail) lo que impedía
+    // ver emails reales en el Admin y rompía la verificación.
+    // El email ficticio queda solo en user_metadata para compatibilidad.
+    const email = emailVal; // email real del estudiante
+    const legajoEmail = legajoToEmail(legajo); // solo para metadata
     const res = await fetch(SUPABASE_URL + '/auth/v1/signup', {
       method: 'POST',
       headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pass, data: { nombre, legajo } })
+      body: JSON.stringify({
+        email,
+        password: pass,
+        data: { nombre, legajo, legajo_email: legajoEmail },
+      })
     });
     const data = await res.json();
     if (!res.ok) {
       const msg = data.error_description || data.msg || '';
       if (msg.includes('already registered') || msg.includes('User already')) {
-        errEl.textContent = 'Ese legajo ya tiene una cuenta. Iniciá sesión.';
+        errEl.textContent = 'Ese email ya tiene una cuenta. Iniciá sesión.';
       } else {
         errEl.textContent = 'Error al crear la cuenta: ' + msg;
       }
       btn.disabled = false; btn.textContent = 'Crear cuenta';
       return;
     }
-    // Guardar en tabla usuarios
+    // Guardar en tabla usuarios con email real
     await SB.upsert('usuarios', [{ legajo, nombre, email, fecha: new Date().toLocaleDateString('es-AR') }]);
-    // Login automático — el token puede venir en data o en data.session
+    // Login automático
     const token = data.access_token || (data.session && data.session.access_token);
     if (token) {
       localStorage.setItem('sb_token', token);
       localStorage.setItem('sb_email', email);
     } else {
-      // Sin token en signup → hacer login explícito
       await SB.login(email, pass);
     }
     _currentUser = { legajo, nombre, email };
