@@ -703,13 +703,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
         <div>
           <div class="t-hero-tag">CopyECOS</div>
           <div class="t-hero-title">Apuntes para<br>tus cursadas</div>
-          <div class="t-hero-sub">$10 por hoja doble faz · Retirá en mesita</div>
+          <div class="t-hero-sub">$55 por hoja doble faz · Retirá en mesita</div>
         </div>
         <span style="font-size:44px;opacity:.2;">🖨️</span>
       </div>
       <div style="background:#EFF6FF;border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:8px;">
         <span style="font-size:18px;">💡</span>
-        <p style="font-size:12px;color:#1E40AF;line-height:1.5;"><strong>Precio por hojas:</strong> $10 cada hoja doble faz. El total se calcula automáticamente según las páginas del apunte.</p>
+        <p style="font-size:12px;color:#1E40AF;line-height:1.5;"><strong>Precio por hojas:</strong> $55 cada hoja doble faz. El total se calcula automáticamente según las páginas del apunte.</p>
       </div>
       <div class="search-box">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -1624,6 +1624,39 @@ function onLoginSuccess() {
   initCarrusel();
   setTimeout(() => initPushNotifications(), 2500);
 
+  // 8. Realtime: suscripción a cambios en pedidos del usuario logueado
+  const _legajoActual = _currentUser?.legajo;
+  if (_legajoActual && window.SB) {
+    const _uPedidos = SB.subscribe('pedidos', (payload) => {
+      // El WebSocket de Supabase entrega todos los cambios de la tabla;
+      // filtramos por legajo del usuario actual en el callback.
+      const rec = payload?.record || payload?.new || payload?.data || {};
+      const legajoRec = rec.legajo || rec?.old?.legajo || '';
+      if (String(legajoRec) !== String(_legajoActual)) return;
+
+      // Recargar historial visible
+      renderHistorial();
+      cargarMisPedidos();
+
+      // Feedback visual según el nuevo estado
+      const estadoMsgs = {
+        en_proceso: '🔄 Tu pedido está siendo procesado',
+        listo:      '✅ ¡Tu pedido está listo para retirar!',
+        entregado:  '📦 Tu pedido fue entregado',
+      };
+      const msg = estadoMsgs[rec.estado];
+      if (msg) {
+        toast(msg);
+        // Si el usuario está en la pantalla "pedido", actualizar también el dot de nav
+        updateCartUI();
+      }
+    });
+    // Registrar para limpieza en logout
+    if (Array.isArray(window._sbUnsubscribers)) {
+      window._sbUnsubscribers.push(_uPedidos);
+    }
+  }
+
   // 8. Banner de instalación
   setTimeout(() => {
     try {
@@ -2181,7 +2214,7 @@ function renderTree(lista){
             <div style="background:#EEF4FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:9px;border:1.5px solid #DBEAFE;">
               <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;">Rango de hojas a imprimir</span>
-                <span style="font-size:11px;color:#94A3B8;">$10 por hoja doble faz</span>
+                <span style="font-size:11px;color:#94A3B8;">$55 por hoja doble faz</span>
               </div>
               <!-- Atajos rápidos -->
               <div style="display:flex;gap:5px;flex-wrap:wrap;" id="rng-${a.id}">${getRangosHojas(Math.ceil(a.paginas/2),a.id)}</div>
@@ -2284,6 +2317,7 @@ function switchTab(tab){
 // ── CART ──
 
 // ── Selector de rango de hojas por apunte ───────────────────
+const PRECIO_HOJA = 55; // $55 por hoja doble faz (cada hoja = 2 páginas)
 let cartRango = {}; // { apunte_id: { desde, hasta } }
 
 function getRangoCart(id, campo, maxH) {
@@ -2293,8 +2327,8 @@ function getRangoCart(id, campo, maxH) {
   const hojas = Math.max(1, hasta - desde + 1);
   if (campo === 'desde')  return desde;
   if (campo === 'hasta')  return hasta;
-  if (campo === 'precio') return (hojas * 10).toLocaleString('es-AR');
-  if (campo === 'label')  return hojas + ' hoja' + (hojas!==1?'s':'') + ' · $' + (hojas*10).toLocaleString('es-AR');
+  if (campo === 'precio') return (hojas * PRECIO_HOJA).toLocaleString('es-AR');
+  if (campo === 'label')  return hojas + ' hoja' + (hojas!==1?'s':'') + ' · $' + (hojas*PRECIO_HOJA).toLocaleString('es-AR');
   return hojas;
 }
 
@@ -2309,9 +2343,9 @@ function selRango(id, maxH) {
   cartRango[String(id)] = { desde, hasta };
   const hojas = hasta - desde + 1;
   const pr = document.getElementById('pr-' + id);
-  if (pr) pr.textContent = '$' + (hojas * 10).toLocaleString('es-AR');
+  if (pr) pr.textContent = '$' + (hojas * PRECIO_HOJA).toLocaleString('es-AR');
   const lbl = document.getElementById('lbl-' + id);
-  if (lbl) lbl.textContent = hojas + ' hoja' + (hojas!==1?'s':'') + ' · $' + (hojas * 10).toLocaleString('es-AR');
+  if (lbl) lbl.textContent = hojas + ' hoja' + (hojas!==1?'s':'') + ' · $' + (hojas * PRECIO_HOJA).toLocaleString('es-AR');
   // Desmarcar atajos rápidos si el rango no coincide con ninguno
   _actualizarRngBtns(id, maxH, desde, hasta);
 }
@@ -2374,7 +2408,7 @@ function agregarApunte(id, maxHojas) {
   const desde = r ? r.desde : 1;
   const hasta  = r ? r.hasta  : maxHojas;
   const hojas = Math.max(1, hasta - desde + 1);
-  const precio = hojas * 10;
+  const precio = hojas * PRECIO_HOJA;
   const _APUNTES = window.APUNTES || APUNTES;
   const apunte = _APUNTES.find(a => String(a.id) === String(id));
   if (!apunte) { console.warn('agregarApunte: id no encontrado', id); return; }
@@ -2398,9 +2432,9 @@ function agregarApunte(id, maxHojas) {
 }
 // ──────────────────────────────────────────────────────────
 function calcPrecioHojas(paginas){
-  // $10 por hoja doble faz (cada hoja = 2 páginas)
+  // PRECIO_HOJA por hoja doble faz (cada hoja = 2 páginas)
   const hojas=Math.ceil((paginas||1)/2);
-  return hojas*10;
+  return hojas*PRECIO_HOJA;
 }
 
 function addCart(id, esCod){
@@ -2601,11 +2635,25 @@ function chgQtyTienda(id,d,esCod){
     if(d<=0) return;
     const _CODIGOS=window.CODIGOS||CODIGOS;
     const _APUNTES=window.APUNTES||APUNTES;
-    const item=esCod?_CODIGOS.find(c=>String(c.id)===String(id)):_APUNTES.find(a=>String(a.id)===String(id));
-    if(!item) return;
-    const nombre=esCod?item.nombre+' — '+item.subtitulo:item.materia;
-    const precio=esCod?item.precio:calcPrecioHojas(item.paginas||0);
-    cart[key]={id:key,nombre,precio,qty:1,paginas:esCod?null:item.paginas};
+    if(esCod){
+      // ECódigos: precio fijo del catálogo
+      const item=_CODIGOS.find(c=>String(c.id)===String(id));
+      if(!item) return;
+      cart[key]={id:key, nombre:item.nombre+' — '+item.subtitulo,
+                 precio:item.precio, qty:1, paginas:null, esCod:true};
+    } else {
+      // Apuntes CopyEcos: respetar el rango ya seleccionado en cartRango
+      const item=_APUNTES.find(a=>String(a.id)===String(id));
+      if(!item) return;
+      const maxH=Math.ceil((item.paginas||1)/2);
+      const r=cartRango[String(id)];
+      const desde=r?r.desde:1;
+      const hasta=r?r.hasta:maxH;
+      const hojas=Math.max(1, hasta-desde+1);
+      const precio=hojas*PRECIO_HOJA;
+      cart[key]={id:key, nombre:item.materia, precio, qty:1,
+                 esCod:false, paginas:hojas*2, hojas, desde, hasta};
+    }
   } else {
     cart[key].qty+=d;
     if(cart[key].qty<=0){delete cart[key];}
