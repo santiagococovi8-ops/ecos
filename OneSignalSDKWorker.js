@@ -1,17 +1,19 @@
 // api/send-notification.js — Vercel Serverless Function
-// Envía notificaciones push via OneSignal REST API v1.
-//
-// Si el body incluye `legajo`, la notificación va SOLO al dispositivo
-// de ese alumno (usando external_id = legajo, seteado en la app con
-// OneSignal.login(legajo)).
-//
-// Si no hay `legajo`, se envía a todos los suscriptores (broadcast).
-//
-// Variables de entorno requeridas en Vercel:
-//   ONESIGNAL_APP_ID      → ID de la app (no es secreto, pero conviene centralizar)
-//   ONESIGNAL_REST_API_KEY → REST API Key (SECRETA — nunca en el frontend)
+// Notificaciones push via OneSignal REST API v1.
+// - Con `legajo` → solo ese alumno (external_id)
+// - Sin `legajo` → broadcast a todos
 
 export default async function handler(req, res) {
+  // CORS — permite llamadas desde el admin (cualquier origen)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Preflight OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -30,10 +32,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Configuración de servidor incompleta' });
   }
 
-  // ── Armar el target: usuario específico o todos ──────────────────────────
-  // OneSignal v1 API: si hay legajo, usar include_aliases para apuntar
-  // exactamente al external_id registrado con OneSignal.login(legajo).
-  // Si no hay legajo, broadcast a todos los suscriptores activos.
+  // Target: usuario específico o broadcast
   const target = legajo
     ? {
         include_aliases: { external_id: [String(legajo)] },
@@ -70,7 +69,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // data.recipients puede ser 0 si el usuario no tiene el push habilitado
     return res.status(200).json({
       id:         data.id,
       recipients: data.recipients ?? 0,
