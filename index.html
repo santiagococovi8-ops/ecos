@@ -2022,7 +2022,7 @@ function onLoginSuccess() {
   renderCodigos();
   actualizarFeed(window.NOTICIAS || NOTICIAS);
   initCarrusel();
-  setTimeout(() => initPushNotifications(), 2500);
+  setTimeout(() => initPushNotifications(), 4000);
 
   // 8. Realtime: suscripción a cambios en pedidos del usuario logueado
   const _legajoActual = _currentUser?.legajo;
@@ -2931,28 +2931,29 @@ function updateCartUI(){
 function initPushNotifications() {
   if (!window.OneSignalDeferred) return;
 
-  // Sanitizar legajo: la barra "/" y otros caracteres no son válidos en OneSignal external_id
+  // Sanitizar legajo: "/" y otros chars no son válidos en OneSignal external_id
   const legajoId = _currentUser?.legajo
     ? String(_currentUser.legajo).replace(/[^a-zA-Z0-9_\-\.@]/g, '_')
     : null;
 
+  if (!legajoId) return;
+
   const _doLogin = async (OneSignal) => {
     try {
+      // Pedir permiso si no lo tiene
       const permission = await OneSignal.Notifications.permission;
       if (!permission) {
         await OneSignal.Notifications.requestPermission();
       }
-      // Asociar siempre el legajo, no solo al pedir permiso
-      if (legajoId) {
-        await OneSignal.login(legajoId);
-        console.log('OneSignal login OK:', legajoId);
-      }
+      // Vincular external_id siempre (aunque ya tenga permiso)
+      await OneSignal.login(legajoId);
+      console.log('OneSignal vinculado:', legajoId);
     } catch(e) {
-      console.warn('OneSignal init error:', e.message);
+      console.warn('OneSignal error:', e.message);
     }
   };
 
-  // Usar el SDK si ya está listo, sino encolar
+  // Si el SDK ya está inicializado usarlo directo, sino encolar
   if (window.OneSignal && typeof window.OneSignal.login === 'function') {
     _doLogin(window.OneSignal);
   } else {
