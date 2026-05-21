@@ -639,7 +639,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
   </div>
 </div>
 
-<div id="app">
+<div id="app" style="visibility:hidden;">
 
 <!-- LANDING -->
 <div id="auth-screen">
@@ -1487,6 +1487,7 @@ async function iniciarApp() {
     const delay = Math.max(0, T_MIN - elapsed);
     setTimeout(() => {
       splash.classList.add('hide');
+      document.getElementById('app').style.visibility = 'visible';
       setTimeout(() => { splash.style.display = 'none'; }, 520);
     }, delay);
   };
