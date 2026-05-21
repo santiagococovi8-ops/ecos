@@ -1185,7 +1185,7 @@ window._sbUnsubscribers = [];
 <script>
 // ── SUPABASE: normalizar filas (snake_case → camelCase) ──
 function normN(r){ return {...r, catBg:r.cat_bg||r.catBg||'#F59E0B', catTxt:r.cat_txt||r.catTxt||'#0F172A', heroBg:r.hero_bg||r.heroBg||'#0F172A', imgUrl:r.img_url||r.imgUrl||'', enCarrusel:r.en_carrusel!==undefined?r.en_carrusel:r.enCarrusel}; }
-function normA(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0}; }
+function normA(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0, materia_id:r.materia_id||null}; }
 function normC(r){ return {...r, badgeBg:r.badge_bg||r.badgeBg, precio:Number(r.precio)||0, stock:r.stock===true||r.stock==='true'||r.stock===1}; }
 
 // ── SEED datos iniciales si las tablas están vacías ──
@@ -1279,19 +1279,22 @@ function actualizarFeed(docs) {
 
 async function iniciarApp() {
   try {
-    const [nots,aps,cods] = await Promise.all([
+    const [nots,aps,cods,anios,mats] = await Promise.all([
       SB.select('noticias','order=orden.asc'),
       SB.select('apuntes','order=id.asc'),
       SB.select('codigos','order=id.asc'),
+      SB.select('anios','order=orden.asc'),
+      SB.select('materias','order=orden.asc'),
     ]);
     const docsN = nots.map(normN);
     window.NOTICIAS = docsN;
     window.APUNTES  = aps.map(normA);
     window.CODIGOS  = cods.map(normC);
+    window.ANIOS    = anios;
+    window.MATERIAS = mats;
     actualizarDestacadas(docsN);
     actualizarFeed(docsN);
-    if (window._appLista)  { renderTree(window.APUNTES); renderCodigos(); }
-    // Reiniciar carrusel siempre que haya datos, esté o no iniciado
+    if (window._appLista) { renderTree(window.APUNTES); renderCodigos(); }
     initCarrusel();
     window._carruselIniciado = true;
     // Realtime
@@ -1308,7 +1311,21 @@ async function iniciarApp() {
       window.CODIGOS=r.map(normC);
       if(window._appLista) renderCodigos();
     }));
-    window._sbUnsubscribers = [_u1, _u2, _u3];
+    const _u4=SB.subscribe('anios',()=>Promise.all([
+      SB.select('anios','order=orden.asc'),
+      SB.select('materias','order=orden.asc'),
+    ]).then(([a,m])=>{
+      window.ANIOS=a; window.MATERIAS=m;
+      if(window._appLista) renderTree(window.APUNTES||APUNTES);
+    }));
+    const _u5=SB.subscribe('materias',()=>Promise.all([
+      SB.select('anios','order=orden.asc'),
+      SB.select('materias','order=orden.asc'),
+    ]).then(([a,m])=>{
+      window.ANIOS=a; window.MATERIAS=m;
+      if(window._appLista) renderTree(window.APUNTES||APUNTES);
+    }));
+    window._sbUnsubscribers = [_u1, _u2, _u3, _u4, _u5];
     window._sbListo = true;
     console.log('Supabase conectado ✓');
   } catch(err) {
@@ -2168,89 +2185,134 @@ function abrirNota(id){
   goTo('noticia');
 }
 
-// ── TIENDA — TREE ──
-const YEAR_COLORS={'1° año':'#2563EB','2° año':'#059669','3° año':'#D97706','4° año':'#7C3AED','5° año':'#DC2626'};
+// ── TIENDA — TREE (año → materia → apuntes) ──
+const YEAR_PALETTE=['#2563EB','#059669','#D97706','#7C3AED','#DC2626','#0891B2','#DB2777','#65A30D'];
+
+function _apunteCard(a){
+  const inCart=cart[String(a.id)]?cart[String(a.id)].qty:0;
+  const maxH=Math.ceil(a.paginas/2);
+  return `<div class="apunte-item" style="flex-direction:column;align-items:stretch;gap:0;">
+    <div style="display:flex;align-items:center;gap:12px;padding:2px 0 8px;">
+      <div class="apunte-icon">📄</div>
+      <div class="apunte-info" style="flex:1;">
+        <div class="apunte-name">${esc(a.titulo||a.materia)}</div>
+        <div class="apunte-meta">${a.paginas} págs. · ${maxH} hojas máx.</div>
+      </div>
+      ${a.drive?`<button class="btn-ver" onclick="window.open('${esc(a.drive)}','_blank')">Ver</button>`:''}
+    </div>
+    <div style="background:#EEF4FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:9px;border:1.5px solid #DBEAFE;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;">Rango de hojas a imprimir</span>
+        <span style="font-size:11px;color:#94A3B8;">$${PRECIO_HOJA} por hoja doble faz</span>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;" id="rng-${a.id}">${getRangosHojas(maxH,a.id)}</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:12px;color:#64748B;white-space:nowrap;">Hoja</span>
+        <input type="number" id="hoj-desde-${a.id}" min="1" max="${maxH}" value="${getRangoCart(a.id,'desde',maxH)}"
+          style="width:52px;padding:5px 6px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
+          oninput="selRango('${a.id}',${maxH})">
+        <span style="font-size:12px;color:#64748B;">hasta</span>
+        <input type="number" id="hoj-hasta-${a.id}" min="1" max="${maxH}" value="${getRangoCart(a.id,'hasta',maxH)}"
+          style="width:52px;padding:5px 6px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
+          oninput="selRango('${a.id}',${maxH})">
+        <span style="font-size:12px;color:#94A3B8;">de ${maxH}</span>
+        <span style="margin-left:auto;font-size:15px;font-weight:800;color:var(--blue);" id="pr-${a.id}">$${getRangoCart(a.id,'precio',maxH)}</span>
+      </div>
+      <div style="font-size:11px;color:#64748B;" id="lbl-${a.id}">${getRangoCart(a.id,'label',maxH)}</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;">
+      <span style="font-size:11px;color:#94A3B8;">En pedido: <b id="qts-${a.id}" style="color:${inCart>0?'var(--blue)':'#94A3B8'}">${inCart}</b></span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        ${inCart>0?`<button class="qty-btn" style="width:28px;height:28px;font-size:15px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)">−</button>`:''}
+        <button class="qty-btn" style="background:var(--blue);border-color:var(--blue);color:white;padding:6px 16px;border-radius:9px;font-size:12px;font-weight:700;width:auto;height:auto;"
+          onclick="event.stopPropagation();agregarApunte('${a.id}',${maxH})">
+          ${inCart>0?'+ Agregar otra':'Agregar al pedido'}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
 
 function renderTree(lista){
-  const tree=document.getElementById('apuntes-tree');if(!tree)return;
-  const byYear={};
-  lista.forEach(a=>{if(!byYear[a.año])byYear[a.año]=[];byYear[a.año].push(a);});
+  const tree=document.getElementById('apuntes-tree'); if(!tree) return;
+  const _ANIOS    = window.ANIOS    || [];
+  const _MATERIAS = window.MATERIAS || [];
+
+  // Si no hay años cargados aún, fallback al árbol plano por a.año (compatibilidad)
+  if(_ANIOS.length === 0){
+    const byYear={};
+    lista.forEach(a=>{ const k=a.año||'Sin año'; if(!byYear[k])byYear[k]=[]; byYear[k].push(a); });
+    let html='';
+    Object.keys(byYear).sort().forEach((año,i)=>{
+      const color=YEAR_PALETTE[i%YEAR_PALETTE.length];
+      const yid='y-'+año.replace(/[°\s\/]/g,'');
+      const apuntesDelAnio=byYear[año];
+      html+=`<div class="year-folder">
+        <div class="year-header" onclick="toggleYear('${yid}')">
+          <div class="year-header-l">
+            <div class="year-badge" style="background:${color};">${año.charAt(0)}</div>
+            <div><div class="year-name">${esc(año)}</div><div class="year-count">${apuntesDelAnio.length} apunte${apuntesDelAnio.length!==1?'s':''}</div></div>
+          </div>
+          <span class="year-chevron" id="chev-${yid}">›</span>
+        </div>
+        <div class="year-materias" id="${yid}">
+          ${apuntesDelAnio.map(a=>`<div class="mat-folder" style="padding:10px 14px;">${_apunteCard(a)}</div>`).join('')}
+        </div>
+      </div>`;
+    });
+    tree.innerHTML = html || '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin apuntes disponibles.</p>';
+    return;
+  }
+
+  // Modelo completo: año → materia → apuntes
   let html='';
-  Object.keys(byYear).sort().forEach(año=>{
-    const color=YEAR_COLORS[año]||'#2563EB';
-    const items=byYear[año];
-    const yid='y-'+año.replace(/[°\s]/g,'');
+  _ANIOS.forEach((anio, i)=>{
+    const color = YEAR_PALETTE[i % YEAR_PALETTE.length];
+    const yid   = 'ya-' + anio.id;
+    const materiasDesteAnio = _MATERIAS.filter(m => String(m.anio_id) === String(anio.id));
+
+    // Contar apuntes totales en este año (filtrando por materia_id)
+    const apuntesDesteAnio = lista.filter(a =>
+      materiasDesteAnio.some(m => String(m.id) === String(a.materia_id))
+    );
+    if(apuntesDesteAnio.length === 0) return; // ocultar años sin apuntes
+
     html+=`<div class="year-folder">
       <div class="year-header" onclick="toggleYear('${yid}')">
         <div class="year-header-l">
-          <div class="year-badge" style="background:${color};">${año.charAt(0)}°</div>
-          <div><div class="year-name">${esc(año)}</div><div class="year-count">${items.length} apunte${items.length!==1?'s':''}</div></div>
+          <div class="year-badge" style="background:${color};">${esc(anio.nombre.charAt(0))}</div>
+          <div>
+            <div class="year-name">${esc(anio.nombre)}</div>
+            <div class="year-count">${materiasDesteAnio.length} materia${materiasDesteAnio.length!==1?'s':''} · ${apuntesDesteAnio.length} apunte${apuntesDesteAnio.length!==1?'s':''}</div>
+          </div>
         </div>
         <span class="year-chevron" id="chev-${yid}">›</span>
       </div>
       <div class="year-materias" id="${yid}">`;
-    items.forEach(a=>{
-      const inCart=cart[String(a.id)]?cart[String(a.id)].qty:0;
+
+    materiasDesteAnio.forEach(mat=>{
+      const mid = 'ma-' + mat.id;
+      const apuntesDeMat = lista.filter(a => String(a.materia_id) === String(mat.id));
+      if(apuntesDeMat.length === 0) return; // ocultar materias sin apuntes
+
       html+=`<div class="mat-folder">
-        <div class="mat-header" onclick="toggleMat('mat-${a.id}')">
-          <span class="mat-name">${esc(a.materia)}</span>
+        <div class="mat-header" onclick="toggleMat('${mid}')">
+          <span class="mat-name">${esc(mat.nombre)}</span>
           <div style="display:flex;align-items:center;gap:6px;">
-            <span class="mat-count">${a.paginas}p · $${a.precio.toLocaleString('es-AR')}</span>
-            <span class="mat-chevron" id="mchev-${a.id}">›</span>
+            <span class="mat-count">${apuntesDeMat.length} apunte${apuntesDeMat.length!==1?'s':''}</span>
+            <span class="mat-chevron" id="mchev-${mid}">›</span>
           </div>
         </div>
-        <div class="mat-apuntes" id="mat-${a.id}">
-          <div class="apunte-item" style="flex-direction:column;align-items:stretch;gap:0;">
-            <!-- Fila superior: ícono, info, botón Ver -->
-            <div style="display:flex;align-items:center;gap:12px;padding:2px 0 8px;">
-              <div class="apunte-icon">📄</div>
-              <div class="apunte-info" style="flex:1;">
-                <div class="apunte-name">${esc(a.materia)}</div>
-                <div class="apunte-meta">${a.paginas} págs. · ${Math.ceil(a.paginas/2)} hojas máx.</div>
-              </div>
-              <button class="btn-ver" onclick="window.open('${a.drive}','_blank')">Ver</button>
-            </div>
-            <!-- Selector de rango de hojas -->
-            <div style="background:#EEF4FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:9px;border:1.5px solid #DBEAFE;">
-              <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.05em;">Rango de hojas a imprimir</span>
-                <span style="font-size:11px;color:#94A3B8;">$55 por hoja doble faz</span>
-              </div>
-              <!-- Atajos rápidos -->
-              <div style="display:flex;gap:5px;flex-wrap:wrap;" id="rng-${a.id}">${getRangosHojas(Math.ceil(a.paginas/2),a.id)}</div>
-              <!-- Desde / Hasta -->
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:12px;color:#64748B;white-space:nowrap;">Hoja</span>
-                <input type="number" id="hoj-desde-${a.id}" min="1" max="${Math.ceil(a.paginas/2)}" value="${getRangoCart(a.id,'desde',Math.ceil(a.paginas/2))}"
-                  style="width:52px;padding:5px 6px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
-                  oninput="selRango('${a.id}',${Math.ceil(a.paginas/2)})">
-                <span style="font-size:12px;color:#64748B;">hasta</span>
-                <input type="number" id="hoj-hasta-${a.id}" min="1" max="${Math.ceil(a.paginas/2)}" value="${getRangoCart(a.id,'hasta',Math.ceil(a.paginas/2))}"
-                  style="width:52px;padding:5px 6px;border:1.5px solid #CBD5E1;border-radius:7px;font-size:13px;text-align:center;font-family:inherit;outline:none;"
-                  oninput="selRango('${a.id}',${Math.ceil(a.paginas/2)})">
-                <span style="font-size:12px;color:#94A3B8;">de ${Math.ceil(a.paginas/2)}</span>
-                <span style="margin-left:auto;font-size:15px;font-weight:800;color:var(--blue);" id="pr-${a.id}">$${ getRangoCart(a.id,'precio',Math.ceil(a.paginas/2)) }</span>
-              </div>
-              <div style="font-size:11px;color:#64748B;" id="lbl-${a.id}">${getRangoCart(a.id,'label',Math.ceil(a.paginas/2))}</div>
-            </div>
-            <!-- Botón agregar -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;">
-              <span style="font-size:11px;color:#94A3B8;">En pedido: <b id="qts-${a.id}" style="color:${inCart>0?'var(--blue)':'#94A3B8'}">${inCart}</b></span>
-              <div style="display:flex;gap:6px;align-items:center;">
-                ${inCart>0?`<button class="qty-btn" style="width:28px;height:28px;font-size:15px;" onclick="event.stopPropagation();chgQtyTienda('${a.id}',-1,false)">−</button>`:''}
-                <button class="qty-btn" style="background:var(--blue);border-color:var(--blue);color:white;padding:6px 16px;border-radius:9px;font-size:12px;font-weight:700;width:auto;height:auto;"
-                  onclick="event.stopPropagation();agregarApunte('${a.id}',${Math.ceil(a.paginas/2)})">
-                  ${inCart>0?'+ Agregar otra':'Agregar al pedido'}
-                </button>
-              </div>
-            </div>
-          </div>
+        <div class="mat-apuntes" id="${mid}">
+          ${apuntesDeMat.map(a => `<div style="padding:10px 14px 4px;">${_apunteCard(a)}</div>`).join('')}
         </div>
       </div>`;
     });
+
     html+=`</div></div>`;
   });
-  tree.innerHTML=html;
+
+  tree.innerHTML = html || '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin apuntes disponibles.</p>';
 }
 
 function toggleYear(id){
@@ -2261,18 +2323,33 @@ function toggleYear(id){
 }
 function toggleMat(id){
   const el=document.getElementById(id);
-  const ch=document.getElementById('mchev-'+id.replace('mat-',''));
+  const ch=document.getElementById('mchev-'+id);
   const open=el.classList.toggle('open');
   if(ch)ch.classList.toggle('open',open);
 }
 
 function filtrar(q){
   const _APUNTES=window.APUNTES||APUNTES;
-  const filtered=_APUNTES.filter(a=>a.materia.toLowerCase().includes(q.toLowerCase())||a.año.toLowerCase().includes(q.toLowerCase()));
+  const _MATERIAS=window.MATERIAS||[];
+  const qq=q.toLowerCase();
+  const filtered = q
+    ? _APUNTES.filter(a=>{
+        const mat=_MATERIAS.find(m=>String(m.id)===String(a.materia_id));
+        return (a.titulo||a.materia||'').toLowerCase().includes(qq)
+            || (mat?.nombre||'').toLowerCase().includes(qq)
+            || (a.año||'').toLowerCase().includes(qq);
+      })
+    : _APUNTES;
   renderTree(filtered);
   if(q){
-    document.querySelectorAll('.year-materias').forEach(el=>{el.classList.add('open');const id=el.id;const ch=document.getElementById('chev-'+id);if(ch)ch.classList.add('open');});
-    document.querySelectorAll('.mat-apuntes').forEach(el=>{el.classList.add('open');const id=el.id.replace('mat-','');const ch=document.getElementById('mchev-'+id);if(ch)ch.classList.add('open');});
+    document.querySelectorAll('.year-materias').forEach(el=>{
+      el.classList.add('open');
+      const ch=document.getElementById('chev-'+el.id); if(ch)ch.classList.add('open');
+    });
+    document.querySelectorAll('.mat-apuntes').forEach(el=>{
+      el.classList.add('open');
+      const ch=document.getElementById('mchev-'+el.id); if(ch)ch.classList.add('open');
+    });
   }
 }
 
