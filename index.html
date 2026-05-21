@@ -2930,21 +2930,34 @@ function updateCartUI(){
 // ── ONESIGNAL PUSH ──
 function initPushNotifications() {
   if (!window.OneSignalDeferred) return;
-  OneSignalDeferred.push(async function(OneSignal) {
+
+  // Sanitizar legajo: la barra "/" y otros caracteres no son válidos en OneSignal external_id
+  const legajoId = _currentUser?.legajo
+    ? String(_currentUser.legajo).replace(/[^a-zA-Z0-9_\-\.@]/g, '_')
+    : null;
+
+  const _doLogin = async (OneSignal) => {
     try {
-      // Pedir permiso si aún no lo dio
       const permission = await OneSignal.Notifications.permission;
       if (!permission) {
         await OneSignal.Notifications.requestPermission();
       }
-      // Asociar el legajo del usuario con el suscriptor
-      if (_currentUser && _currentUser.legajo) {
-        await OneSignal.login(_currentUser.legajo);
+      // Asociar siempre el legajo, no solo al pedir permiso
+      if (legajoId) {
+        await OneSignal.login(legajoId);
+        console.log('OneSignal login OK:', legajoId);
       }
     } catch(e) {
       console.warn('OneSignal init error:', e.message);
     }
-  });
+  };
+
+  // Usar el SDK si ya está listo, sino encolar
+  if (window.OneSignal && typeof window.OneSignal.login === 'function') {
+    _doLogin(window.OneSignal);
+  } else {
+    OneSignalDeferred.push(_doLogin);
+  }
 }
 
 // ── HISTORIAL DE PEDIDOS ─────────────────────────────────────────────────
