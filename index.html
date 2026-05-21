@@ -1497,6 +1497,23 @@ const SB = {
   },
 
   // Subir imagen a Storage
+  // Subir cualquier archivo (File object) a Supabase Storage
+  async uploadFile(bucket, file, path) {
+    const token = this.getToken() || SUPABASE_ANON;
+    const res = await fetch(SUPABASE_URL + '/storage/v1/object/' + bucket + '/' + path, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': file.type || 'application/octet-stream',
+        'x-upsert': 'true',
+      },
+      body: file,
+    });
+    if (!res.ok) throw new Error('Storage error: ' + await res.text());
+    return SUPABASE_URL + '/storage/v1/object/public/' + bucket + '/' + path;
+  },
+
   async uploadImage(bucket, filename, base64DataUrl) {
     const token = this.getToken() || SUPABASE_ANON;
     const base64 = base64DataUrl.split(',')[1];
@@ -3147,6 +3164,7 @@ function chgQtyTienda(id,d,esCod){
 }
 
 function confirmar(){
+  // ── Validación de campos ──
   let ok=true;
   [['fn','en'],['fw','ew'],['fp','ep']].forEach(([fi,ei])=>{
     const f=document.getElementById(fi),e=document.getElementById(ei);
@@ -3154,128 +3172,171 @@ function confirmar(){
     else{f.classList.remove('err');if(e)e.classList.remove('on');}
   });
   if(!ok)return;
-  const btn=document.getElementById('btn-conf');btn.disabled=true;btn.textContent='Enviando...';
-  // Guardar pedido en Supabase
-  const _n=document.getElementById('fn').value.trim();
-  const _w=document.getElementById('fw').value.trim();
-  const _p=document.getElementById('fp').value;
-  const _no=document.getElementById('fno')?.value.trim()||'';
-  const _it=Object.values(cart);
-  const _itemsDetalle = _it.map(i => ({
-    id: i.id,
-    nombre: i.nombre,
-    qty: i.qty,
-    precio_unit: i.precio,
-    subtotal: i.precio * i.qty,
-    esCod: i.esCod || false,
-    hojas: i.hojas || null,
-    desde: i.desde || null,
-    hasta: i.hasta || null,
-    paginas: i.paginas || null,
-  }));
+
+  const ECOS_WSP='5492215524280';
+  const btn=document.getElementById('btn-conf');
+
+  // ── Datos del formulario ──
+  const _n  = document.getElementById('fn').value.trim();
+  const _w  = document.getElementById('fw').value.trim();
+  const _p  = document.getElementById('fp').value;
+  const _no = document.getElementById('fno')?.value.trim()||'';
+  const _it = Object.values(cart);
   const _total = _it.reduce((s,i)=>s+i.precio*i.qty,0);
-  const _legajo = _currentUser?.legajo || null;
-  const _email  = _currentUser?.email  || null;
-  SB.upsert('pedidos',[{
-    nombre: _n,
-    legajo: _legajo,
-    email: _email,
-    wsp: _w,
-    pago: _p,
-    nota: _no || null,
-    items: JSON.stringify(_itemsDetalle),
-    items_resumen: _it.map(i=>i.esPersonalizado?`📁 ${(i.customConfig&&i.customConfig.fileName)||i.nombre} x${i.qty}`:i.esCod?`${i.nombre} x${i.qty}`:`${i.nombre} (hjs.${i.desde||1}-${i.hasta||i.hojas||'?'}) x${i.qty}`).join(' · '),
-    total: _total,
-    estado: 'pendiente',
-    fecha: new Date().toISOString(),
-  }]).catch(e=>console.warn('No se pudo guardar pedido:',e.message));
-  // Número de WhatsApp de ECOS (sin +, sin espacios)
-  const ECOS_WSP = '5492215524280';
+  const _legajo = _currentUser?.legajo||null;
+  const _email  = _currentUser?.email||null;
+  const _personalizados = _it.filter(i=>i.esPersonalizado&&i.customConfig);
+  const _tieneArchivo   = _personalizados.some(i=>i.customConfig._fileRef);
 
-  setTimeout(()=>{
-    orderDone=true;
-    const nombre=document.getElementById('fn').value;
-    const wsp=document.getElementById('fw').value;
-    const pago=document.getElementById('fp').value;
-    const pagoLbl=pago==='efectivo'?'Efectivo en mesita':'Transferencia bancaria';
-    const items=Object.values(cart);
+  // ── Función que arma y envía el WA ──
+  function _abrirWA(){
+    const pago    = _p;
+    const pagoLbl = pago==='efectivo'?'Efectivo en mesita':'Transferencia bancaria';
+    const pagoEmoji = pago==='efectivo'?'💵':'🏦';
+    const nota    = _no;
+    const apuntesItems  = _it.filter(i=>!i.esPersonalizado&&i.paginas!=null);
+    const codigosItems  = _it.filter(i=>!i.esPersonalizado&&i.paginas==null&&!i.esPersonalizado);
+    const persItems     = _it.filter(i=>i.esPersonalizado);
 
-    // Separar apuntes CopyECOS de ECódigos y personalizados para el mensaje
-    const personalizadoItems=items.filter(i=>i.esPersonalizado);
-    const apuntesItems=items.filter(i=>!i.esPersonalizado&&i.paginas!=null);
-    const codigosItems=items.filter(i=>!i.esPersonalizado&&i.paginas==null);
-
-    const total=items.reduce((s,i)=>s+i.precio*i.qty,0);
-    const nota=document.getElementById('fno')?.value.trim();
-    const pagoEmoji=pago==='efectivo'?'💵':'🏦';
-
-    // ── Encabezado ──
     let msg='🛒 *Nuevo pedido — EC☀️S*\n';
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
-    msg+=`👤 *Alumno:* ${nombre}\n`;
-    msg+=`📱 *WhatsApp:* ${wsp}\n`;
+    msg+=`👤 *Alumno:* ${_n}\n`;
+    msg+=`📱 *WhatsApp:* ${_w}\n`;
     msg+=`${pagoEmoji} *Pago:* ${pagoLbl}\n`;
-
-    // ── Productos ──
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
     msg+='📦 *Productos:*\n';
 
-    if(apuntesItems.length>0){
-      apuntesItems.forEach(i=>{
-        const hojas=i.hojas||Math.ceil((i.paginas||1)/2);
-        const rangoStr=(i.desde&&i.hasta&&!(i.desde===1&&i.hasta===hojas))
-          ?` — hojas ${i.desde} al ${i.hasta} (${hojas} hjs.)`
-          :` — ${hojas} hojas doble faz`;
-        msg+=`   🖨️ ${i.nombre} ×${i.qty}${rangoStr} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
-      });
-    }
-    if(codigosItems.length>0){
-      codigosItems.forEach(i=>{
-        msg+=`   📘 ${i.nombre} ×${i.qty} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
-      });
-    }
-    if(personalizadoItems.length>0){
-      personalizadoItems.forEach(i=>{
-        const cfg=i.customConfig||{};
-        const precioStr = i.precio > 0
-          ? `*$${i.precio.toLocaleString('es-AR')}*`
-          : '*Precio a confirmar*';
-        const hojasStr = cfg.hojas ? ` (${cfg.hojas} hjs. × ${cfg.copias||1} cop.)` : '';
-        msg+=`   📁 *Impresión personalizada* ×${i.qty} — ${precioStr}\n`;
-        msg+=`      📄 Archivo: ${cfg.fileName||i.nombre}\n`;
-        msg+=`      🎨 Config: ${cfg.configLabel||''}${hojasStr}\n`;
-        if(cfg.aclaraciones) msg+=`      📝 Aclar.: ${cfg.aclaraciones}\n`;
-      });
-    }
+    apuntesItems.forEach(i=>{
+      const hojas=i.hojas||Math.ceil((i.paginas||1)/2);
+      const rangoStr=(i.desde&&i.hasta&&!(i.desde===1&&i.hasta===hojas))
+        ?` — hojas ${i.desde} al ${i.hasta} (${hojas} hjs.)`
+        :` — ${hojas} hojas doble faz`;
+      msg+=`   🖨️ ${i.nombre} ×${i.qty}${rangoStr} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
+    });
+    codigosItems.forEach(i=>{
+      msg+=`   📘 ${i.nombre} ×${i.qty} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
+    });
+    persItems.forEach(i=>{
+      const cfg=i.customConfig||{};
+      const precioStr=i.precio>0?`*$${i.precio.toLocaleString('es-AR')}*`:'*Precio a confirmar*';
+      const hojasStr=cfg.hojas?` (${cfg.hojas} hjs. × ${cfg.copias||1} cop.)`:'';
+      msg+=`   📁 *Impresión personalizada* — ${precioStr}\n`;
+      msg+=`      📄 Archivo: ${cfg.fileName||'—'}\n`;
+      msg+=`      🎨 Config: ${cfg.configLabel||''}${hojasStr}\n`;
+      if(cfg.aclaraciones) msg+=`      📝 Aclar.: ${cfg.aclaraciones}\n`;
+      if(cfg.archivoURL)   msg+=`      🔗 Archivo: ${cfg.archivoURL}\n`;
+    });
 
-    // ── Total y nota ──
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
-    msg+=`💰 *Total: $${total.toLocaleString('es-AR')}*\n`;
+    const totalConf = _it.filter(i=>!i.esPersonalizado||i.precio>0).reduce((s,i)=>s+i.precio*i.qty,0);
+    const tieneACConfirmar = persItems.some(i=>i.precio===0);
+    msg+=`💰 *Total: $${totalConf.toLocaleString('es-AR')}${tieneACConfirmar?' + personalizados a confirmar':''}*\n`;
     if(nota) msg+=`\n📝 *Nota:* ${nota}\n`;
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
     msg+='✅ Pedido confirmado desde la app ECOS.';
 
-    // Abrir WSP a ECOS automáticamente al confirmar
-    const wspUrl='https://wa.me/'+ECOS_WSP+'?text='+encodeURIComponent(msg);
-    window.open(wspUrl,'_blank');
+    window.open('https://wa.me/'+ECOS_WSP+'?text='+encodeURIComponent(msg),'_blank');
+  }
 
+  // ── Función que guarda en Supabase ──
+  function _guardarPedido(archivosURLs){
+    const archivosResumen = archivosURLs.length ? archivosURLs.join(' | ') : null;
+    // Enriquecer items con URLs
+    _personalizados.forEach((item,idx)=>{
+      if(archivosURLs[idx]) item.customConfig.archivoURL = archivosURLs[idx];
+    });
+    const itemsDetalle = _it.map(i=>({
+      id:i.id, nombre:i.nombre, qty:i.qty,
+      precio_unit:i.precio, subtotal:i.precio*i.qty,
+      esCod:i.esCod||false, hojas:i.hojas||null,
+      desde:i.desde||null, hasta:i.hasta||null,
+      paginas:i.paginas||null,
+      esPersonalizado:i.esPersonalizado||false,
+      customConfig:i.customConfig||null,
+    }));
+    SB.upsert('pedidos',[{
+      nombre:_n, legajo:_legajo, email:_email, wsp:_w, pago:_p,
+      nota:_no||null,
+      items:JSON.stringify(itemsDetalle),
+      items_resumen:_it.map(i=>i.esPersonalizado
+        ?`📁 ${(i.customConfig&&i.customConfig.fileName)||i.nombre} x${i.qty}`
+        :i.esCod?`${i.nombre} x${i.qty}`
+        :`${i.nombre} (hjs.${i.desde||1}-${i.hasta||i.hojas||'?'}) x${i.qty}`
+      ).join(' · '),
+      total:_total, estado:'pendiente',
+      fecha:new Date().toISOString(),
+      archivos_urls:archivosResumen,
+    }]).catch(e=>console.warn('Supabase pedido error:',e.message));
+  }
+
+  // ── Mostrar pantalla de éxito ──
+  function _mostrarExito(conArchivo){
+    orderDone=true;
     document.getElementById('ped-content').style.display='none';
-    document.getElementById('ped-success').style.display='flex';
-    document.getElementById('ped-success').innerHTML=`
-      <div class="success-box"><div class="success-icon">✅</div><div class="success-title">¡Pedido enviado a ECOS!</div><div class="success-sub">Se abrió WhatsApp para confirmar tu pedido con ECOS. Si no se abrió, tocá el botón de abajo.</div></div>
-      <div class="info-card">
-        <div class="info-row"><span class="icon">📍</span><div><div class="lbl">Dónde retirarlo</div><div class="val">Mesita ECOS — Hall de entrada, JurSoc</div></div></div>
-        <div class="info-row"><span class="icon">🕐</span><div><div class="lbl">Horario</div><div class="val">Lunes a viernes, 9 a 18hs</div></div></div>
-        <div class="info-row"><span class="icon">💳</span><div><div class="lbl">Método elegido</div><div class="val">${pagoLbl}</div></div></div>
-        <div class="info-row"><span class="icon">💰</span><div><div class="lbl">Total a pagar</div><div class="val" style="font-size:16px;font-weight:800;color:var(--blue);">$${total.toLocaleString('es-AR')}</div></div></div>
+    const suc=document.getElementById('ped-success');
+    suc.style.display='flex';
+    const extraMsg = conArchivo
+      ? '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:6px;">📎 Archivo adjuntado al pedido</div>'
+      : '';
+    suc.innerHTML=`
+      <div class="success-box">
+        <div class="success-icon">✅</div>
+        <div class="success-title">¡Pedido enviado a ECOS!</div>
+        <div class="success-sub">Se abrió WhatsApp con tu pedido. Si no se abrió, tocá el botón de abajo.</div>
+        ${extraMsg}
       </div>
-      <button class="btn-wsp" onclick="window.open('${wspUrl}','_blank')">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-        Reabrir WhatsApp ECOS
+      <button class="btn-wsp" onclick="window.open('https://wa.me/'+${ECOS_WSP},'_blank')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.885.52 3.65 1.426 5.163L2 22l4.979-1.403A9.954 9.954 0 0012 22c5.523 0 10-4.477 10-10S17.522 2 12 2z"/></svg>
+        Abrir WhatsApp
       </button>
       <button class="btn-outline" onclick="resetPedido()">Hacer otro pedido</button>`;
     cart={};updateCartUI();
-  },800);
+  }
+
+  // ── FLUJO PRINCIPAL ──
+  if(!_tieneArchivo){
+    // Sin archivo: flujo normal rápido
+    btn.disabled=true; btn.textContent='Enviando...';
+    _guardarPedido([]);
+    _abrirWA();
+    _mostrarExito(false);
+    return;
+  }
+
+  // Con archivo: subir primero, luego WA
+  btn.disabled=true; btn.textContent='📎 Subiendo archivo...';
+
+  // Mostrar barra de progreso en el botón
+  let _dots=0;
+  const _dotTimer=setInterval(()=>{
+    _dots=(_dots+1)%4;
+    btn.textContent='📎 Subiendo'+'.'.repeat(_dots||1);
+  },500);
+
+  (async()=>{
+    const archivosURLs=[];
+    let subioOk=false;
+    for(const item of _personalizados){
+      const file=item.customConfig._fileRef;
+      if(!file) continue;
+      try{
+        const ts=Date.now();
+        const safe=(item.customConfig.fileName||'archivo').replace(/[^a-zA-Z0-9._-]/g,'_');
+        const path=`pedidos/${_legajo||'anonimo'}/${ts}_${safe}`;
+        const url=await SB.uploadFile('pedidos-archivos',file,path);
+        archivosURLs.push(url);
+        item.customConfig.archivoURL=url;
+        subioOk=true;
+      }catch(e){
+        console.warn('Upload failed:',e.message);
+        archivosURLs.push(null);
+      }
+    }
+    clearInterval(_dotTimer);
+    _guardarPedido(archivosURLs.filter(Boolean));
+    _abrirWA();
+    _mostrarExito(subioOk);
+  })();
 }
 
 function resetPedido(){
@@ -3751,8 +3812,8 @@ function customAgregarAlCarrito(){
   cart[key] = {
     id: key,
     nombre: '📁 ' + _customState.fileName,
-    precio: precioUnit,   // precio total (ya incluye copias * hojas * PRECIO_HOJA)
-    qty: 1,               // qty=1 porque precio ya tiene las copias
+    precio: precioUnit,
+    qty: 1,
     esCod: false,
     esPersonalizado: true,
     paginas: null,
@@ -3768,7 +3829,8 @@ function customAgregarAlCarrito(){
       configLabel: configLabel,
       pdfPageCount: _customState.pdfPageCount,
       hojas: hojasCalc,
-      precioCalculado: precioUnit > 0
+      precioCalculado: precioUnit > 0,
+      _fileRef: _customState.file,   // referencia al File original para subir a Storage
     }
   };
 
