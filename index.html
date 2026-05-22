@@ -327,10 +327,32 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .codigo-price{font-size:18px;font-weight:900;color:var(--blue);}
 .codigo-price-lbl{font-size:10px;color:var(--gray-400);}
 
+/* ── TOASTS ── */
+#toast-container{position:fixed;bottom:80px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:9999;pointer-events:none;}
+.toast-item{display:flex;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;font-family:var(--font);color:white;box-shadow:0 4px 20px rgba(0,0,0,.25);opacity:0;transform:translateY(14px) scale(.94);transition:opacity .28s cubic-bezier(.34,1.56,.64,1),transform .28s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:90vw;white-space:nowrap;}
+.toast-item.show{opacity:1;transform:translateY(0) scale(1);}
+.toast-item.hide{opacity:0;transform:translateY(8px) scale(.96);transition:opacity .22s ease,transform .22s ease;}
+.toast-item.success{background:var(--green);}
+.toast-item.error{background:var(--red);}
+.toast-item.info{background:var(--blue);}
+.toast-item.warning{background:var(--yellow-d);color:white;}
+.toast-icon{font-size:15px;flex-shrink:0;}
+
+/* ── SKELETONS ── */
+.skel{border-radius:8px;background:linear-gradient(90deg,var(--gray-200) 25%,var(--gray-100) 50%,var(--gray-200) 75%);background-size:200% 100%;animation:skel-shimmer 1.4s infinite;}
+@keyframes skel-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-text{height:13px;width:75%;margin-bottom:8px;border-radius:6px;}
+.skel-title{height:18px;width:50%;margin-bottom:12px;border-radius:6px;}
+.skel-card{height:80px;width:100%;border-radius:12px;}
+.skel-card-sm{height:60px;width:100%;border-radius:10px;}
+.skel-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;}
+.skel-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#FAFCFF;border-radius:12px;box-shadow:var(--sh);}
+
 /* ── PEDIDO ── */
-.empty-st{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;text-align:center;}
-.empty-st .ei{font-size:48px;opacity:.25;}
-.empty-st p{font-size:14px;color:var(--gray-400);}
+.empty-st{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 24px;text-align:center;}
+.empty-st .ei{font-size:52px;opacity:.22;line-height:1;margin-bottom:4px;}
+.empty-st h3{font-size:16px;font-weight:700;color:var(--gray-700);}
+.empty-st p{font-size:13px;color:var(--gray-400);line-height:1.6;max-width:200px;}
 
 .cart-item{background:#FAFCFF;border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh);}
 .cart-item-info{flex:1;min-width:0;}
@@ -1104,9 +1126,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
   <div id="ped-empty" class="sp">
     <div class="empty-st">
       <div class="ei">🛒</div>
-      <p>Tu carrito está vacío</p>
-      <small style="font-size:12px;color:var(--gray-400);">Agregá apuntes desde la Tienda</small>
-      <button class="btn-confirm" style="margin-top:8px;width:auto;padding:12px 24px;" onclick="goTo('apuntes')">Ir a la Tienda →</button>
+      <h3>Tu carrito está vacío</h3>
+      <p>Explorá los apuntes disponibles y empezá tu colección</p>
+      <button class="btn-confirm" style="margin-top:4px;width:auto;padding:12px 26px;font-size:14px;" onclick="goTo('apuntes')">Ver apuntes →</button>
     </div>
     <!-- Historial de pedidos anteriores -->
     <div id="ped-historial" style="width:100%;margin-top:8px;"></div>
@@ -2197,6 +2219,45 @@ const NOTICIAS = [
 ];
 
 // ── STATE ──
+// ── TOAST SYSTEM ──
+(function(){
+  const container = document.createElement('div');
+  container.id = 'toast-container';
+  document.body.appendChild(container);
+  window.toast = function(msg, type, duration){
+    type = type||'success'; duration = duration||3500;
+    const icons = {success:'✓',error:'✕',info:'ℹ',warning:'⚠'};
+    const t = document.createElement('div');
+    t.className = 'toast-item '+type;
+    t.innerHTML = '<span class="toast-icon">'+icons[type]+'</span><span>'+msg+'</span>';
+    container.appendChild(t);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+    setTimeout(()=>{ t.classList.add('hide'); setTimeout(()=>{ if(t.parentNode)t.parentNode.removeChild(t); },260); }, duration);
+  };
+})();
+
+// ── CART BUMP ANIMATION ──
+function animateCartBadge(){
+  const cartEl = document.querySelector('.h-cart');
+  if(!cartEl) return;
+  cartEl.style.transition = 'transform .28s cubic-bezier(.34,1.56,.64,1)';
+  cartEl.style.transform = 'scale(1.38)';
+  setTimeout(()=>{ cartEl.style.transform='scale(1)'; },300);
+  setTimeout(()=>{ cartEl.style.transition=''; },620);
+}
+
+// ── SKELETON HELPERS ──
+function showSkeletons(containerId, count, type){
+  const el = document.getElementById(containerId); if(!el) return;
+  let html='';
+  for(let i=0;i<count;i++){
+    if(type==='card'){
+      html+='<div class="skel-row"><div class="skel skel-avatar"></div><div style="flex:1"><div class="skel skel-title"></div><div class="skel skel-text" style="width:60%"></div></div></div>';
+    } else { html+='<div class="skel skel-card" style="margin-bottom:10px"></div>'; }
+  }
+  el.innerHTML = html;
+}
+
 let cart = {}, currentScreen = 'inicio', orderDone = false;
 let calYear, calMonth, calDiaSel, calTipoSel, calEventos = {}, calInited = false;
 
@@ -2214,20 +2275,20 @@ function goTo(name, back=false){
   const curName = cur ? cur.id.replace('screen-','') : 'inicio';
   const isBack = back || (DEPTH[name]!==undefined && DEPTH[curName]!==undefined && DEPTH[name]<DEPTH[curName]);
   nxt.style.transition='none';
-  nxt.style.transform=isBack?'translateX(-20px)':'translateX(20px)';
+  nxt.style.transform=isBack?'translateX(-28px)':'translateX(28px)';
   nxt.style.opacity='0';
   nxt.getBoundingClientRect();
   if(cur){
-    cur.style.transition='opacity .24s cubic-bezier(.4,0,.2,1),transform .24s cubic-bezier(.4,0,.2,1)';
-    cur.style.transform=isBack?'translateX(20px)':'translateX(-20px)';
+    cur.style.transition='opacity .32s cubic-bezier(.4,0,.2,1),transform .32s cubic-bezier(.4,0,.2,1)';
+    cur.style.transform=isBack?'translateX(28px)':'translateX(-28px)';
     cur.style.opacity='0';cur.style.pointerEvents='none';
-    setTimeout(()=>{cur.classList.remove('active');cur.style.cssText='';},260);
+    setTimeout(()=>{cur.classList.remove('active');cur.style.cssText='';},360);
   }
-  nxt.style.transition='opacity .26s cubic-bezier(.4,0,.2,1),transform .26s cubic-bezier(.4,0,.2,1)';
+  nxt.style.transition='opacity .35s cubic-bezier(.4,0,.2,1),transform .35s cubic-bezier(.4,0,.2,1)';
   nxt.classList.add('active');nxt.scrollTop=0;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     nxt.style.transform='translateX(0)';nxt.style.opacity='1';
-    setTimeout(()=>{ nxt.style.cssText=''; NAV_LOCK.unlock(); },280);
+    setTimeout(()=>{ nxt.style.cssText=''; NAV_LOCK.unlock(); },370);
   }));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   const nid='nav-'+(NAVMAP[name]||name);
@@ -2888,6 +2949,7 @@ function agregarApunte(id, maxHojas) {
                   esCod: false, paginas: hojas*2, hojas, desde, hasta };
   }
   updateCartUI();
+  animateCartBadge();
   const qtsEl = document.getElementById('qts-' + id);
   if (qtsEl) { qtsEl.textContent = cart[key].qty; qtsEl.style.color = 'var(--blue)'; }
   toast('Agregado al pedido ✓');
@@ -2913,6 +2975,7 @@ function addCart(id, esCod){
   const key=String(id);
   if(cart[key])cart[key].qty++;else cart[key]={id:key,nombre,precio,qty:1,paginas:esCod?null:item.paginas};
   updateCartUI();
+  animateCartBadge();
   const btn=document.getElementById('ba-'+id);
   if(btn){btn.textContent='✓ '+cart[key].qty;btn.classList.add('added');}
   if(esCod)renderCodigos();
