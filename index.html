@@ -774,8 +774,11 @@ html, body {
 
 .verify-icon {
   font-size: 64px;
-  animation: vs-float 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 20px rgba(245,158,11,.3));
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,.8);
 }
 
 @keyframes vs-float {
@@ -1433,6 +1436,10 @@ html, body {
   cursor: pointer;
   transition: background .18s, color .18s, transform .14s;
   letter-spacing: -.01em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .t-tab:active   { transform: scale(.97); }
@@ -1914,10 +1921,14 @@ html, body {
 }
 
 .empty-st .ei {
-  font-size: 54px;
-  opacity: .2;
-  line-height: 1;
+  width: 72px; height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-100);
+  border-radius: 50%;
   margin-bottom: 4px;
+  color: var(--gray-300);
 }
 
 .empty-st h3 {
@@ -2396,9 +2407,9 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
   flex-shrink: 0;
 }
+.prog-badge svg { width: 22px; height: 22px; }
 
 .prog-name { font-size: 15px; font-weight: 700; color: var(--gray-800); letter-spacing: -.01em; }
 .prog-tag  { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
@@ -2421,6 +2432,8 @@ html, body {
   font-size: 13px;
   font-weight: 700;
   color: var(--blue);
+  gap: 6px;
+  cursor: pointer;
 }
 
 /* ═══════════════════════════════════════
@@ -2479,7 +2492,7 @@ html, body {
 }
 
 .vs-hero::after {
-  content: '🌙';
+  content: '';
   position: absolute;
   right: 16px; top: 50%;
   transform: translateY(-50%);
@@ -2828,6 +2841,10 @@ html, body {
   text-align: center;
   transition: all .15s, transform .13s;
   color: var(--gray-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .cal-tipo-btn:active  { transform: scale(.95); }
@@ -3151,6 +3168,11 @@ html, body {
   cursor: pointer;
   transition: all .15s;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  line-height: 1.3;
 }
 
 .f-radio-btn.selected {
@@ -3308,6 +3330,20 @@ input:focus-visible {
   background: rgba(37,99,235,.2);
   color: var(--gray-900);
 }
+
+/* ── SVG ICON HELPERS ── */
+.us-btn svg { flex-shrink: 0; }
+.info-row .icon { display:flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--gray-100); border-radius:8px; flex-shrink:0; color:var(--gray-500); }
+.apunte-icon { display:flex; align-items:center; justify-content:center; color:var(--blue); flex-shrink:0; }
+.apunte-icon svg { width:16px; height:16px; }
+.vs-bar button { display:flex; align-items:center; justify-content:center; }
+.install-step .step-num { font-size:13px; font-weight:800; }
+.custom-upload-icon { display:flex; align-items:center; justify-content:center; color:var(--gray-400); margin-bottom:4px; }
+.custom-file-icon { display:flex; align-items:center; justify-content:center; width:36px; height:36px; background:var(--blue-50,#EFF6FF); border-radius:8px; }
+.custom-file-remove { display:flex; align-items:center; justify-content:center; }
+.car-time { display:inline-flex; align-items:center; gap:4px; }
+.art-meta span { display:inline-flex; align-items:center; gap:4px; }
+.prog-hero-icon { display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 </style>
   <!-- OneSignal Push Notifications -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -3416,7 +3452,7 @@ input:focus-visible {
 
 <!-- VERIFY EMAIL SCREEN -->
 <div id="verify-screen">
-  <div class="verify-icon">📬</div>
+  <div class="verify-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg></div>
   <div class="verify-title">Verificá tu email</div>
   <div class="verify-sub">Te enviamos un link de verificación. Revisá tu bandeja de entrada y tocá el link para activar tu cuenta.</div>
   <div class="verify-email-badge" id="verify-email-badge">tucorreo@ejemplo.com</div>
@@ -3438,7 +3474,7 @@ input:focus-visible {
   <div class="us-legajo" id="us-legajo">—</div>
   <div class="us-divider"></div>
   <button class="us-btn us-btn-logout" onclick="closeUserSheet();doLogout();">
-    <div class="us-btn-icon">🚪</div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     Cerrar sesión
   </button>
 </div>
@@ -3475,7 +3511,7 @@ input:focus-visible {
 
 <!-- INSTALL BANNER -->
 <div id="install-banner">
-  <p>📲 Instalá la app en tu pantalla de inicio</p>
+  <p><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 16V4"/><path d="m8 12 4 4 4-4"/><path d="M2 18h20v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-2z"/></svg> Instalá la app en tu pantalla de inicio</p>
   <button class="ib-btn" onclick="showInstall()">¿Cómo?</button>
   <button class="ib-x" onclick="this.parentElement.classList.remove('on')">×</button>
 </div>
@@ -3513,7 +3549,7 @@ input:focus-visible {
   <div class="sp">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 2px;">
       <div style="font-size:21px;font-weight:900;color:var(--blue-deep);letter-spacing:-.5px;">Noticias</div>
-      <div style="font-size:10px;font-weight:800;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase;">EC☀S</div>
+      <div style="font-size:10px;font-weight:800;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase;"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--blue)" stroke="none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3" stroke="var(--blue)" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="var(--blue)" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="var(--blue)" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="var(--blue)" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="var(--blue)" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="var(--blue)" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="var(--blue)" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="var(--blue)" stroke-width="2"/></svg></div>
     </div>
 
     <!-- CARRUSEL PRINCIPAL -->
@@ -3546,9 +3582,9 @@ input:focus-visible {
 <!-- ── TIENDA ── -->
 <div class="screen" id="screen-apuntes">
   <div class="tienda-tabs">
-    <button class="t-tab active" id="tab-copyecos" onclick="switchTab('copyecos')">🖨️ CopyECOS</button>
-    <button class="t-tab" id="tab-ecodigos" onclick="switchTab('ecodigos')">⚖️ ECódigos</button>
-    <button class="t-tab" id="tab-personalizado" onclick="switchTab('personalizado')">📁 Personalizado</button>
+    <button class="t-tab active" id="tab-copyecos" onclick="switchTab('copyecos')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> CopyECOS</button>
+    <button class="t-tab" id="tab-ecodigos" onclick="switchTab('ecodigos')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg> ECódigos</button>
+    <button class="t-tab" id="tab-personalizado" onclick="switchTab('personalizado')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Personalizado</button>
   </div>
   <div id="panel-copyecos" class="t-panel">
     <div class="sp" style="padding-top:10px;">
@@ -3558,10 +3594,10 @@ input:focus-visible {
           <div class="t-hero-title">Apuntes para<br>tus cursadas</div>
           <div class="t-hero-sub">$55 por hoja doble faz · Retirá en mesita</div>
         </div>
-        <span style="font-size:44px;opacity:.2;">🖨️</span>
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       </div>
       <div style="background:#EFF6FF;border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:18px;">💡</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
         <p style="font-size:12px;color:#1E40AF;line-height:1.5;"><strong>Precio por hojas:</strong> $55 cada hoja doble faz. El total se calcula automáticamente según las páginas del apunte.</p>
       </div>
       <div class="search-box">
@@ -3579,7 +3615,7 @@ input:focus-visible {
           <div class="t-hero-title">Códigos a precio<br>solidario</div>
           <div class="t-hero-sub">Stock disponible en mesita</div>
         </div>
-        <span style="font-size:44px;opacity:.2;">⚖️</span>
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
       </div>
       <div id="codigos-container"></div>
     </div>
@@ -3594,7 +3630,7 @@ input:focus-visible {
           <div class="t-hero-title">Subí tu archivo<br>y configuralo</div>
           <div class="t-hero-sub">PDF, Word, imágenes · Precio a confirmar</div>
         </div>
-        <span style="font-size:44px;opacity:.2;">📁</span>
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
       </div>
 
       <!-- Error global -->
@@ -3610,17 +3646,17 @@ input:focus-visible {
           <input type="file" id="custom-file-input"
             accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*"
             onchange="customOnFileSelect(this)">
-          <div class="custom-upload-icon">📄</div>
+          <div class="custom-upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg></div>
           <div class="custom-upload-label">Tocá para seleccionar</div>
           <div class="custom-upload-hint">PDF, Word, JPG, PNG · Máx. 25 MB</div>
         </div>
         <div class="custom-file-preview" id="custom-file-preview">
-          <div class="custom-file-icon" id="custom-file-icon">📄</div>
+          <div class="custom-file-icon" id="custom-file-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
           <div class="custom-file-info">
             <div class="custom-file-name" id="custom-file-name">—</div>
             <div class="custom-file-size" id="custom-file-size">—</div>
           </div>
-          <button class="custom-file-remove" onclick="customRemoveFile()" title="Quitar archivo">✕</button>
+          <button class="custom-file-remove" onclick="customRemoveFile()" title="Quitar archivo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
       </div>
 
@@ -3628,8 +3664,8 @@ input:focus-visible {
       <div class="custom-section">
         <div class="custom-section-title">Color</div>
         <div class="f-radios" id="grp-color">
-          <div class="f-radio-btn selected" onclick="customSelectOption('grp-color',this)" data-val="bn">⬜ Blanco y Negro</div>
-          <div class="f-radio-btn" onclick="customSelectOption('grp-color',this)" data-val="color">🌈 Color</div>
+          <div class="f-radio-btn selected" onclick="customSelectOption('grp-color',this)" data-val="bn">B&amp;N</div>
+          <div class="f-radio-btn" onclick="customSelectOption('grp-color',this)" data-val="color">Color</div>
         </div>
       </div>
 
@@ -3637,8 +3673,8 @@ input:focus-visible {
       <div class="custom-section">
         <div class="custom-section-title">Caras</div>
         <div class="f-radios" id="grp-caras">
-          <div class="f-radio-btn selected" onclick="customSelectOption('grp-caras',this)" data-val="doble">↔️ Doble faz</div>
-          <div class="f-radio-btn" onclick="customSelectOption('grp-caras',this)" data-val="simple">📄 Simple faz</div>
+          <div class="f-radio-btn selected" onclick="customSelectOption('grp-caras',this)" data-val="doble">Doble faz</div>
+          <div class="f-radio-btn" onclick="customSelectOption('grp-caras',this)" data-val="simple">Simple faz</div>
         </div>
       </div>
 
@@ -3670,8 +3706,8 @@ input:focus-visible {
         <div class="custom-section-title">Páginas a imprimir</div>
         <div class="custom-paginas-wrap">
           <div class="f-radios" id="grp-paginas">
-            <div class="f-radio-btn selected" onclick="customSelectPaginasTipo(this,'todas')" data-val="todas">📋 Todas</div>
-            <div class="f-radio-btn" onclick="customSelectPaginasTipo(this,'rango')" data-val="rango">✂️ Rango</div>
+            <div class="f-radio-btn selected" onclick="customSelectPaginasTipo(this,'todas')" data-val="todas">Todas las páginas</div>
+            <div class="f-radio-btn" onclick="customSelectPaginasTipo(this,'rango')" data-val="rango">Rango de páginas</div>
           </div>
           <div id="custom-rango-wrap" style="display:none;">
             <input type="text" class="custom-rango-input" id="custom-rango-input"
@@ -3694,7 +3730,7 @@ input:focus-visible {
       <div class="custom-section" id="custom-resumen-section" style="display:none;">
         <div class="custom-section-title">Resumen del pedido</div>
         <div class="custom-summary">
-          <div class="custom-summary-title">📁 Pedido Personalizado</div>
+          <div class="custom-summary-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Pedido Personalizado</div>
           <div class="custom-summary-row">
             <span class="custom-summary-key">Archivo</span>
             <span class="custom-summary-val" id="res-archivo">—</span>
@@ -3746,7 +3782,7 @@ input:focus-visible {
 <div class="screen" id="screen-pedido">
   <div id="ped-empty" class="sp">
     <div class="empty-st">
-      <div class="ei">🛒</div>
+      <div class="ei"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
       <h3>Tu carrito está vacío</h3>
       <p>Explorá los apuntes disponibles y empezá tu colección</p>
       <button class="btn-confirm" style="margin-top:4px;width:auto;padding:12px 26px;font-size:14px;" onclick="goTo('apuntes')">Ver apuntes →</button>
@@ -3777,7 +3813,7 @@ input:focus-visible {
 <div class="screen" id="screen-programas">
   <div class="sp">
     <div class="prog-hero" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);">
-      <span style="font-size:36px;opacity:.2;">🌟</span>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <div>
         <div class="prog-hero-t">Nuestros programas</div>
         <div class="prog-hero-s">Servicios y espacios para la comunidad estudiantil.</div>
@@ -3785,42 +3821,42 @@ input:focus-visible {
     </div>
     <div class="prog-card">
       <div class="prog-ch">
-        <div class="prog-badge" style="background:#EFF6FF;">🖨️</div>
+        <div class="prog-badge" style="background:#EFF6FF;color:#2563EB;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
         <div><div class="prog-name">CopyECOS</div><div class="prog-tag">Fotocopiadora estudiantil</div></div>
       </div>
       <div class="prog-body">Imprimimos y fotocopiamos a precios accesibles. Pasá por la mesita y consultanos.</div>
       <div class="prog-action" style="color:var(--blue);">
-        <span>Consultar en mesita</span><span>📍</span>
+        <span>Consultar en mesita</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
       </div>
     </div>
     <div class="prog-card" onclick="goTo('apuntes')">
       <div class="prog-ch">
-        <div class="prog-badge" style="background:#ECFDF5;">⚖️</div>
+        <div class="prog-badge" style="background:#ECFDF5;color:#059669;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></div>
         <div><div class="prog-name">ECódigos</div><div class="prog-tag">Códigos civiles y comerciales</div></div>
       </div>
       <div class="prog-body">Códigos a precios solidarios. Civil, Penal y Constitución Nacional en stock.</div>
       <div class="prog-action" style="color:var(--green);">
-        <span>Ver en Tienda</span><span>→</span>
+        <span>Ver en Tienda</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </div>
     </div>
     <div class="prog-card">
       <div class="prog-ch">
-        <div class="prog-badge" style="background:#FFFBEB;">💬</div>
+        <div class="prog-badge" style="background:#FFFBEB;color:#D97706;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <div><div class="prog-name">EConsultas</div><div class="prog-tag">Charlas y consultoría estudiantil</div></div>
       </div>
       <div class="prog-body">Charlas con estudiantes avanzados y graduados para dudas sobre materias, inscripciones y más.</div>
       <div class="prog-action" style="color:var(--yellow-d);" onclick="window.open('https://www.instagram.com/ecosjursoc/','_blank')">
-        <span>Ver fechas en IG</span><span>📸</span>
+        <span>Ver fechas en IG</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
       </div>
     </div>
     <div class="prog-card" onclick="goTo('vuelta-segura')">
       <div class="prog-ch">
-        <div class="prog-badge" style="background:#EDE9FE;">💜</div>
+        <div class="prog-badge" style="background:#EDE9FE;color:#7C3AED;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
         <div><div class="prog-name">Frente de Mujeres</div><div class="prog-tag">Espacio feminista de ECOS</div></div>
       </div>
       <div class="prog-body">Trabajamos por la igualdad y la seguridad. Vuelta Segura disponible todas las noches.</div>
       <div class="prog-action" style="color:#6D28D9;background:#EDE9FE;">
-        <span>🌙 Vuelta Segura</span><span>→</span>
+        <span>Vuelta Segura</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </div>
     </div>
   </div>
@@ -3835,11 +3871,11 @@ input:focus-visible {
     </div>
     <div class="vs-hero">
       <div class="vs-tag">Frente de Mujeres · ECOS</div>
-      <div class="vs-title">Vuelta Segura 🌙</div>
+      <div class="vs-title">Vuelta Segura</div>
       <div class="vs-sub">Avisanos cuando salís de cursar de noche. Una compañera te va a estar esperando.</div>
     </div>
     <div class="vs-info">
-      <span style="font-size:18px;flex-shrink:0;">💜</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#7C3AED" stroke="none" style="flex-shrink:0"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       <p>Este espacio es completamente confidencial. Siempre hay alguien del Frente disponible para acompañarte a la distancia.</p>
     </div>
     <div class="vs-chat">
@@ -3847,11 +3883,11 @@ input:focus-visible {
         <div><div style="display:flex;align-items:center;gap:6px;"><div class="vs-dot"></div><span class="vs-chat-t">Frente de Mujeres ECOS</span></div><div class="vs-chat-s">En línea · Responde en minutos</div></div>
       </div>
       <div class="vs-msgs" id="vs-msgs">
-        <div class="vs-msg them">Hola 💜 Acá estamos. ¿A qué hora salís y de dónde?<div class="vs-msg-time">Frente de Mujeres</div></div>
+        <div class="vs-msg them">Hola ♥ Acá estamos. ¿A qué hora salís y de dónde?<div class="vs-msg-time">Frente de Mujeres</div></div>
       </div>
       <div class="vs-bar">
         <input type="text" id="vs-input" placeholder="Escribí tu mensaje..." onkeydown="if(event.key==='Enter')vsEnviar()">
-        <button onclick="vsEnviar()">➤</button>
+        <button onclick="vsEnviar()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button>
       </div>
     </div>
     <div class="vs-status">
@@ -3859,7 +3895,7 @@ input:focus-visible {
         <div><div style="font-size:11px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.06em;">Aviso de llegada</div><div style="font-size:12px;color:var(--gray-400);margin-top:2px;" id="vs-hint">Activá cuando llegues a destino</div></div>
         <button class="vs-toggle" id="vs-toggle" onclick="vsToggle()"></button>
       </div>
-      <div id="vs-arrived" style="display:none;background:#ECFDF5;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--green);font-weight:700;">✅ ¡Llegué bien! Avisado al Frente.</div>
+      <div id="vs-arrived" style="display:none;background:#ECFDF5;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> ¡Llegué bien! Avisado al Frente.</div>
     </div>
     <button class="btn-wsp" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);" onclick="window.open('https://wa.me/5492215524280?text='+encodeURIComponent('Hola Frente de Mujeres ECOS 💜 Quiero avisar para la vuelta segura.'),'_blank')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
@@ -3878,11 +3914,11 @@ input:focus-visible {
   <div class="sp" style="padding-top:14px;">
     <div class="card" style="padding:16px;"><p style="font-size:13px;color:var(--gray-600);line-height:1.7;">ECOS es la agrupación estudiantil de la Facultad de Ciencias Jurídicas y Sociales de la UNLP. Producimos y vendemos apuntes para todas las cursadas, y trabajamos por una universidad pública, gratuita y de calidad.</p></div>
     <div class="info-card">
-      <div class="info-row"><span class="icon">📍</span><div><div class="lbl">Mesita</div><div class="val">Hall de entrada · JurSoc · UNLP</div></div></div>
-      <div class="info-row"><span class="icon">🕐</span><div><div class="lbl">Horario</div><div class="val">Lunes a viernes, 9 a 18hs</div></div></div>
-      <div class="info-row"><span class="icon">📸</span><div><div class="lbl">Instagram</div><div class="val"><a href="https://www.instagram.com/ecosjursoc/" target="_blank">@ecosjursoc</a></div></div></div>
+      <div class="info-row"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><div><div class="lbl">Mesita</div><div class="val">Hall de entrada · JurSoc · UNLP</div></div></div>
+      <div class="info-row"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="lbl">Horario</div><div class="val">Lunes a viernes, 9 a 18hs</div></div></div>
+      <div class="info-row"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></span><div><div class="lbl">Instagram</div><div class="val"><a href="https://www.instagram.com/ecosjursoc/" target="_blank">@ecosjursoc</a></div></div></div>
     </div>
-    <button class="btn-confirm" style="background:var(--gray-800);" onclick="showInstall()">📲 Cómo instalar la app</button>
+    <button class="btn-confirm" style="background:var(--gray-800);" onclick="showInstall()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m8 12 4 4 4-4"/><path d="M2 18h20v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-2z"/></svg> Cómo instalar la app</button>
   </div>
 </div>
 
@@ -3920,7 +3956,7 @@ input:focus-visible {
 <!-- MODALES -->
 <div id="install-modal">
   <div class="modal-sheet">
-    <div class="modal-title">📲 Instalar la app de ECOS</div>
+    <div class="modal-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:-3px"><path d="M12 16V4"/><path d="m8 12 4 4 4-4"/><path d="M2 18h20v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-2z"/></svg>Instalar la app de ECOS</div>
     <p style="font-size:13px;color:var(--gray-600);margin-bottom:14px;line-height:1.6;">Agregá esta app a tu pantalla de inicio para abrirla como cualquier app.</p>
     <div class="install-step"><div class="step-num">1</div><div class="step-txt"><strong>Android (Chrome):</strong> Tocá los tres puntos ⋮ → <strong>"Agregar a pantalla de inicio"</strong></div></div>
     <div class="install-step"><div class="step-num">2</div><div class="step-txt"><strong>iPhone (Safari):</strong> Tocá el botón compartir ⬆ → <strong>"Agregar a pantalla de inicio"</strong></div></div>
@@ -3933,10 +3969,10 @@ input:focus-visible {
   <div class="modal-sheet">
     <div class="modal-title" id="cal-modal-fecha">Agregar fecha</div>
     <div class="cal-tipo-grid">
-      <button class="cal-tipo-btn" data-tipo="final" style="color:#DC2626;" onclick="calTipo(this)">📝 Final</button>
-      <button class="cal-tipo-btn" data-tipo="parcial" style="color:#2563EB;" onclick="calTipo(this)">📋 Parcial</button>
-      <button class="cal-tipo-btn" data-tipo="entrega" style="color:#059669;" onclick="calTipo(this)">📌 Entrega</button>
-      <button class="cal-tipo-btn" data-tipo="otro" style="color:#7C3AED;" onclick="calTipo(this)">🗓 Otro</button>
+      <button class="cal-tipo-btn" data-tipo="final" style="color:#DC2626;" onclick="calTipo(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg> Final</button>
+      <button class="cal-tipo-btn" data-tipo="parcial" style="color:#2563EB;" onclick="calTipo(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg> Parcial</button>
+      <button class="cal-tipo-btn" data-tipo="entrega" style="color:#059669;" onclick="calTipo(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> Entrega</button>
+      <button class="cal-tipo-btn" data-tipo="otro" style="color:#7C3AED;" onclick="calTipo(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Otro</button>
     </div>
     <div class="f-field" style="margin-bottom:12px;">
       <label class="f-lbl">Materia / descripción</label>
@@ -4249,9 +4285,9 @@ async function seedSupabase() {
   }
   if (c.length === 0) {
     await SB.upsert('codigos',[
-      {id:'101',nombre:'Código Civil y Comercial',subtitulo:'de la Nación',badge:'📘',badge_bg:'#EFF6FF',edicion:'Edición 2024 · Tapa blanda',descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones.',precio:8500,stock:true},
-      {id:'102',nombre:'Código Penal',subtitulo:'de la Nación Argentina',badge:'📕',badge_bg:'#FEF2F2',edicion:'Edición 2024 · Tapa blanda',descripcion:'Texto oficial con todas las reformas vigentes.',precio:6500,stock:true},
-      {id:'103',nombre:'Constitución Nacional',subtitulo:'Argentina',badge:'📗',badge_bg:'#ECFDF5',edicion:'Edición 2024 · Formato bolsillo',descripcion:'Texto completo con la reforma de 1994.',precio:3500,stock:true},
+      {id:'101',nombre:'Código Civil y Comercial',subtitulo:'de la Nación',badge:'CC',badge_bg:'#EFF6FF',edicion:'Edición 2024 · Tapa blanda',descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones.',precio:8500,stock:true},
+      {id:'102',nombre:'Código Penal',subtitulo:'de la Nación Argentina',badge:'CP',badge_bg:'#FEF2F2',edicion:'Edición 2024 · Tapa blanda',descripcion:'Texto oficial con todas las reformas vigentes.',precio:6500,stock:true},
+      {id:'103',nombre:'Constitución Nacional',subtitulo:'Argentina',badge:'CN',badge_bg:'#ECFDF5',edicion:'Edición 2024 · Formato bolsillo',descripcion:'Texto completo con la reforma de 1994.',precio:3500,stock:true},
     ]);
   }
 }
@@ -4289,7 +4325,7 @@ function actualizarFeed(docs) {
             <div class="nota-cat" style="background:${catBg};color:${catTxt};margin-bottom:8px;">${n.cat}</div>
             <div class="nota-title" style="color:${titleColor};font-size:15px;">${esc(n.titulo)}</div>
           </div>
-          <span style="font-size:34px;opacity:.4;margin-top:4px;">📍</span>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-top:4px;opacity:.4"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
       </div>`;
     } else {
@@ -4683,9 +4719,9 @@ function onLoginSuccess() {
 
       // Feedback visual según el nuevo estado
       const estadoMsgs = {
-        en_proceso: '🔄 Tu pedido está siendo procesado',
-        listo:      '✅ ¡Tu pedido está listo para retirar!',
-        entregado:  '📦 Tu pedido fue entregado',
+        en_proceso: '⏳ Tu pedido está siendo procesado',
+        listo:      '✔ ¡Tu pedido está listo para retirar!',
+        entregado:  '✓ Tu pedido fue entregado',
       };
       const msg = estadoMsgs[rec.estado];
       if (msg) {
@@ -4787,9 +4823,9 @@ const APUNTES = [
 ];
 
 const CODIGOS = [
-  { id:101, nombre:'Código Civil y Comercial', subtitulo:'de la Nación', badge:'📘', badgeBg:'#EFF6FF', edicion:'Edición 2024 · Tapa blanda', descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones. Incluye fe de erratas y normas complementarias actualizadas.', precio:8500 },
-  { id:102, nombre:'Código Penal',             subtitulo:'de la Nación Argentina', badge:'📕', badgeBg:'#FEF2F2', edicion:'Edición 2024 · Tapa blanda', descripcion:'Texto oficial con todas las reformas vigentes. Necesario para Derecho Penal I y II y Procesal Penal.', precio:6500 },
-  { id:103, nombre:'Constitución Nacional',    subtitulo:'Argentina', badge:'📗', badgeBg:'#ECFDF5', edicion:'Edición 2024 · Formato bolsillo', descripcion:'Texto completo con la reforma de 1994. Útil desde primer año para todas las materias del programa.', precio:3500 },
+  { id:101, nombre:'Código Civil y Comercial', subtitulo:'de la Nación', badge:'CC', badgeBg:'#EFF6FF', edicion:'Edición 2024 · Tapa blanda', descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones. Incluye fe de erratas y normas complementarias actualizadas.', precio:8500 },
+  { id:102, nombre:'Código Penal',             subtitulo:'de la Nación Argentina', badge:'CP', badgeBg:'#FEF2F2', edicion:'Edición 2024 · Tapa blanda', descripcion:'Texto oficial con todas las reformas vigentes. Necesario para Derecho Penal I y II y Procesal Penal.', precio:6500 },
+  { id:103, nombre:'Constitución Nacional',    subtitulo:'Argentina', badge:'CN', badgeBg:'#ECFDF5', edicion:'Edición 2024 · Formato bolsillo', descripcion:'Texto completo con la reforma de 1994. Útil desde primer año para todas las materias del programa.', precio:3500 },
 ];
 
 const NOTICIAS = [
@@ -4834,7 +4870,7 @@ const NOTICIAS = [
     cuerpo:[
       {t:'texto', c:'Lunes a viernes de 9 a 18hs en el hall de entrada. Podés pasar a buscar apuntes, Códigos, o simplemente conocernos.'},
       {t:'sub', c:'Qué encontrás'},
-      {t:'texto', c:'📄 Apuntes · ⚖️ ECódigos · 🖨️ CopyECOS · 💬 Consultas'},
+      {t:'texto', c:'Apuntes · ECódigos · CopyECOS · Consultas'},
       {t:'cta', bg:'#2563EB', titulo:'Pedir apuntes online', sub:'Sin pasar por la mesita', fn:'goTo("apuntes")'}
     ]},
 ];
@@ -4847,7 +4883,7 @@ const NOTICIAS = [
   document.body.appendChild(container);
   window.toast = function(msg, type, duration){
     type = type||'success'; duration = duration||3500;
-    const icons = {success:'✓',error:'✕',info:'ℹ',warning:'⚠'};
+    const icons = {success:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',error:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',info:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',warning:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'};
     const t = document.createElement('div');
     t.className = 'toast-item '+type;
     t.innerHTML = '<span class="toast-icon">'+icons[type]+'</span><span>'+msg+'</span>';
@@ -4884,7 +4920,7 @@ let calYear, calMonth, calDiaSel, calTipoSel, calEventos = {}, calInited = false
 
 // ── NAV ──
 const DEPTH = {inicio:0,apuntes:1,pedido:1,calendario:1,programas:1,nosotros:1,noticia:2,'vuelta-segura':2};
-const TITLES = {inicio:'Inicio',apuntes:'Tienda',pedido:'Mi pedido',calendario:'Mis fechas',programas:'Programas',nosotros:'Sobre ECOS','vuelta-segura':'Vuelta Segura 🌙',noticia:''};
+const TITLES = {inicio:'Inicio',apuntes:'Tienda',pedido:'Mi pedido',calendario:'Mis fechas',programas:'Programas',nosotros:'Sobre ECOS','vuelta-segura':'Vuelta Segura',noticia:''};
 const NAVMAP = {'vuelta-segura':'programas',noticia:'inicio'};
 
 function goTo(name, back=false){
@@ -5023,7 +5059,7 @@ function initCarrusel() {
         <div class="car-cat" style="background:${esc(n.catBg)};color:${esc(n.catTxt)};">${esc(n.cat)}</div>
         <div class="car-title">${esc(n.titulo).replace('\n','<br>')}</div>
         <div class="car-footer">
-          <span class="car-time">🕐 ${esc(n.fecha)}</span>
+          <span class="car-time"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${esc(n.fecha)}</span>
           <span class="car-place">${esc(n.lugar)}</span>
         </div>
       </div>
@@ -5230,7 +5266,7 @@ function abrirNota(id){
       </button>
       <div style="display:inline-block;background:${esc(n.catBg)||'#F59E0B'};color:${esc(n.catTxt)||'#0F172A'};font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:10px;">${esc(n.cat)}</div>
       <div class="art-title">${esc(n.titulo)}</div>
-      <div class="art-meta"><span>🕐 ${esc(n.fecha)}</span><span>📍 ${esc(n.lugar)}</span></div>
+      <div class="art-meta"><span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${esc(n.fecha)}</span><span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(n.lugar)}</span></div>
     </div>`;
 
   let html = `<p class="art-lead">${esc(n.lead||n.titulo)}</p>`;
@@ -5258,7 +5294,7 @@ function _apunteCard(a){
   const maxH=Math.ceil(a.paginas/2);
   return `<div class="apunte-item" style="flex-direction:column;align-items:stretch;gap:0;">
     <div style="display:flex;align-items:center;gap:12px;padding:2px 0 8px;">
-      <div class="apunte-icon">📄</div>
+      <div class="apunte-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
       <div class="apunte-info" style="flex:1;">
         <div class="apunte-name">${esc(a.titulo||a.materia)}</div>
         <div class="apunte-meta">${a.paginas} págs. · ${maxH} hojas máx.</div>
@@ -5425,7 +5461,7 @@ function renderCodigos(){
   let html='';
   _CODIGOS.forEach(cd=>{
     const inCart=cart[String(cd.id)]?cart[String(cd.id)].qty:0;
-    const _bg=cd.badgeBg||cd.badge_bg||'#EFF6FF';const _badge=cd.badge||'📘';
+    const _bg=cd.badgeBg||cd.badge_bg||'#EFF6FF';const _badge=cd.badge||'CC';
     html+=`<div class="codigo-card">
       <div class="codigo-header">
         <div class="codigo-badge" style="background:${_bg};">${_badge}</div>
@@ -5663,9 +5699,9 @@ async function renderHistorial() {
 
     const estadoMap = {
       pendiente:  ['⏳ Pendiente',  'pendiente'],
-      en_proceso: ['🔄 En proceso', 'en_proceso'],
+      en_proceso: ['<span class="status-spin">↻</span> En proceso', 'en_proceso'],
       listo:      ['✅ Listo',       'listo'],
-      entregado:  ['📦 Entregado',  'entregado'],
+      entregado:  ['■ Entregado',  'entregado'],
     };
 
     let html = '<p class="hist-section-lbl" style="margin-top:24px;">Mis pedidos anteriores</p>';
@@ -5681,7 +5717,7 @@ async function renderHistorial() {
       const itemsHtml = items.length > 0
         ? items.map(i => {
             const rango = (i.desde && i.hasta) ? ` hjs. ${i.desde}–${i.hasta}` : '';
-            const emoji = i.esPersonalizado ? '📁' : i.esCod ? '📘' : '🖨️';
+            const emoji = i.esPersonalizado ? '📂' : i.esCod ? '📖' : '';
             return `${emoji} ${esc(i.nombre)}${rango} ×${i.qty}`;
           }).join('<br>')
         : esc(p.items_resumen || '—');
@@ -5717,9 +5753,9 @@ async function cargarMisPedidos() {
     if (!rows || rows.length === 0) { cont.innerHTML = ''; return; }
     const estadoStyle = {
       pendiente:  { bg:'#FEF3C7', color:'#92400E', lbl:'⏳ Pendiente'  },
-      en_proceso: { bg:'#DBEAFE', color:'#1E40AF', lbl:'🔄 En proceso' },
+      en_proceso: { bg:'#DBEAFE', color:'#1E40AF', lbl:'<span class="status-spin">↻</span> En proceso' },
       listo:      { bg:'#D1FAE5', color:'#065F46', lbl:'✅ Listo'       },
-      entregado:  { bg:'#F3F4F6', color:'#374151', lbl:'📦 Entregado'  },
+      entregado:  { bg:'#F3F4F6', color:'#374151', lbl:'■ Entregado'  },
     };
     let html = '<div class="mis-ped-title">Mis pedidos anteriores</div>';
     rows.forEach(p => {
@@ -5890,46 +5926,46 @@ function confirmar(){
   function _abrirWA(){
     const pago    = _p;
     const pagoLbl = pago==='efectivo'?'Efectivo en mesita':'Transferencia bancaria';
-    const pagoEmoji = pago==='efectivo'?'💵':'🏦';
+    const pagoEmoji = pago==='efectivo'?'$':'';
     const nota    = _no;
     const apuntesItems  = _it.filter(i=>!i.esPersonalizado&&i.paginas!=null);
     const codigosItems  = _it.filter(i=>!i.esPersonalizado&&i.paginas==null&&!i.esPersonalizado);
     const persItems     = _it.filter(i=>i.esPersonalizado);
 
-    let msg='🛒 *Nuevo pedido — EC☀️S*\n';
+    let msg=' *Nuevo pedido — EC☀️S*\n';
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
-    msg+=`👤 *Alumno:* ${_n}\n`;
-    msg+=`📱 *WhatsApp:* ${_w}\n`;
+    msg+=` *Alumno:* ${_n}\n`;
+    msg+=` *WhatsApp:* ${_w}\n`;
     msg+=`${pagoEmoji} *Pago:* ${pagoLbl}\n`;
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
-    msg+='📦 *Productos:*\n';
+    msg+='■ *Productos:*\n';
 
     apuntesItems.forEach(i=>{
       const hojas=i.hojas||Math.ceil((i.paginas||1)/2);
       const rangoStr=(i.desde&&i.hasta&&!(i.desde===1&&i.hasta===hojas))
         ?` — hojas ${i.desde} al ${i.hasta} (${hojas} hjs.)`
         :` — ${hojas} hojas doble faz`;
-      msg+=`   🖨️ ${i.nombre} ×${i.qty}${rangoStr} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
+      msg+=`   ️ ${i.nombre} ×${i.qty}${rangoStr} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
     });
     codigosItems.forEach(i=>{
-      msg+=`   📘 ${i.nombre} ×${i.qty} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
+      msg+=`   · ${i.nombre} ×${i.qty} — *$${(i.precio*i.qty).toLocaleString('es-AR')}*\n`;
     });
     persItems.forEach(i=>{
       const cfg=i.customConfig||{};
       const precioStr=i.precio>0?`*$${i.precio.toLocaleString('es-AR')}*`:'*Precio a confirmar*';
       const hojasStr=cfg.hojas?` (${cfg.hojas} hjs. × ${cfg.copias||1} cop.)`:'';
-      msg+=`   📁 *Impresión personalizada* — ${precioStr}\n`;
-      msg+=`      📄 Archivo: ${cfg.fileName||'—'}\n`;
-      msg+=`      🎨 Config: ${cfg.configLabel||''}${hojasStr}\n`;
-      if(cfg.aclaraciones) msg+=`      📝 Aclar.: ${cfg.aclaraciones}\n`;
-      if(cfg.archivoURL)   msg+=`      🔗 Archivo: ${cfg.archivoURL}\n`;
+      msg+=`   · *Impresión personalizada* — ${precioStr}\n`;
+      msg+=`      Archivo: ${cfg.fileName||'—'}\n`;
+      msg+=`       Config: ${cfg.configLabel||''}${hojasStr}\n`;
+      if(cfg.aclaraciones) msg+=`       Aclar.: ${cfg.aclaraciones}\n`;
+      if(cfg.archivoURL)   msg+=`       Archivo: ${cfg.archivoURL}\n`;
     });
 
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
     const totalConf = _it.filter(i=>!i.esPersonalizado||i.precio>0).reduce((s,i)=>s+i.precio*i.qty,0);
     const tieneACConfirmar = persItems.some(i=>i.precio===0);
-    msg+=`💰 *Total: $${totalConf.toLocaleString('es-AR')}${tieneACConfirmar?' + personalizados a confirmar':''}*\n`;
-    if(nota) msg+=`\n📝 *Nota:* ${nota}\n`;
+    msg+=`$ *Total: $${totalConf.toLocaleString('es-AR')}${tieneACConfirmar?' + personalizados a confirmar':''}*\n`;
+    if(nota) msg+=`\n *Nota:* ${nota}\n`;
     msg+='━━━━━━━━━━━━━━━━━━━━\n';
     msg+='✅ Pedido confirmado desde la app ECOS.';
 
@@ -5957,7 +5993,7 @@ function confirmar(){
       nota:_no||null,
       items:JSON.stringify(itemsDetalle),
       items_resumen:_it.map(i=>i.esPersonalizado
-        ?`📁 ${(i.customConfig&&i.customConfig.fileName)||i.nombre} x${i.qty}`
+        ?`${(i.customConfig&&i.customConfig.fileName)||i.nombre} x${i.qty}`
         :i.esCod?`${i.nombre} x${i.qty}`
         :`${i.nombre} (hjs.${i.desde||1}-${i.hasta||i.hojas||'?'}) x${i.qty}`
       ).join(' · '),
@@ -5974,7 +6010,7 @@ function confirmar(){
     const suc=document.getElementById('ped-success');
     suc.style.display='flex';
     const extraMsg = conArchivo
-      ? '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:6px;">📎 Archivo adjuntado al pedido</div>'
+      ? '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:6px;"> Archivo adjuntado al pedido</div>'
       : '';
     suc.innerHTML=`
       <div class="success-box">
@@ -6002,13 +6038,13 @@ function confirmar(){
   }
 
   // Con archivo: subir primero, luego WA
-  btn.disabled=true; btn.textContent='📎 Subiendo archivo...';
+  btn.disabled=true; btn.textContent=' Subiendo archivo...';
 
   // Mostrar barra de progreso en el botón
   let _dots=0;
   const _dotTimer=setInterval(()=>{
     _dots=(_dots+1)%4;
-    btn.textContent='📎 Subiendo'+'.'.repeat(_dots||1);
+    btn.textContent=' Subiendo'+'.'.repeat(_dots||1);
   },500);
 
   (async()=>{
@@ -6138,7 +6174,7 @@ function calBorrar(key,idx){
 document.getElementById('cal-modal').addEventListener('click',e=>{if(e.target===document.getElementById('cal-modal'))document.getElementById('cal-modal').classList.remove('on');});
 
 // ── VUELTA SEGURA ──
-const VS_R=['¡Gracias por avisarnos! ¿A qué hora salís y de dónde?💜','Perfecto, estamos atentas. Mandanos un mensaje cuando estés saliendo.','¿Vas sola? ¿Cómo vas a volver — a pie, en colectivo?','Entendido. Te vamos a estar esperando. Cualquier cosa nos escribís al toque 💜','Anotado. Cuando llegues avisanos así sabemos que estás bien 🌙'];
+const VS_R=['¡Gracias por avisarnos! ¿A qué hora salís y de dónde?💜','Perfecto, estamos atentas. Mandanos un mensaje cuando estés saliendo.','¿Vas sola? ¿Cómo vas a volver — a pie, en colectivo?','Entendido. Te vamos a estar esperando. Cualquier cosa nos escribís al toque 💜','Anotado. Cuando llegues avisanos así sabemos que estás bien '];
 let vsIdx=0;
 function vsEnviar(){
   const inp=document.getElementById('vs-input');const t=inp.value.trim();if(!t)return;
@@ -6155,7 +6191,7 @@ function vsEnviar(){
 function vsToggle(){
   const tg=document.getElementById('vs-toggle');const hint=document.getElementById('vs-hint');const arr=document.getElementById('vs-arrived');
   tg.classList.toggle('on');
-  if(tg.classList.contains('on')){hint.textContent='✅ Activado — el Frente fue notificado';arr.style.display='block';const msgs=document.getElementById('vs-msgs');const d=document.createElement('div');d.className='vs-msg them';d.innerHTML='¡Qué bien que llegaste! Gracias por avisarnos. Buenas noches 💜🌙<div class="vs-msg-time">Frente de Mujeres</div>';msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;}
+  if(tg.classList.contains('on')){hint.textContent='✅ Activado — el Frente fue notificado';arr.style.display='block';const msgs=document.getElementById('vs-msgs');const d=document.createElement('div');d.className='vs-msg them';d.innerHTML='¡Qué bien que llegaste! Gracias por avisarnos. Buenas noches ♥<div class="vs-msg-time">Frente de Mujeres</div>';msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;}
   else{hint.textContent='Activá cuando llegues a destino';arr.style.display='none';}
 }
 
@@ -6218,10 +6254,10 @@ var _customCounter = 0; // para IDs únicos del carrito
 
 function customGetFileIcon(ext){
   var ext2 = (ext||'').toLowerCase();
-  if(ext2==='pdf') return '📕';
-  if(ext2==='doc'||ext2==='docx') return '📘';
-  if(['jpg','jpeg','png','gif','webp','bmp'].indexOf(ext2)>=0) return '🖼️';
-  return '📄';
+  if(ext2==='pdf') return 'PDF';
+  if(ext2==='doc'||ext2==='docx') return 'DOC';
+  if(['jpg','jpeg','png','gif','webp','bmp'].indexOf(ext2)>=0) return '️';
+  return 'FILE';
 }
 
 function customFormatSize(bytes){
@@ -6509,7 +6545,7 @@ function customAgregarAlCarrito(){
 
   cart[key] = {
     id: key,
-    nombre: '📁 ' + _customState.fileName,
+    nombre: _customState.fileName,
     precio: precioUnit,
     qty: 1,
     esCod: false,
