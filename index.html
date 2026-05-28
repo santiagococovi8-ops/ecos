@@ -481,15 +481,7 @@ html, body {
 }
 
 /* Active indicator dot */
-.nb.active::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 24px; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--blue-light), transparent);
-  border-radius: 0 0 2px 2px;
-}
+.nb.active::after { content: none; }
 
 .nb:active svg { transform: scale(.86); }
 
@@ -3351,11 +3343,11 @@ input:focus-visible {
    Fuente: Geist (display) + DM Sans (body)
    ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&display=swap');
+
 
 /* ── DESIGN TOKENS ── */
 :root {
-  --font: 'DM Sans', -apple-system, system-ui, sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Core brand — deep navy stays, everything else gets lifted */
   --ink:      #040C1B;
@@ -3404,10 +3396,7 @@ input:focus-visible {
   --r-pill: 9999px;
 }
 
-/* ── GLOBAL FONT SWAP ── */
-*, *::before, *::after {
-  font-family: var(--font) !important;
-}
+/* font: original Inter kept */
 html, body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -3548,14 +3537,7 @@ html, body {
 }
 
 .nb.active::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 4px; left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 4px; height: 4px !important;
-  border-radius: 50% !important;
-  background: #60A5FA !important;
-  box-shadow: 0 0 8px #60A5FA, 0 0 16px rgba(96,165,250,.5) !important;
+  content: none !important;
 }
 
 .nb:active svg { transform: scale(.78) !important; }
