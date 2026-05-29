@@ -4035,7 +4035,7 @@ input:focus-visible {
 /* ══════════════════════════════════════════
    TOASTS
    ══════════════════════════════════════════ */
-#toast-container { bottom: calc(58px + env(safe-area-inset-bottom, 0px)) !important; }
+#toast-container { bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important; }
 
 .toast-item {
   border-radius: 14px !important;
@@ -4200,11 +4200,10 @@ input:focus-visible {
    + env(safe-area-inset-bottom) para el home indicator
    ──────────────────────────────────────────────────── */
 #nav {
-  height: calc(50px + env(safe-area-inset-bottom, 0px)) !important;
-  min-height: calc(50px + env(safe-area-inset-bottom, 0px)) !important;
+  height: calc(50px + env(safe-area-inset-bottom, 0px) + 12px) !important;
+  min-height: calc(50px + env(safe-area-inset-bottom, 0px) + 12px) !important;
   padding-top: 0 !important;
-  /* 8px de aire entre los iconos y el home indicator */
-  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
   background: rgba(8, 14, 28, 0.97) !important;
@@ -4224,8 +4223,8 @@ input:focus-visible {
   height: auto !important;
   min-height: unset !important;
   max-height: unset !important;
-  /* Padding top para empujar iconos hacia el centro del área visible */
-  padding: 7px 0 0 !important;
+  /* Más padding top = iconos más arriba dentro del área */
+  padding: 9px 0 0 !important;
   margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -4264,21 +4263,21 @@ input:focus-visible {
 
 /* ── SCROLL PAD — espacio para navbar ────────────── */
 .sp {
-  padding: 10px 11px calc(66px + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 10px 11px calc(70px + env(safe-area-inset-bottom, 0px)) !important;
   gap: 8px !important;
 }
 
 #toast-container {
-  bottom: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 .cal-evts {
-  padding: 9px 9px calc(66px + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 9px 9px calc(70px + env(safe-area-inset-bottom, 0px)) !important;
   gap: 6px !important;
 }
 
 .art-body {
-  padding: 16px 13px calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 16px 13px calc(80px + env(safe-area-inset-bottom, 0px)) !important;
   gap: 12px !important;
   border-radius: 16px 16px 0 0 !important;
 }
