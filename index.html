@@ -4133,1700 +4133,426 @@ input:focus-visible {
 .ticker { border-radius: 10px !important; }
 .ticker-inner { font-size: 9.5px !important; font-weight: 900 !important; letter-spacing: .16em !important; }
 
+
 /* ══════════════════════════════════════════════════════════════
-   ECOS JurSoc — v5 Visual Refactor
-   Ref: Instagram iOS · escala compacta · jerarquía limpia
-   Principios: reducir todo ~15-20% · más aire · menos ruido
+   ECOS JurSoc — Visual Refactor Final
+   Un único bloque CSS al final para máxima especificidad
+   Referencia: Instagram iOS (screenshot proporcionado)
    ══════════════════════════════════════════════════════════════ */
 
-/* ── TOKENS v5 ── */
-:root {
-  /* Radios más compactos */
-  --r:      10px !important;
-  --r-sm:   8px !important;
-  --r-xs:   6px !important;
-
-  /* Sombras más sutiles */
-  --sh:    0 1px 2px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04) !important;
-  --sh-md: 0 3px 12px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.05) !important;
-}
-
-/* ══════════════════════════════════════════
-   APP SHELL — Fondo uniforme
-   ══════════════════════════════════════════ */
+/* ── SAFE AREA & SHELL ────────────────────────────── */
 #app { background: #EDEEF2 !important; }
 .screen { background: #EDEEF2 !important; }
 
-/* ══════════════════════════════════════════
-   HEADER — Más fino (44px como iOS native)
-   ══════════════════════════════════════════ */
+/* ── HEADER 44px ─────────────────────────────────── */
 #header {
   height: 44px !important;
+  min-height: 44px !important;
   padding: 0 12px !important;
   display: flex !important;
   align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
 }
 
+/* Logo container — no deformar la imagen */
 .h-logo {
-  width: 26px !important;
-  height: 26px !important;
-  border-radius: 50% !important;
-  font-size: 9px !important;
-  font-weight: 800 !important;
-}
-
-.h-title {
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.02em !important;
-}
-
-.h-cart {
-  width: 30px !important;
-  height: 30px !important;
-}
-
-.cart-badge {
-  width: 15px !important;
-  height: 15px !important;
-  font-size: 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   NAVBAR — Instagram style (49px + safe area)
-   ══════════════════════════════════════════ */
-#nav {
-  height: calc(49px + env(safe-area-inset-bottom, 0px)) !important;
-  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-  padding-top: 0 !important;
-  background: rgba(10,22,40,.97) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-top: 1px solid rgba(255,255,255,.06) !important;
-  box-shadow: 0 -1px 0 rgba(0,0,0,.25) !important;
-}
-
-/* Nav items container — altura fija 49px */
-#nav > div {
-  height: 49px !important;
-  align-items: center !important;
-}
-
-.nb {
-  gap: 2px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
   padding: 0 !important;
-  height: 49px !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
   display: flex !important;
-  flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
-.nb svg {
-  width: 22px !important;
-  height: 22px !important;
-}
-
-.nb span {
-  font-size: 8px !important;
-  font-weight: 600 !important;
-  letter-spacing: .03em !important;
-}
-
-/* Cart badge dot */
-.nb-dot {
-  width: 5px !important;
-  height: 5px !important;
-}
-
-/* Scroll pad updated for 49px nav */
-.sp {
-  padding: 10px 12px calc(65px + env(safe-area-inset-bottom, 0px)) !important;
-  gap: 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   CARRUSEL HOME — Más compacto
-   ══════════════════════════════════════════ */
-.carrusel {
-  height: 168px !important;
-  border-radius: 10px !important;
-}
-
-.car-content {
-  padding: 10px 13px 0 !important;
-}
-
-.car-cat {
-  font-size: 8px !important;
-  font-weight: 800 !important;
-  letter-spacing: .12em !important;
-  padding: 2px 8px !important;
-  border-radius: 4px !important;
-  margin-bottom: 6px !important;
-}
-
-.car-title {
-  font-size: 16px !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
-  line-height: 1.2 !important;
-}
-
-.car-footer {
-  padding: 7px 0 10px !important;
-  margin-top: 8px !important;
-}
-
-.car-time, .car-place {
-  font-size: 10px !important;
-}
-
-.car-dots {
-  top: 8px !important;
-  gap: 4px !important;
-}
-
-.car-dot {
-  width: 5px !important;
-  height: 5px !important;
-}
-
-.car-dot.active {
-  width: 16px !important;
-}
-
-/* ══════════════════════════════════════════
-   TICKER — Más compacto
-   ══════════════════════════════════════════ */
-.ticker {
-  padding: 6px 0 !important;
-  border-radius: 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   NEWS HEADER — Sub-header de sección
-   ══════════════════════════════════════════ */
-.news-header {
-  padding: 8px 12px 6px !important;
-}
-
-.news-header-l, .news-header-r {
-  font-size: 8px !important;
-  letter-spacing: .1em !important;
-}
-
-.news-stripe { height: 1.5px !important; }
-
-/* ══════════════════════════════════════════
-   GRID DE NOTICIAS
-   ══════════════════════════════════════════ */
-.grid {
-  gap: 7px !important;
-}
-
-.nota-card {
-  border-radius: 10px !important;
-  padding: 11px !important;
-  min-height: 106px !important;
-}
-
-.nota-half { min-height: 114px !important; }
-
-.nota-cat {
-  font-size: 8px !important;
-  font-weight: 800 !important;
-  letter-spacing: .1em !important;
-  padding: 2px 8px !important;
-  border-radius: 4px !important;
-  margin-bottom: 6px !important;
-}
-
-.nota-title {
-  font-size: 12px !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.015em !important;
-  line-height: 1.3 !important;
-}
-
-.nota-footer-lt {
-  font-size: 10px !important;
-  padding: 5px 0 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   MINI CARDS — Links / accesos rápidos
-   ══════════════════════════════════════════ */
-.mini {
-  padding: 11px 12px !important;
-  gap: 10px !important;
-  border-radius: 10px !important;
-}
-
-.mini-icon {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 9px !important;
-  font-size: 16px !important;
-}
-
-/* ══════════════════════════════════════════
-   SEC LABEL — Etiquetas de sección
-   ══════════════════════════════════════════ */
-.sec-label, .hist-section-lbl, .cal-evts-title, .mis-ped-title,
-.custom-section-title, .news-header-l, .f-lbl, .auth-label {
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  letter-spacing: .08em !important;
-  color: #8E9BB0 !important;
-}
-
-/* ══════════════════════════════════════════
-   TIENDA TABS
-   ══════════════════════════════════════════ */
-.tienda-tabs {
-  padding: 8px 10px 0 !important;
-  gap: 5px !important;
-}
-
-.t-tab {
-  padding: 8px 5px !important;
-  font-size: 10.5px !important;
-  font-weight: 700 !important;
-  border-radius: 8px 8px 0 0 !important;
-  gap: 4px !important;
-}
-
-/* ── Hero banners tienda ── */
-.t-hero {
-  padding: 14px 13px !important;
-  border-radius: 10px !important;
-}
-
-.t-hero-tag {
-  font-size: 8px !important;
-  letter-spacing: .12em !important;
-  margin-bottom: 4px !important;
-}
-
-.t-hero-title {
-  font-size: 18px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.03em !important;
-  margin-bottom: 3px !important;
-}
-
-.t-hero-sub {
-  font-size: 11px !important;
-}
-
-/* ── Year / Materia folders ── */
-.year-folder { border-radius: 10px !important; }
-
-.year-header {
-  padding: 11px 13px !important;
-}
-
-.year-badge {
+/* Forzar aspect-ratio correcto en la imagen del logo */
+.h-logo img {
   width: 32px !important;
   height: 32px !important;
-  border-radius: 9px !important;
-  font-size: 10.5px !important;
-  font-weight: 900 !important;
-}
-
-.year-header-l { gap: 11px !important; }
-
-.year-name {
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.01em !important;
-}
-
-.year-count { font-size: 11px !important; }
-
-.year-chevron { font-size: 14px !important; }
-
-.mat-header {
-  padding: 9px 13px 9px 48px !important;
-}
-
-.mat-name {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-}
-
-.mat-count { font-size: 10.5px !important; }
-
-/* ── Apunte items ── */
-.apunte-item {
-  padding: 9px 11px 9px 48px !important;
-  gap: 10px !important;
-}
-
-.apunte-icon {
-  width: 30px !important;
-  height: 30px !important;
-  border-radius: 7px !important;
-}
-
-.apunte-name {
-  font-size: 12px !important;
-  font-weight: 700 !important;
-}
-
-.apunte-meta { font-size: 10px !important; }
-
-.apunte-price {
-  font-size: 12px !important;
-  font-weight: 800 !important;
-}
-
-.btn-ver {
-  font-size: 9.5px !important;
-  padding: 3px 8px !important;
-  border-radius: 5px !important;
-}
-
-.btn-add {
-  padding: 5px 10px !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  border-radius: 7px !important;
-}
-
-/* ══════════════════════════════════════════
-   CÓDIGO CARDS
-   ══════════════════════════════════════════ */
-.codigo-card {
-  border-radius: 10px !important;
-  margin-bottom: 8px !important;
-}
-
-.codigo-header {
-  padding: 13px 13px 0 !important;
-  gap: 11px !important;
-}
-
-.codigo-badge {
-  width: 42px !important;
-  height: 42px !important;
-  border-radius: 11px !important;
-  font-size: 20px !important;
-}
-
-.codigo-name {
-  font-size: 13.5px !important;
-  font-weight: 800 !important;
-}
-
-.codigo-sub {
-  font-size: 12px !important;
-}
-
-.codigo-ed {
-  font-size: 10.5px !important;
-  margin-top: 1px !important;
-}
-
-.codigo-desc {
-  font-size: 11.5px !important;
-  padding: 9px 13px 10px !important;
-  margin-top: 8px !important;
-}
-
-.codigo-footer {
-  padding: 11px 13px !important;
-}
-
-.codigo-price {
-  font-size: 17px !important;
-  font-weight: 900 !important;
-}
-
-.codigo-price-lbl { font-size: 9.5px !important; }
-
-/* ══════════════════════════════════════════
-   HIST CARDS — Pedidos
-   ══════════════════════════════════════════ */
-.hist-card {
-  padding: 11px 13px !important;
-  gap: 7px !important;
-}
-
-.hist-card-titulo {
-  font-size: 12.5px !important;
-  font-weight: 700 !important;
-}
-
-.hist-card-fecha { font-size: 10.5px !important; }
-.hist-card-items { font-size: 11.5px !important; }
-.hist-card-total { font-size: 13px !important; font-weight: 800 !important; }
-
-.hist-estado {
-  font-size: 9.5px !important;
-  font-weight: 700 !important;
-  padding: 2px 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   CART ITEMS
-   ══════════════════════════════════════════ */
-.cart-item {
-  padding: 10px 12px !important;
-  gap: 10px !important;
-  border-radius: 10px !important;
-}
-
-.cart-item-name { font-size: 12px !important; }
-.cart-item-price { font-size: 11px !important; }
-
-.qty-btn {
-  width: 24px !important;
-  height: 24px !important;
-  font-size: 14px !important;
-}
-
-.qty-n { font-size: 14px !important; }
-
-/* ── Total box ── */
-.total-box {
-  padding: 13px 15px !important;
-  border-radius: 10px !important;
-}
-
-.total-lbl { font-size: 10px !important; }
-.total-amt { font-size: 22px !important; }
-
-/* ══════════════════════════════════════════
-   FORM ELEMENTS
-   ══════════════════════════════════════════ */
-.form-card {
-  padding: 14px 13px !important;
-  gap: 12px !important;
-  border-radius: 10px !important;
-}
-
-.f-lbl {
-  font-size: 9.5px !important;
-  font-weight: 700 !important;
-  letter-spacing: .08em !important;
-}
-
-.f-input, .f-select {
-  padding: 9px 11px !important;
-  font-size: 13px !important;
-  border-radius: 7px !important;
-}
-
-/* ══════════════════════════════════════════
-   BOTONES — jerarquía proporcional
-   ══════════════════════════════════════════ */
-.btn-confirm, .btn-enter, .btn-auth {
-  padding: 12px 16px !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  border-radius: 999px !important;
-}
-
-.btn-wsp {
-  padding: 12px !important;
-  font-size: 13.5px !important;
-}
-
-.btn-outline {
-  padding: 11px !important;
-  font-size: 13px !important;
-}
-
-.btn-confirm-custom {
-  padding: 12px !important;
-  font-size: 13.5px !important;
-}
-
-/* ══════════════════════════════════════════
-   PROG CARDS
-   ══════════════════════════════════════════ */
-.prog-card { border-radius: 10px !important; }
-
-.prog-ch {
-  padding: 12px 13px !important;
-  gap: 11px !important;
-}
-
-.prog-badge {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 11px !important;
-}
-
-.prog-badge svg {
-  width: 20px !important;
-  height: 20px !important;
-}
-
-.prog-name {
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-}
-
-.prog-tag { font-size: 11.5px !important; }
-
-.prog-body {
-  font-size: 12.5px !important;
-  padding: 0 13px 11px !important;
-  padding-top: 9px !important;
-}
-
-.prog-action {
-  padding: 10px 13px !important;
-  font-size: 12.5px !important;
-}
-
-/* ── Prog hero ── */
-.prog-hero {
-  padding: 15px 13px !important;
-  border-radius: 10px !important;
-  gap: 11px !important;
-}
-
-.prog-hero-t {
-  font-size: 15px !important;
-  font-weight: 800 !important;
-  margin-bottom: 3px !important;
-}
-
-.prog-hero-s { font-size: 11.5px !important; }
-
-/* ══════════════════════════════════════════
-   CALENDARIO
-   ══════════════════════════════════════════ */
-.cal-hdr {
-  padding: 11px 13px !important;
-}
-
-.cal-mes {
-  font-size: 15px !important;
-  font-weight: 800 !important;
-}
-
-.cal-nb {
-  width: 30px !important;
-  height: 30px !important;
-  font-size: 16px !important;
-}
-
-.cal-dow { padding: 4px 7px 3px !important; }
-
-.cal-dl {
-  font-size: 8px !important;
-  letter-spacing: .05em !important;
-}
-
-.cal-cell {
-  min-height: 40px !important;
-  padding: 4px 3px 3px !important;
-  gap: 1.5px !important;
-}
-
-.cal-num { font-size: 11px !important; }
-
-.cal-cell.today .cal-num,
-.cal-cell.sel .cal-num {
-  width: 22px !important;
-  height: 22px !important;
-}
-
-.cal-dot { width: 4px !important; height: 4px !important; }
-
-.cal-evts {
-  padding: 10px 10px calc(72px + env(safe-area-inset-bottom, 0px)) !important;
-  gap: 7px !important;
-}
-
-.evt-item {
-  padding: 10px 12px !important;
-  border-radius: 10px !important;
-  gap: 11px !important;
-}
-
-.evt-name { font-size: 12.5px !important; font-weight: 700 !important; }
-.evt-meta { font-size: 10.5px !important; }
-
-/* ══════════════════════════════════════════
-   EVENTOS — Empty / seccion title
-   ══════════════════════════════════════════ */
-.cal-evts-title {
-  font-size: 9.5px !important;
-  padding: 2px 0 !important;
-}
-
-/* ══════════════════════════════════════════
-   PERFIL / NOSOTROS
-   ══════════════════════════════════════════ */
-.perfil-hdr {
-  padding: 26px 14px 20px !important;
-  gap: 8px !important;
-}
-
-.perfil-logo {
-  width: 64px !important;
-  height: 64px !important;
-  font-size: 12px !important;
-}
-
-.perfil-name {
-  font-size: 17px !important;
-  font-weight: 800 !important;
-}
-
-.perfil-sub { font-size: 11.5px !important; }
-
-/* ══════════════════════════════════════════
-   INFO CARD — rows
-   ══════════════════════════════════════════ */
-.info-card { border-radius: 10px !important; overflow: hidden !important; }
-
-.info-row {
-  padding: 10px 13px !important;
-}
-
-.info-row .icon {
-  width: 26px !important;
-  height: 26px !important;
-  border-radius: 7px !important;
-  font-size: 14px !important;
-}
-
-.info-row .lbl { font-size: 11px !important; }
-.info-row .val { font-size: 12.5px !important; }
-
-/* ══════════════════════════════════════════
-   MODALS / SHEETS
-   ══════════════════════════════════════════ */
-.modal-sheet {
-  border-radius: 20px 20px 0 0 !important;
-  padding: 20px 18px 36px !important;
-}
-
-.modal-title {
-  font-size: 16px !important;
-  font-weight: 800 !important;
-  margin-bottom: 14px !important;
-}
-
-.install-step {
-  padding: 9px 0 !important;
-  gap: 11px !important;
-}
-
-.step-num {
-  width: 24px !important;
-  height: 24px !important;
-  font-size: 11px !important;
-}
-
-.step-txt { font-size: 12.5px !important; }
-
-.btn-close-m {
-  padding: 12px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  margin-top: 14px !important;
-}
-
-/* ── Cal modal tipo grid ── */
-.cal-tipo-btn {
-  padding: 10px 7px !important;
-  font-size: 11.5px !important;
-  border-radius: 8px !important;
-}
-
-/* ── Install banner ── */
-#install-banner {
-  padding: 9px 13px !important;
-  gap: 9px !important;
-}
-
-#install-banner p { font-size: 11.5px !important; }
-
-#install-banner .ib-btn {
-  padding: 6px 13px !important;
-  font-size: 11.5px !important;
-  font-weight: 800 !important;
-}
-
-/* ══════════════════════════════════════════
-   USER SHEET
-   ══════════════════════════════════════════ */
-#user-sheet { border-radius: 20px 20px 0 0 !important; }
-
-.us-avatar {
-  width: 52px !important;
-  height: 52px !important;
-  font-size: 20px !important;
-  margin: 18px auto 8px !important;
-}
-
-.us-name { font-size: 15px !important; font-weight: 800 !important; }
-.us-legajo { font-size: 11.5px !important; margin-bottom: 18px !important; }
-
-.us-btn {
-  padding: 11px 20px !important;
-  font-size: 13.5px !important;
-  gap: 12px !important;
-}
-
-.us-btn-icon {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 9px !important;
-  font-size: 16px !important;
-}
-
-/* ══════════════════════════════════════════
-   TOASTS
-   ══════════════════════════════════════════ */
-#toast-container {
-  bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-.toast-item {
-  padding: 10px 18px !important;
-  font-size: 13px !important;
-  border-radius: 12px !important;
-}
-
-.toast-icon { font-size: 14px !important; }
-
-/* ══════════════════════════════════════════
-   PEDIDO PERSONALIZADO — Panel limpio
-   ══════════════════════════════════════════ */
-.custom-section-title {
-  font-size: 9.5px !important;
-  margin-bottom: 7px !important;
-}
-
-.custom-upload-zone {
-  padding: 24px 13px !important;
-  border-radius: 10px !important;
-}
-
-.custom-upload-label { font-size: 13px !important; }
-.custom-upload-hint  { font-size: 11px !important; }
-
-.custom-file-preview {
-  padding: 9px 12px !important;
-  border-radius: 8px !important;
-  gap: 9px !important;
-}
-
-.custom-file-name { font-size: 12.5px !important; }
-.custom-file-size { font-size: 10.5px !important; }
-
-.f-radio-btn {
-  padding: 8px 6px !important;
-  font-size: 11.5px !important;
-  border-radius: 7px !important;
-}
-
-.custom-copias-val { font-size: 15px !important; }
-
-.custom-rango-input {
-  padding: 9px 11px !important;
-  font-size: 13px !important;
-  border-radius: 7px !important;
-}
-
-.custom-rango-hint { font-size: 10.5px !important; }
-
-.custom-aclaraciones {
-  padding: 9px 11px !important;
-  font-size: 13px !important;
-  border-radius: 7px !important;
-  min-height: 68px !important;
-}
-
-.custom-summary {
-  padding: 13px 15px !important;
-  border-radius: 10px !important;
-}
-
-.custom-summary-title {
-  font-size: 10px !important;
-  margin-bottom: 10px !important;
-}
-
-.custom-summary-row { margin-bottom: 5px !important; }
-.custom-summary-key { font-size: 12px !important; }
-.custom-summary-val { font-size: 12px !important; }
-.custom-summary-precio { font-size: 17px !important; }
-
-.btn-custom-add {
-  padding: 12px !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  margin-top: 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   ARTÍCULO
-   ══════════════════════════════════════════ */
-.art-hero { min-height: 200px !important; }
-
-.art-body {
-  padding: 18px 14px calc(80px + env(safe-area-inset-bottom, 0px)) !important;
-  gap: 13px !important;
-  border-radius: 16px 16px 0 0 !important;
-}
-
-.art-title {
-  font-size: 18px !important;
-  font-weight: 900 !important;
-  letter-spacing: -0.03em !important;
-}
-
-.art-meta { font-size: 10.5px !important; }
-
-.art-lead {
-  font-size: 13.5px !important;
-  font-weight: 600 !important;
-  padding-left: 12px !important;
-  line-height: 1.6 !important;
-}
-
-.art-text {
-  font-size: 13.5px !important;
-  line-height: 1.8 !important;
-}
-
-.art-sub {
-  font-size: 14px !important;
-  font-weight: 800 !important;
-}
-
-.art-cta {
-  padding: 12px 13px !important;
-  border-radius: 10px !important;
-  gap: 11px !important;
-}
-
-.art-cta-t { font-size: 13px !important; }
-.art-cta-s { font-size: 11px !important; }
-
-/* ══════════════════════════════════════════
-   VUELTA SEGURA
-   ══════════════════════════════════════════ */
-.vs-hero {
-  padding: 18px 13px !important;
-  border-radius: 10px !important;
-  gap: 6px !important;
-}
-
-.vs-tag { font-size: 8px !important; }
-
-.vs-title {
-  font-size: 18px !important;
-  font-weight: 900 !important;
-}
-
-.vs-sub { font-size: 11.5px !important; }
-
-.vs-info {
-  padding: 11px 13px !important;
-  border-radius: 10px !important;
-}
-
-.vs-info p { font-size: 11.5px !important; }
-
-.vs-chat { border-radius: 10px !important; }
-
-.vs-chat-hdr {
-  padding: 9px 13px !important;
-  gap: 9px !important;
-}
-
-.vs-chat-t { font-size: 12.5px !important; }
-.vs-chat-s { font-size: 10.5px !important; }
-
-.vs-msgs {
-  height: 200px !important;
-  padding: 11px !important;
-  gap: 7px !important;
-}
-
-.vs-msg {
-  padding: 8px 11px !important;
-  font-size: 12.5px !important;
-}
-
-.vs-msg-time { font-size: 9.5px !important; }
-
-.vs-bar {
-  padding: 9px 11px !important;
-  gap: 7px !important;
-}
-
-.vs-bar input {
-  padding: 8px 12px !important;
-  font-size: 12.5px !important;
-  border-radius: 18px !important;
-}
-
-.vs-bar button {
-  width: 32px !important;
-  height: 32px !important;
-  font-size: 14px !important;
-}
-
-.vs-status {
-  padding: 12px 13px !important;
-  border-radius: 10px !important;
-}
-
-/* ══════════════════════════════════════════
-   SEARCH BOX
-   ══════════════════════════════════════════ */
-.search-box {
-  border-radius: 9px !important;
-  padding: 0 12px !important;
-}
-
-.search-box input {
-  padding: 10px 0 !important;
-  font-size: 13px !important;
-}
-
-/* ══════════════════════════════════════════
-   MIS PEDIDOS
-   ══════════════════════════════════════════ */
-.mis-ped-card {
-  padding: 11px 13px !important;
-  margin-bottom: 7px !important;
-  border-radius: 10px !important;
-}
-
-.mis-ped-fecha { font-size: 10.5px !important; }
-.mis-ped-items { font-size: 11.5px !important; }
-.mis-ped-total { font-size: 12.5px !important; }
-
-.mis-ped-estado {
-  font-size: 9.5px !important;
-  padding: 2px 8px !important;
-}
-
-/* ══════════════════════════════════════════
-   EMPTY STATES
-   ══════════════════════════════════════════ */
-.empty-st {
-  padding: 44px 22px !important;
-  gap: 11px !important;
-}
-
-.empty-st .ei {
-  width: 62px !important;
-  height: 62px !important;
-  font-size: 28px !important;
-}
-
-.empty-st h3 { font-size: 15px !important; }
-.empty-st p  { font-size: 12.5px !important; }
-
-/* ══════════════════════════════════════════
-   SUCCESS BOX
-   ══════════════════════════════════════════ */
-.success-box {
-  padding: 18px 14px !important;
-  border-radius: 10px !important;
-  gap: 8px !important;
-}
-
-.success-icon  { font-size: 40px !important; }
-.success-title { font-size: 16px !important; }
-.success-sub   { font-size: 12.5px !important; }
-
-/* ══════════════════════════════════════════
-   SKELETONS
-   ══════════════════════════════════════════ */
-.skel-row {
-  padding: 11px 12px !important;
-  border-radius: 10px !important;
-}
-
-.skel-card    { height: 70px !important; }
-.skel-card-sm { height: 52px !important; }
-.skel-text    { height: 12px !important; }
-.skel-title   { height: 17px !important; }
-
-/* ══════════════════════════════════════════
-   AUTH SCREEN
-   ══════════════════════════════════════════ */
-.auth-hero {
-  padding: 40px 22px 32px !important;
-  gap: 8px !important;
-}
-
-.auth-logo {
-  width: 66px !important;
-  height: 66px !important;
-}
-
-.auth-brand { font-size: 20px !important; }
-.auth-tagline { font-size: 12px !important; }
-
-.auth-card {
-  border-radius: 16px !important;
-  padding: 22px 20px 28px !important;
-  margin: 0 14px 24px !important;
-}
-
-.auth-tabs { margin-bottom: 20px !important; }
-
-.auth-tab {
-  padding: 9px 0 !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-}
-
-.auth-form { gap: 13px !important; }
-
-.auth-field { gap: 5px !important; }
-
-.auth-input {
-  padding: 10px 12px !important;
-  font-size: 13.5px !important;
-  border-radius: 7px !important;
-}
-
-/* ══════════════════════════════════════════
-   AUTH USER PILL (header)
-   ══════════════════════════════════════════ */
-.auth-user-pill {
-  gap: 6px !important;
-  padding: 3px 6px !important;
-}
-
-.auth-user-av {
-  width: 22px !important;
-  height: 22px !important;
-  font-size: 9px !important;
-}
-
-.auth-user-name { font-size: 11px !important; }
-
-.auth-logout-btn { font-size: 10.5px !important; }
-
-/* ══════════════════════════════════════════
-   VERIFY SCREEN
-   ══════════════════════════════════════════ */
-.verify-title { font-size: 20px !important; }
-.verify-sub   { font-size: 13px !important; }
-
-.verify-email-badge {
-  padding: 8px 18px !important;
-  font-size: 12.5px !important;
-}
-
-.btn-verify-check {
-  padding: 12px 26px !important;
-  font-size: 13.5px !important;
-}
-
-.btn-verify-resend {
-  padding: 11px 20px !important;
-  font-size: 12.5px !important;
-}
-
-/* ══════════════════════════════════════════
-   PTR INDICATOR
-   ══════════════════════════════════════════ */
-#ptr-indicator { gap: 6px !important; }
-#ptr-indicator.visible, #ptr-indicator.loading { height: 44px !important; }
-#ptr-indicator span { font-size: 11px !important; }
-.ptr-spinner { width: 18px !important; height: 18px !important; }
-
-/* ══════════════════════════════════════════
-   SPLASH — Mantener estética pero escalar
-   ══════════════════════════════════════════ */
-.sp-logo { width: 80px !important; height: 80px !important; }
-.sp-brand { font-size: 19px !important; margin-top: 18px !important; }
-.sp-tagline { font-size: 12px !important; }
-
-/* ══════════════════════════════════════════
-   HOVER STATES — más sutiles
-   ══════════════════════════════════════════ */
-.nota-card:hover,
-.prog-card:hover,
-.mini:hover {
-  transform: translateY(-1px) !important;
-}
-
-/* Scroll padding para safe area en todas las pantallas */
-.screen { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
-
-/* ══════════════════════════════════════════
-   ARTÍCULO back button
-   ══════════════════════════════════════════ */
-.art-back {
-  font-size: 10px !important;
-  gap: 5px !important;
-  margin-bottom: 12px !important;
-}
-
-/* ══════════════════════════════════════════════════════════════
-   ECOS v6 — Instagram-accurate scale
-   Basado en screenshot real de Instagram iOS (imagen de referencia)
-   Reducción agresiva para igualar proporciones nativas
-   ══════════════════════════════════════════════════════════════ */
-
-/* ── Viewport scaling base ──
-   Forzamos font-size base más chico en toda la app */
-#app {
-  font-size: 14px !important;
-}
-
-/* ══════════════════════════════════════════
-   HEADER — 44px como iOS Navigation Bar real
-   Logo · Título · Botones: todo más compacto
-   ══════════════════════════════════════════ */
-#header {
-  height: 44px !important;
-  padding: 0 10px !important;
-}
-
-.h-logo {
-  width: 24px !important;
-  height: 24px !important;
-  font-size: 8px !important;
+  object-fit: contain !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  border-radius: 0 !important;
 }
 
 .h-title {
   font-size: 13px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
+  flex: 1 !important;
 }
 
-.h-cart {
-  width: 28px !important;
-  height: 28px !important;
-}
+.h-cart { width: 30px !important; height: 30px !important; }
+.cart-badge { width: 15px !important; height: 15px !important; font-size: 7.5px !important; }
+.auth-user-pill { padding: 3px 7px 3px 4px !important; gap: 5px !important; }
+.auth-user-av { width: 22px !important; height: 22px !important; font-size: 8px !important; }
+.auth-user-name { font-size: 11px !important; }
 
-/* User pill — más compacto */
-.auth-user-pill {
-  padding: 3px 6px 3px 4px !important;
-  gap: 5px !important;
-  border-radius: 14px !important;
-}
-
-.auth-user-av {
-  width: 20px !important;
-  height: 20px !important;
-  font-size: 7.5px !important;
-}
-
-.auth-user-name {
-  font-size: 10.5px !important;
-  font-weight: 600 !important;
-  max-width: 70px !important;
-}
-
-.cart-badge {
-  width: 14px !important;
-  height: 14px !important;
-  font-size: 7.5px !important;
-}
-
-/* ══════════════════════════════════════════
-   NAVBAR — Igual que Instagram:
-   50px total, iconos 24px, labels 9px
-   ══════════════════════════════════════════ */
+/* ── NAVBAR — Instagram iOS exacto ───────────────────
+   Estructura: #nav es un flex container
+   Altura total: 49px de tab bar + safe area del home indicator
+   Los .nb buttons tienen exactamente 49px y se centran dentro
+   ──────────────────────────────────────────────────── */
 #nav {
-  height: calc(50px + env(safe-area-inset-bottom, 0px)) !important;
+  /* Crítico: 49px tab bar + home indicator padding */
+  height: calc(49px + env(safe-area-inset-bottom, 0px)) !important;
+  min-height: calc(49px + env(safe-area-inset-bottom, 0px)) !important;
+  /* El padding-bottom empuja el home indicator fuera del área de tap */
+  padding-top: 0 !important;
   padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  /* Visual */
+  background: rgba(8, 14, 28, 0.97) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-top: 1px solid rgba(255,255,255,.07) !important;
+  box-shadow: 0 -1px 0 rgba(0,0,0,.2) !important;
+  /* Layout */
+  display: flex !important;
+  align-items: flex-start !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
 }
 
-#nav > div,
-#nav > div:first-child {
-  height: 50px !important;
-  padding: 0 !important;
-  align-items: center !important;
-}
-
+/* Cada botón: 49px exactos, iconos y labels centrados */
 .nb {
-  height: 50px !important;
-  gap: 2px !important;
-  padding: 8px 0 !important;
+  flex: 1 !important;
+  height: 49px !important;
+  min-height: 49px !important;
+  max-height: 49px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Iconos SVG de nav: 23px como Instagram */
 .nb svg {
-  width: 23px !important;
-  height: 23px !important;
+  width: 24px !important;
+  height: 24px !important;
+  color: rgba(255,255,255,.35) !important;
+  transition: color .18s, transform .2s cubic-bezier(.34,1.56,.64,1) !important;
+  flex-shrink: 0 !important;
 }
 
 .nb span {
   font-size: 9px !important;
   font-weight: 500 !important;
+  color: rgba(255,255,255,.35) !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
+  line-height: 1 !important;
 }
 
-/* Label activo ligeramente más visible */
-.nb.active span {
-  font-weight: 600 !important;
-  font-size: 9px !important;
-}
+.nb.active svg   { color: white !important; transform: scale(1.08) !important; }
+.nb.active span  { color: rgba(255,255,255,.85) !important; font-weight: 600 !important; }
+.nb:active svg   { transform: scale(.84) !important; }
+.nb-dot          { width: 5px !important; height: 5px !important; }
 
-/* Scroll pad ajustado */
+/* ── SCROLL PAD — espacio para navbar ────────────── */
 .sp {
-  padding: 10px 11px calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 10px 11px calc(61px + env(safe-area-inset-bottom, 0px)) !important;
   gap: 8px !important;
 }
 
-/* ══════════════════════════════════════════
-   SECCIÓN "NOTICIAS" — título de pantalla
-   En la imagen se ve "Noticias" con ~22px
-   Pero en la ref de IG los títulos son ~17px
-   ══════════════════════════════════════════ */
-
-/* El título "Noticias" grande que aparece en la imagen */
-/* Busca el h2/h3 de título de sección */
-.screen h2, .screen h3 {
-  font-size: 17px !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.02em !important;
+#toast-container {
+  bottom: calc(57px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* ══════════════════════════════════════════
-   CARRUSEL — más bajo, título más chico
-   En la imagen ocupa demasiado vertically
-   ══════════════════════════════════════════ */
-.carrusel {
-  height: 155px !important;
-  border-radius: 10px !important;
+.cal-evts {
+  padding: 9px 9px calc(63px + env(safe-area-inset-bottom, 0px)) !important;
+  gap: 6px !important;
 }
 
-.car-cat {
-  font-size: 7.5px !important;
-  padding: 2px 7px !important;
-  letter-spacing: .1em !important;
-  margin-bottom: 5px !important;
+.art-body {
+  padding: 16px 13px calc(73px + env(safe-area-inset-bottom, 0px)) !important;
+  gap: 12px !important;
+  border-radius: 16px 16px 0 0 !important;
 }
 
-.car-title {
-  font-size: 14px !important;
-  font-weight: 800 !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.02em !important;
-}
-
-.car-content {
-  padding: 9px 12px 0 !important;
-}
-
-.car-footer {
-  padding: 6px 0 9px !important;
-  margin-top: 7px !important;
-}
-
+/* ── CARRUSEL ─────────────────────────────────────── */
+.carrusel        { height: 158px !important; border-radius: 10px !important; }
+.car-content     { padding: 9px 12px 0 !important; }
+.car-cat         { font-size: 7.5px !important; padding: 2px 7px !important; letter-spacing: .1em !important; margin-bottom: 5px !important; border-radius: 4px !important; }
+.car-title       { font-size: 15px !important; font-weight: 800 !important; letter-spacing: -0.025em !important; line-height: 1.2 !important; }
+.car-footer      { padding: 6px 0 9px !important; margin-top: 7px !important; }
 .car-time, .car-place { font-size: 9.5px !important; }
+.car-dots        { top: 8px !important; gap: 4px !important; }
+.car-dot         { width: 5px !important; height: 5px !important; }
+.car-dot.active  { width: 16px !important; }
 
-/* ══════════════════════════════════════════
-   TICKER — compacto
-   ══════════════════════════════════════════ */
-.ticker { padding: 5px 0 !important; }
-.ticker-inner { font-size: 8.5px !important; letter-spacing: .14em !important; }
+/* ── NEWS HEADER & TICKER ────────────────────────── */
+.news-header                   { padding: 7px 11px 5px !important; }
+.news-header-l, .news-header-r { font-size: 8px !important; letter-spacing: .1em !important; }
+.news-stripe                   { height: 1.5px !important; }
+.ticker                        { padding: 5px 0 !important; }
+.ticker-inner                  { font-size: 8.5px !important; letter-spacing: .14em !important; }
 
-/* ══════════════════════════════════════════
-   NEWS CARDS — el bloque "Jornada de Conciencia"
-   se veía igual de grande que el carrusel
-   ══════════════════════════════════════════ */
-.nota-card {
-  padding: 10px !important;
-  min-height: 96px !important;
-  border-radius: 9px !important;
-}
+/* ── GRID DE NOTICIAS ────────────────────────────── */
+.grid           { gap: 6px !important; }
+.nota-card      { padding: 10px !important; min-height: 98px !important; border-radius: 10px !important; }
+.nota-half      { min-height: 106px !important; }
+.nota-cat       { font-size: 7.5px !important; font-weight: 800 !important; letter-spacing: .1em !important; padding: 2px 7px !important; border-radius: 4px !important; margin-bottom: 5px !important; }
+.nota-title     { font-size: 12px !important; font-weight: 800 !important; letter-spacing: -0.015em !important; line-height: 1.3 !important; }
+.nota-footer-lt { font-size: 9.5px !important; padding: 5px 0 8px !important; }
 
-.nota-half { min-height: 104px !important; }
+/* ── MINI CARDS ──────────────────────────────────── */
+.mini       { padding: 10px 11px !important; gap: 9px !important; border-radius: 10px !important; }
+.mini-icon  { width: 34px !important; height: 34px !important; border-radius: 8px !important; font-size: 15px !important; }
 
-.nota-cat {
-  font-size: 7.5px !important;
-  letter-spacing: .1em !important;
-  padding: 2px 7px !important;
-  border-radius: 4px !important;
-  margin-bottom: 5px !important;
-}
-
-.nota-title {
-  font-size: 11.5px !important;
-  font-weight: 800 !important;
-  line-height: 1.3 !important;
-  letter-spacing: -0.01em !important;
-}
-
-.nota-footer-lt { font-size: 9.5px !important; }
-
-/* Grid gap */
-.grid { gap: 6px !important; }
-
-/* ══════════════════════════════════════════
-   MINI CARDS — más chicos
-   ══════════════════════════════════════════ */
-.mini {
-  padding: 10px 11px !important;
-  gap: 9px !important;
-  border-radius: 9px !important;
-}
-
-.mini-icon {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 8px !important;
-  font-size: 15px !important;
-}
-
-/* ══════════════════════════════════════════
-   TIENDA — folders y apuntes más compactos
-   ══════════════════════════════════════════ */
-.tienda-tabs {
-  padding: 7px 9px 0 !important;
-  gap: 4px !important;
-}
-
-.t-tab {
-  padding: 7px 4px !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-}
-
-.year-header { padding: 10px 12px !important; }
-
-.year-badge {
-  width: 30px !important;
-  height: 30px !important;
-  border-radius: 8px !important;
-  font-size: 10px !important;
-}
-
-.year-name {
-  font-size: 12.5px !important;
-  font-weight: 700 !important;
-}
-
-.year-count { font-size: 10.5px !important; }
-
-.mat-header { padding: 8px 12px 8px 46px !important; }
-.mat-name { font-size: 11.5px !important; }
-.mat-count { font-size: 10px !important; }
-
-.apunte-item {
-  padding: 8px 10px 8px 46px !important;
-  gap: 9px !important;
-}
-
-.apunte-icon {
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 6px !important;
-}
-
-.apunte-name { font-size: 11.5px !important; }
-.apunte-meta { font-size: 9.5px !important; }
-.apunte-price { font-size: 11.5px !important; }
-
-.btn-ver {
-  font-size: 9px !important;
-  padding: 2px 7px !important;
-}
-
-.btn-add {
-  padding: 5px 9px !important;
-  font-size: 10.5px !important;
-  border-radius: 6px !important;
-}
-
-/* ══════════════════════════════════════════
-   CÓDIGO CARDS — reducidos
-   ══════════════════════════════════════════ */
-.codigo-header { padding: 11px 12px 0 !important; gap: 10px !important; }
-.codigo-badge { width: 38px !important; height: 38px !important; font-size: 18px !important; }
-.codigo-name { font-size: 13px !important; }
-.codigo-sub { font-size: 11.5px !important; }
-.codigo-desc { font-size: 11px !important; padding: 8px 12px 9px !important; }
-.codigo-footer { padding: 10px 12px !important; }
-.codigo-price { font-size: 16px !important; }
-
-/* ══════════════════════════════════════════
-   PROG CARDS
-   ══════════════════════════════════════════ */
-.prog-ch { padding: 11px 12px !important; gap: 10px !important; }
-.prog-badge { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
-.prog-name { font-size: 12.5px !important; }
-.prog-tag { font-size: 11px !important; }
-.prog-body { font-size: 12px !important; padding: 8px 12px 10px !important; }
-.prog-action { padding: 9px 12px !important; font-size: 12px !important; }
-
-.prog-hero {
-  padding: 13px 12px !important;
-  gap: 10px !important;
-  border-radius: 9px !important;
-}
-.prog-hero-t { font-size: 14px !important; }
-.prog-hero-s { font-size: 11px !important; }
-
-/* ══════════════════════════════════════════
-   HIST CARDS
-   ══════════════════════════════════════════ */
-.hist-card { padding: 10px 12px !important; gap: 6px !important; }
-.hist-card-titulo { font-size: 12px !important; }
-.hist-card-fecha { font-size: 10px !important; }
-.hist-card-items { font-size: 11px !important; }
-.hist-card-total { font-size: 12.5px !important; }
-.hist-estado { font-size: 9px !important; padding: 2px 7px !important; }
-
-/* ══════════════════════════════════════════
-   CART
-   ══════════════════════════════════════════ */
-.cart-item { padding: 9px 11px !important; gap: 9px !important; border-radius: 9px !important; }
-.cart-item-name { font-size: 11.5px !important; }
-.cart-item-price { font-size: 10.5px !important; }
-.qty-btn { width: 22px !important; height: 22px !important; font-size: 13px !important; }
-.qty-n { font-size: 13px !important; }
-.total-box { padding: 12px 14px !important; border-radius: 9px !important; }
-.total-lbl { font-size: 9.5px !important; }
-.total-amt { font-size: 20px !important; }
-
-/* ══════════════════════════════════════════
-   FORMS
-   ══════════════════════════════════════════ */
-.form-card { padding: 13px 12px !important; gap: 11px !important; border-radius: 9px !important; }
-.f-lbl { font-size: 9px !important; letter-spacing: .07em !important; }
-.f-input, .f-select { padding: 8px 10px !important; font-size: 12.5px !important; border-radius: 6px !important; }
-
-/* ══════════════════════════════════════════
-   BOTONES
-   ══════════════════════════════════════════ */
-.btn-confirm, .btn-enter, .btn-auth {
-  padding: 11px 14px !important;
-  font-size: 13px !important;
-}
-.btn-wsp { padding: 11px !important; font-size: 13px !important; }
-.btn-outline { padding: 10px !important; font-size: 12.5px !important; }
-.btn-custom-add { padding: 11px !important; font-size: 13px !important; margin-top: 7px !important; }
-
-/* ══════════════════════════════════════════
-   CALENDARIO
-   ══════════════════════════════════════════ */
-.cal-hdr { padding: 10px 12px !important; }
-.cal-mes { font-size: 14px !important; }
-.cal-nb { width: 28px !important; height: 28px !important; font-size: 15px !important; }
-.cal-dl { font-size: 7.5px !important; }
-.cal-cell { min-height: 36px !important; padding: 3px 2px 2px !important; }
-.cal-num { font-size: 10.5px !important; }
-.cal-cell.today .cal-num, .cal-cell.sel .cal-num { width: 20px !important; height: 20px !important; }
-.evt-item { padding: 9px 11px !important; gap: 10px !important; border-radius: 9px !important; }
-.evt-name { font-size: 12px !important; }
-.evt-meta { font-size: 10px !important; }
-.cal-evts { padding: 9px 9px calc(64px + env(safe-area-inset-bottom,0px)) !important; gap: 6px !important; }
-
-/* ══════════════════════════════════════════
-   PERFIL
-   ══════════════════════════════════════════ */
-.perfil-hdr { padding: 22px 13px 18px !important; gap: 7px !important; }
-.perfil-logo { width: 58px !important; height: 58px !important; font-size: 11px !important; }
-.perfil-name { font-size: 15px !important; }
-.perfil-sub { font-size: 11px !important; }
-
-/* ══════════════════════════════════════════
-   INFO CARD
-   ══════════════════════════════════════════ */
-.info-row { padding: 9px 12px !important; }
-.info-row .icon { width: 24px !important; height: 24px !important; font-size: 13px !important; }
-.info-row .lbl { font-size: 10.5px !important; }
-.info-row .val { font-size: 12px !important; }
-
-/* ══════════════════════════════════════════
-   SEARCH
-   ══════════════════════════════════════════ */
-.search-box { padding: 0 11px !important; border-radius: 8px !important; }
-.search-box input { padding: 9px 0 !important; font-size: 12.5px !important; }
-
-/* ══════════════════════════════════════════
-   MODALS / SHEETS
-   ══════════════════════════════════════════ */
-.modal-sheet { padding: 18px 16px 32px !important; border-radius: 18px 18px 0 0 !important; }
-.modal-title { font-size: 15px !important; margin-bottom: 13px !important; }
-.step-num { width: 22px !important; height: 22px !important; font-size: 10px !important; }
-.step-txt { font-size: 12px !important; }
-.btn-close-m { padding: 11px !important; font-size: 12.5px !important; margin-top: 13px !important; }
-.install-step { padding: 8px 0 !important; gap: 10px !important; }
-
-/* User sheet */
-#user-sheet { border-radius: 18px 18px 0 0 !important; }
-.us-avatar { width: 46px !important; height: 46px !important; font-size: 18px !important; margin: 16px auto 7px !important; }
-.us-name { font-size: 14px !important; }
-.us-legajo { font-size: 11px !important; margin-bottom: 16px !important; }
-.us-btn { padding: 10px 18px !important; font-size: 13px !important; gap: 11px !important; }
-.us-btn-icon { width: 32px !important; height: 32px !important; border-radius: 8px !important; font-size: 15px !important; }
-.us-handle { margin: 11px auto 0 !important; }
-
-/* ══════════════════════════════════════════
-   TOASTS
-   ══════════════════════════════════════════ */
-#toast-container { bottom: calc(58px + env(safe-area-inset-bottom,0px)) !important; }
-.toast-item { padding: 9px 16px !important; font-size: 12.5px !important; border-radius: 10px !important; }
-
-/* ══════════════════════════════════════════
-   PEDIDO PERSONALIZADO
-   ══════════════════════════════════════════ */
-.custom-upload-zone { padding: 20px 12px !important; }
-.custom-upload-label { font-size: 12.5px !important; }
-.custom-upload-hint { font-size: 10.5px !important; }
-.f-radio-btn { padding: 7px 5px !important; font-size: 11px !important; border-radius: 6px !important; }
-.custom-rango-input { padding: 8px 10px !important; font-size: 12.5px !important; border-radius: 6px !important; }
-.custom-aclaraciones { padding: 8px 10px !important; font-size: 12.5px !important; min-height: 62px !important; }
-.custom-summary { padding: 12px 13px !important; border-radius: 9px !important; }
-.custom-summary-title { font-size: 9px !important; margin-bottom: 9px !important; }
-.custom-summary-key { font-size: 11.5px !important; }
-.custom-summary-val { font-size: 11.5px !important; }
-.custom-summary-precio { font-size: 16px !important; }
-
-/* ══════════════════════════════════════════
-   ARTÍCULO
-   ══════════════════════════════════════════ */
-.art-hero { min-height: 180px !important; }
-.art-title { font-size: 17px !important; }
-.art-meta { font-size: 10px !important; }
-.art-lead { font-size: 13px !important; line-height: 1.55 !important; }
-.art-text { font-size: 13px !important; line-height: 1.75 !important; }
-.art-sub { font-size: 13.5px !important; }
-.art-body { padding: 16px 13px calc(72px + env(safe-area-inset-bottom,0px)) !important; gap: 12px !important; }
-.art-cta { padding: 11px 12px !important; gap: 10px !important; }
-.art-cta-t { font-size: 12.5px !important; }
-.art-cta-s { font-size: 10.5px !important; }
-
-/* ══════════════════════════════════════════
-   VUELTA SEGURA
-   ══════════════════════════════════════════ */
-.vs-hero { padding: 16px 12px !important; gap: 5px !important; border-radius: 9px !important; }
-.vs-title { font-size: 16px !important; }
-.vs-sub { font-size: 11px !important; }
-.vs-info { padding: 10px 12px !important; }
-.vs-info p { font-size: 11px !important; }
-.vs-chat-hdr { padding: 8px 12px !important; }
-.vs-chat-t { font-size: 12px !important; }
-.vs-chat-s { font-size: 10px !important; }
-.vs-msgs { height: 185px !important; padding: 10px !important; gap: 6px !important; }
-.vs-msg { padding: 7px 10px !important; font-size: 12px !important; }
-.vs-bar { padding: 8px 10px !important; }
-.vs-bar input { padding: 7px 11px !important; font-size: 12px !important; }
-.vs-bar button { width: 30px !important; height: 30px !important; font-size: 13px !important; }
-.vs-status { padding: 11px 12px !important; }
-
-/* ══════════════════════════════════════════
-   EMPTY STATES
-   ══════════════════════════════════════════ */
-.empty-st { padding: 38px 20px !important; gap: 10px !important; }
-.empty-st .ei { width: 56px !important; height: 56px !important; font-size: 24px !important; }
-.empty-st h3 { font-size: 14px !important; }
-.empty-st p { font-size: 12px !important; }
-
-/* ══════════════════════════════════════════
-   SUCCESS BOX
-   ══════════════════════════════════════════ */
-.success-box { padding: 16px 13px !important; gap: 7px !important; }
-.success-icon { font-size: 36px !important; }
-.success-title { font-size: 15px !important; }
-.success-sub { font-size: 12px !important; }
-
-/* ══════════════════════════════════════════
-   MIS PEDIDOS
-   ══════════════════════════════════════════ */
-.mis-ped-card { padding: 10px 12px !important; margin-bottom: 6px !important; border-radius: 9px !important; }
-.mis-ped-fecha { font-size: 10px !important; }
-.mis-ped-items { font-size: 11px !important; }
-.mis-ped-total { font-size: 12px !important; }
-.mis-ped-estado { font-size: 9px !important; padding: 2px 7px !important; }
-
-/* ══════════════════════════════════════════
-   SKELETONS
-   ══════════════════════════════════════════ */
-.skel-row { padding: 10px 11px !important; border-radius: 9px !important; }
-.skel-card { height: 64px !important; }
-.skel-card-sm { height: 48px !important; }
-
-/* ══════════════════════════════════════════
-   AUTH SCREEN — más compacta
-   ══════════════════════════════════════════ */
-.auth-hero { padding: 36px 20px 28px !important; gap: 7px !important; }
-.auth-logo { width: 58px !important; height: 58px !important; }
-.auth-brand { font-size: 18px !important; }
-.auth-tagline { font-size: 11.5px !important; }
-.auth-card { padding: 20px 18px 26px !important; margin: 0 13px 22px !important; border-radius: 14px !important; }
-.auth-form { gap: 12px !important; }
-.auth-field { gap: 4px !important; }
-.auth-input { padding: 9px 11px !important; font-size: 13px !important; }
-.auth-tab { padding: 8px 0 !important; font-size: 12.5px !important; }
-.auth-tabs { margin-bottom: 18px !important; }
-
-/* ══════════════════════════════════════════
-   INSTALL BANNER
-   ══════════════════════════════════════════ */
-#install-banner { padding: 8px 12px !important; gap: 8px !important; }
-#install-banner p { font-size: 11px !important; }
-#install-banner .ib-btn { padding: 5px 12px !important; font-size: 11px !important; }
-
-/* ══════════════════════════════════════════
-   SECTION LABELS — muy chicos y discretos
-   ══════════════════════════════════════════ */
+/* ── SECTION LABELS ──────────────────────────────── */
 .sec-label, .hist-section-lbl, .cal-evts-title,
 .mis-ped-title, .custom-section-title {
-  font-size: 9px !important;
-  letter-spacing: .07em !important;
-  color: #9BA8BB !important;
+  font-size: 9.5px !important; font-weight: 700 !important;
+  letter-spacing: .08em !important; color: #8E9BB0 !important;
 }
 
-/* ══════════════════════════════════════════
-   SPLASH — un poco más chico
-   ══════════════════════════════════════════ */
-.sp-logo { width: 72px !important; height: 72px !important; }
-.sp-brand { font-size: 17px !important; margin-top: 16px !important; }
-.sp-tagline { font-size: 11px !important; }
+/* ── TIENDA TABS ─────────────────────────────────── */
+.tienda-tabs   { padding: 7px 9px 0 !important; gap: 4px !important; }
+.t-tab         { padding: 7px 4px !important; font-size: 10px !important; font-weight: 700 !important; border-radius: 8px 8px 0 0 !important; }
+.t-tab.active  { color: var(--blue) !important; }
+.t-hero        { padding: 13px 12px !important; border-radius: 10px !important; }
+.t-hero-tag    { font-size: 7.5px !important; margin-bottom: 3px !important; }
+.t-hero-title  { font-size: 17px !important; font-weight: 900 !important; letter-spacing: -0.025em !important; }
+.t-hero-sub    { font-size: 11px !important; }
 
-/* ══════════════════════════════════════════
-   CAL TIPO MODAL
-   ══════════════════════════════════════════ */
-.cal-tipo-btn { padding: 9px 6px !important; font-size: 11px !important; border-radius: 7px !important; }
+/* ── YEAR / MATERIA / APUNTE ─────────────────────── */
+.year-folder   { border-radius: 10px !important; }
+.year-header   { padding: 10px 12px !important; }
+.year-badge    { width: 30px !important; height: 30px !important; border-radius: 8px !important; font-size: 10px !important; font-weight: 900 !important; }
+.year-name     { font-size: 12.5px !important; font-weight: 700 !important; }
+.year-count    { font-size: 10.5px !important; }
+.year-chevron  { font-size: 14px !important; }
+.mat-header    { padding: 8px 12px 8px 46px !important; }
+.mat-name      { font-size: 11.5px !important; font-weight: 600 !important; }
+.mat-count     { font-size: 10px !important; }
+.apunte-item   { padding: 8px 10px 8px 46px !important; gap: 9px !important; }
+.apunte-icon   { width: 28px !important; height: 28px !important; border-radius: 6px !important; }
+.apunte-name   { font-size: 11.5px !important; font-weight: 700 !important; }
+.apunte-meta   { font-size: 9.5px !important; }
+.apunte-price  { font-size: 11.5px !important; font-weight: 800 !important; }
+.btn-ver       { font-size: 9px !important; padding: 2px 7px !important; border-radius: 5px !important; }
+.btn-add       { padding: 5px 9px !important; font-size: 10.5px !important; font-weight: 700 !important; border-radius: 6px !important; }
 
-/* ══════════════════════════════════════════
-   T-HERO (hero banners de tienda)
-   ══════════════════════════════════════════ */
-.t-hero { padding: 13px 12px !important; border-radius: 9px !important; }
-.t-hero-tag { font-size: 7.5px !important; margin-bottom: 3px !important; }
-.t-hero-title { font-size: 16px !important; letter-spacing: -0.025em !important; }
-.t-hero-sub { font-size: 10.5px !important; }
+/* ── CÓDIGO CARDS ────────────────────────────────── */
+.codigo-card      { border-radius: 10px !important; margin-bottom: 8px !important; }
+.codigo-header    { padding: 11px 12px 0 !important; gap: 10px !important; }
+.codigo-badge     { width: 38px !important; height: 38px !important; border-radius: 10px !important; font-size: 18px !important; }
+.codigo-name      { font-size: 13px !important; font-weight: 800 !important; }
+.codigo-sub       { font-size: 11.5px !important; }
+.codigo-desc      { font-size: 11px !important; padding: 8px 12px 9px !important; margin-top: 8px !important; }
+.codigo-footer    { padding: 10px 12px !important; }
+.codigo-price     { font-size: 16px !important; font-weight: 900 !important; }
+.codigo-price-lbl { font-size: 9.5px !important; }
 
-/* ══════════════════════════════════════════
-   PTR indicator
-   ══════════════════════════════════════════ */
-#ptr-indicator.visible, #ptr-indicator.loading { height: 40px !important; }
-.ptr-spinner { width: 16px !important; height: 16px !important; }
-#ptr-indicator span { font-size: 10.5px !important; }
+/* ── HISTORIAL ───────────────────────────────────── */
+.hist-card         { padding: 10px 12px !important; gap: 6px !important; border-radius: 10px !important; }
+.hist-card-titulo  { font-size: 12px !important; font-weight: 700 !important; }
+.hist-card-fecha   { font-size: 10px !important; }
+.hist-card-items   { font-size: 11px !important; }
+.hist-card-total   { font-size: 12.5px !important; font-weight: 800 !important; }
+.hist-estado       { font-size: 9px !important; font-weight: 700 !important; padding: 2px 7px !important; border-radius: 999px !important; }
+.hist-estado.pendiente  { background: #FEF3C7 !important; color: #92400E !important; border: 1px solid #FDE68A !important; }
+.hist-estado.en_proceso { background: #DBEAFE !important; color: #1E40AF !important; border: 1px solid #BFDBFE !important; }
+.hist-estado.listo      { background: #D1FAE5 !important; color: #065F46 !important; border: 1px solid #A7F3D0 !important; }
+.hist-estado.entregado  { background: #F1F5F9 !important; color: #64748B !important; border: 1px solid #E2E8F0 !important; }
 
-/* ══════════════════════════════════════════
-   NEWS HEADER BAR
-   ══════════════════════════════════════════ */
-.news-header { padding: 7px 11px 5px !important; }
-.news-stripe { height: 1px !important; }
+/* ── CARRITO ─────────────────────────────────────── */
+.cart-item       { padding: 9px 11px !important; gap: 9px !important; border-radius: 10px !important; }
+.cart-item-name  { font-size: 11.5px !important; font-weight: 700 !important; }
+.cart-item-price { font-size: 10.5px !important; }
+.qty-btn         { width: 24px !important; height: 24px !important; font-size: 13px !important; }
+.qty-n           { font-size: 13px !important; font-weight: 700 !important; }
+.total-box       { padding: 12px 14px !important; border-radius: 10px !important; }
+.total-lbl       { font-size: 9.5px !important; }
+.total-amt       { font-size: 21px !important; }
 
-/* ══════════════════════════════════════════
-   VERIFY SCREEN
-   ══════════════════════════════════════════ */
-.verify-title { font-size: 18px !important; }
-.verify-sub { font-size: 12.5px !important; }
+/* ── FORMS ───────────────────────────────────────── */
+.form-card    { padding: 13px 12px !important; gap: 11px !important; border-radius: 10px !important; }
+.f-lbl        { font-size: 9.5px !important; font-weight: 700 !important; letter-spacing: .08em !important; color: #64748B !important; }
+.f-input, .f-select { padding: 8px 10px !important; font-size: 12.5px !important; border-radius: 6px !important; }
+
+/* ── BOTONES ─────────────────────────────────────── */
+.btn-confirm, .btn-auth { padding: 11px 14px !important; font-size: 13px !important; font-weight: 700 !important; border-radius: 999px !important; }
+.btn-wsp                { padding: 11px !important; font-size: 13px !important; border-radius: 999px !important; }
+.btn-outline            { padding: 10px !important; font-size: 12.5px !important; border-radius: 999px !important; }
+.btn-custom-add         { padding: 11px !important; font-size: 13px !important; font-weight: 700 !important; border-radius: 999px !important; margin-top: 7px !important; }
+
+/* ── PROG CARDS ──────────────────────────────────── */
+.prog-card    { border-radius: 10px !important; }
+.prog-ch      { padding: 11px 12px !important; gap: 10px !important; }
+.prog-badge   { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
+.prog-badge svg { width: 20px !important; height: 20px !important; }
+.prog-name    { font-size: 12.5px !important; font-weight: 700 !important; }
+.prog-tag     { font-size: 11px !important; }
+.prog-body    { font-size: 12px !important; padding: 8px 12px 10px !important; }
+.prog-action  { padding: 9px 12px !important; font-size: 12px !important; }
+.prog-hero    { padding: 13px 12px !important; gap: 10px !important; border-radius: 10px !important; }
+.prog-hero-t  { font-size: 14px !important; font-weight: 800 !important; margin-bottom: 3px !important; }
+.prog-hero-s  { font-size: 11px !important; }
+
+/* ── CALENDARIO ──────────────────────────────────── */
+.cal-hdr         { padding: 10px 12px !important; }
+.cal-mes         { font-size: 14px !important; font-weight: 800 !important; }
+.cal-nb          { width: 28px !important; height: 28px !important; font-size: 15px !important; }
+.cal-dl          { font-size: 7.5px !important; }
+.cal-cell        { min-height: 38px !important; padding: 3px 2px 2px !important; }
+.cal-num         { font-size: 10.5px !important; }
+.cal-cell.today .cal-num,
+.cal-cell.sel   .cal-num { width: 20px !important; height: 20px !important; }
+.cal-dot         { width: 4px !important; height: 4px !important; }
+.evt-item        { padding: 9px 11px !important; gap: 10px !important; border-radius: 10px !important; }
+.evt-name        { font-size: 12px !important; font-weight: 700 !important; }
+.evt-meta        { font-size: 10px !important; }
+
+/* ── PERFIL ──────────────────────────────────────── */
+.perfil-hdr  { padding: 22px 13px 18px !important; gap: 7px !important; }
+.perfil-logo { width: 58px !important; height: 58px !important; font-size: 11px !important; }
+.perfil-name { font-size: 16px !important; font-weight: 800 !important; }
+.perfil-sub  { font-size: 11px !important; }
+
+/* ── INFO CARD ───────────────────────────────────── */
+.info-card    { border-radius: 10px !important; overflow: hidden !important; }
+.info-row     { padding: 9px 12px !important; }
+.info-row .icon { width: 24px !important; height: 24px !important; border-radius: 6px !important; }
+.info-row .lbl  { font-size: 10.5px !important; }
+.info-row .val  { font-size: 12px !important; }
+
+/* ── SEARCH ──────────────────────────────────────── */
+.search-box       { padding: 0 11px !important; border-radius: 8px !important; }
+.search-box input { padding: 9px 0 !important; font-size: 12.5px !important; }
+
+/* ── MODALS / SHEETS ─────────────────────────────── */
+.modal-sheet   { border-radius: 20px 20px 0 0 !important; padding: 18px 16px 32px !important; }
+.modal-title   { font-size: 15px !important; font-weight: 800 !important; margin-bottom: 13px !important; }
+.step-num      { width: 22px !important; height: 22px !important; font-size: 10px !important; }
+.step-txt      { font-size: 12px !important; }
+.btn-close-m   { padding: 11px !important; font-size: 12.5px !important; font-weight: 700 !important; margin-top: 13px !important; border-radius: 999px !important; }
+.install-step  { padding: 8px 0 !important; gap: 10px !important; }
+.cal-tipo-btn  { padding: 9px 6px !important; font-size: 11px !important; border-radius: 7px !important; }
+#user-sheet    { border-radius: 20px 20px 0 0 !important; }
+.us-handle     { margin: 11px auto 0 !important; }
+.us-avatar     { width: 48px !important; height: 48px !important; font-size: 18px !important; margin: 16px auto 7px !important; }
+.us-name       { font-size: 14px !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
+.us-legajo     { font-size: 11px !important; margin-bottom: 16px !important; }
+.us-btn        { padding: 10px 18px !important; font-size: 13px !important; gap: 11px !important; }
+.us-btn-icon   { width: 32px !important; height: 32px !important; border-radius: 8px !important; font-size: 15px !important; }
+#install-banner      { padding: 8px 12px !important; gap: 8px !important; }
+#install-banner p    { font-size: 11px !important; }
+#install-banner .ib-btn { padding: 5px 12px !important; font-size: 11px !important; font-weight: 800 !important; }
+
+/* ── TOAST ───────────────────────────────────────── */
+.toast-item { padding: 9px 16px !important; font-size: 12.5px !important; border-radius: 12px !important; }
+.toast-icon { font-size: 13px !important; }
+
+/* ── ARTÍCULO ────────────────────────────────────── */
+.art-hero   { min-height: 190px !important; }
+.art-title  { font-size: 18px !important; font-weight: 900 !important; letter-spacing: -0.03em !important; }
+.art-meta   { font-size: 10px !important; }
+.art-lead   { font-size: 13px !important; font-weight: 600 !important; line-height: 1.6 !important; padding-left: 12px !important; }
+.art-text   { font-size: 13px !important; line-height: 1.8 !important; }
+.art-sub    { font-size: 13.5px !important; font-weight: 800 !important; }
+.art-cta    { padding: 11px 12px !important; gap: 10px !important; border-radius: 10px !important; }
+.art-cta-t  { font-size: 12.5px !important; }
+.art-cta-s  { font-size: 10.5px !important; }
+.art-back   { font-size: 10px !important; gap: 5px !important; margin-bottom: 12px !important; }
+
+/* ── VUELTA SEGURA ───────────────────────────────── */
+.vs-hero       { padding: 16px 12px !important; gap: 5px !important; border-radius: 10px !important; }
+.vs-title      { font-size: 16px !important; font-weight: 900 !important; }
+.vs-sub        { font-size: 11px !important; }
+.vs-info       { padding: 10px 12px !important; border-radius: 10px !important; }
+.vs-info p     { font-size: 11px !important; }
+.vs-chat       { border-radius: 10px !important; }
+.vs-chat-hdr   { padding: 8px 12px !important; gap: 9px !important; }
+.vs-chat-t     { font-size: 12px !important; }
+.vs-chat-s     { font-size: 10px !important; }
+.vs-msgs       { height: 185px !important; padding: 10px !important; gap: 6px !important; }
+.vs-msg        { padding: 7px 10px !important; font-size: 12px !important; }
+.vs-msg-time   { font-size: 9.5px !important; }
+.vs-bar        { padding: 8px 10px !important; }
+.vs-bar input  { padding: 7px 11px !important; font-size: 12px !important; border-radius: 18px !important; }
+.vs-bar button { width: 30px !important; height: 30px !important; font-size: 13px !important; }
+.vs-status     { padding: 11px 12px !important; border-radius: 10px !important; }
+
+/* ── PEDIDO PERSONALIZADO ────────────────────────── */
+.custom-upload-zone  { padding: 22px 12px !important; border-radius: 10px !important; }
+.custom-upload-label { font-size: 12.5px !important; }
+.custom-upload-hint  { font-size: 10.5px !important; }
+.f-radio-btn         { padding: 7px 5px !important; font-size: 11px !important; border-radius: 6px !important; }
+.custom-rango-input  { padding: 8px 10px !important; font-size: 12.5px !important; border-radius: 6px !important; }
+.custom-rango-hint   { font-size: 10.5px !important; }
+.custom-aclaraciones { padding: 8px 10px !important; font-size: 12.5px !important; min-height: 64px !important; border-radius: 6px !important; }
+.custom-summary      { padding: 12px 13px !important; border-radius: 10px !important; }
+.custom-summary-title{ font-size: 9px !important; margin-bottom: 9px !important; }
+.custom-summary-key, .custom-summary-val { font-size: 11.5px !important; }
+.custom-summary-precio { font-size: 16px !important; }
+
+/* ── MIS PEDIDOS ─────────────────────────────────── */
+.mis-ped-card   { padding: 10px 12px !important; margin-bottom: 6px !important; border-radius: 10px !important; }
+.mis-ped-fecha  { font-size: 10px !important; }
+.mis-ped-items  { font-size: 11px !important; }
+.mis-ped-total  { font-size: 12px !important; font-weight: 800 !important; }
+.mis-ped-estado { font-size: 9px !important; padding: 2px 7px !important; border-radius: 999px !important; }
+
+/* ── EMPTY / SUCCESS / SKELETONS ─────────────────── */
+.empty-st        { padding: 40px 20px !important; gap: 10px !important; }
+.empty-st .ei    { width: 58px !important; height: 58px !important; font-size: 26px !important; }
+.empty-st h3     { font-size: 14px !important; font-weight: 700 !important; }
+.empty-st p      { font-size: 12px !important; }
+.success-box     { padding: 16px 13px !important; border-radius: 10px !important; gap: 7px !important; }
+.success-icon    { font-size: 38px !important; }
+.success-title   { font-size: 15px !important; font-weight: 800 !important; }
+.success-sub     { font-size: 12px !important; }
+.skel-row        { padding: 10px 11px !important; border-radius: 10px !important; }
+.skel-card       { height: 64px !important; }
+.skel-card-sm    { height: 48px !important; }
+
+/* ── AUTH ────────────────────────────────────────── */
+.auth-hero    { padding: 36px 20px 28px !important; gap: 7px !important; }
+.auth-logo    { width: 60px !important; height: 60px !important; }
+.auth-brand   { font-size: 18px !important; font-weight: 900 !important; }
+.auth-tagline { font-size: 11.5px !important; }
+.auth-card    { padding: 20px 18px 26px !important; margin: 0 13px 22px !important; border-radius: 14px !important; }
+.auth-form    { gap: 12px !important; }
+.auth-field   { gap: 4px !important; }
+.auth-input   { padding: 9px 11px !important; font-size: 13px !important; border-radius: 6px !important; }
+.auth-tab     { padding: 8px 0 !important; font-size: 12.5px !important; font-weight: 700 !important; }
+.auth-tabs    { margin-bottom: 18px !important; }
+.auth-label   { font-size: 9.5px !important; font-weight: 700 !important; letter-spacing: .08em !important; }
+.verify-title { font-size: 18px !important; font-weight: 900 !important; }
+.verify-sub   { font-size: 12.5px !important; }
 .verify-email-badge { padding: 7px 16px !important; font-size: 12px !important; }
-.btn-verify-check { padding: 11px 24px !important; font-size: 13px !important; }
-.btn-verify-resend { padding: 10px 18px !important; font-size: 12px !important; }
+.btn-verify-check   { padding: 11px 24px !important; font-size: 13px !important; }
+.btn-verify-resend  { padding: 10px 18px !important; font-size: 12px !important; }
+
+/* ── PTR / SPLASH ────────────────────────────────── */
+#ptr-indicator.visible,
+#ptr-indicator.loading { height: 42px !important; }
+.ptr-spinner  { width: 16px !important; height: 16px !important; }
+#ptr-indicator span { font-size: 10.5px !important; }
+.sp-logo      { width: 76px !important; height: 76px !important; }
+.sp-brand     { font-size: 18px !important; margin-top: 16px !important; }
+.sp-tagline   { font-size: 11.5px !important; }
+
+/* ── SCROLLBARS ──────────────────────────────────── */
+.screen::-webkit-scrollbar, .t-panel::-webkit-scrollbar,
+.vs-msgs::-webkit-scrollbar, .cal-evts::-webkit-scrollbar { display: none !important; }
+.screen, .t-panel, .vs-msgs, .cal-evts { scrollbar-width: none !important; }
+
 
 </style>
   <!-- OneSignal Push Notifications -->
