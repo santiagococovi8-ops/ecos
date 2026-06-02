@@ -5244,6 +5244,8 @@ function doLogout() {
     window._sbUnsubscribers.forEach(fn=>{try{fn();}catch(e){}});
     window._sbUnsubscribers=[];
   }
+  // Desvincular OneSignal al cerrar sesión
+  logoutPushNotifications();
   SB.logout();
   _currentUser = null;
   localStorage.removeItem('ecos_user');
@@ -6135,38 +6137,165 @@ function updateCartUI(){
   else{badge.style.display='none';dot.classList.remove('on');}
 }
 
-// ── PEDIDO ──
-// ── ONESIGNAL PUSH ──
+// ══════════════════════════════════════════════════════════════
+// SISTEMA DE NOTIFICACIONES — v2 (reconstruido)
+// ══════════════════════════════════════════════════════════════
+
+// Estado global del módulo de notificaciones
+const PUSH = {
+  initialized: false,
+  permissionGranted: false,
+  userId: null,        // legajo sanitizado
+  retryCount: 0,
+  MAX_RETRIES: 3,
+};
+
+// Sanitizar legajo para OneSignal external_id
+// Solo alfanumérico, guion, underscore, punto, arroba
+function _sanitizeLegajo(legajo) {
+  if (!legajo) return null;
+  return String(legajo).trim().replace(/[^a-zA-Z0-9_\-\.@]/g, '_');
+}
+
+// Inicializar notificaciones (llamar al hacer login)
 function initPushNotifications() {
-  if (!window.OneSignalDeferred) return;
+  if (!window.OneSignalDeferred) {
+    console.warn('[PUSH] OneSignalDeferred no disponible');
+    return;
+  }
+  const legajoId = _sanitizeLegajo(_currentUser?.legajo);
+  if (!legajoId) {
+    console.warn('[PUSH] No hay legajo de usuario para registrar en OneSignal');
+    return;
+  }
 
-  // Sanitizar legajo: "/" y otros chars no son válidos en OneSignal external_id
-  const legajoId = _currentUser?.legajo
-    ? String(_currentUser.legajo).replace(/[^a-zA-Z0-9_\-\.@]/g, '_')
-    : null;
+  PUSH.userId = legajoId;
 
-  if (!legajoId) return;
-
-  const _doLogin = async (OneSignal) => {
+  const _doInit = async (OneSignal) => {
     try {
-      // Pedir permiso si no lo tiene
-      const permission = await OneSignal.Notifications.permission;
-      if (!permission) {
-        await OneSignal.Notifications.requestPermission();
+      console.log('[PUSH] Iniciando registro para legajo:', legajoId);
+
+      // 1. Verificar si ya tiene permiso
+      const hasPermission = await OneSignal.Notifications.permission;
+      console.log('[PUSH] Permiso actual:', hasPermission);
+
+      // 2. Si no tiene permiso, pedirlo (solo si el browser lo permite)
+      if (!hasPermission) {
+        try {
+          const granted = await OneSignal.Notifications.requestPermission();
+          console.log('[PUSH] Permiso solicitado, resultado:', granted);
+          PUSH.permissionGranted = !!granted;
+        } catch(permErr) {
+          console.warn('[PUSH] No se pudo solicitar permiso:', permErr.message);
+          // Continuar igual — tal vez ya tiene permiso o lo denegó
+        }
+      } else {
+        PUSH.permissionGranted = true;
       }
-      // Vincular external_id siempre (aunque ya tenga permiso)
+
+      // 3. Vincular external_id (el legajo) con este dispositivo
+      // Esto es lo que permite enviar notificaciones individuales
       await OneSignal.login(legajoId);
-      console.log('OneSignal vinculado:', legajoId);
+      console.log('[PUSH] ✅ Usuario vinculado en OneSignal:', legajoId);
+      PUSH.initialized = true;
+      PUSH.retryCount = 0;
+
+      // 4. Suscribir al evento de notificación recibida en foreground
+      OneSignal.Notifications.addEventListener('foregroundWillDisplay', (event) => {
+        console.log('[PUSH] Notificación recibida en foreground:', event.notification);
+        // Mostrar un toast nativo en la app si está en primer plano
+        const title = event.notification.title || 'ECOS';
+        const body  = event.notification.body  || '';
+        _showInAppNotif(title, body);
+        // Permitir que también aparezca la notificación del sistema
+        event.notification.display();
+      });
+
+      // 5. Suscribir al evento de click en notificación
+      OneSignal.Notifications.addEventListener('click', (event) => {
+        console.log('[PUSH] Click en notificación:', event.notification);
+        const url = event.notification.launchURL || event.notification.data?.url;
+        if (url && url !== window.location.href) {
+          // Si tiene URL de destino, navegar (en PWA)
+          try { window.open(url, '_self'); } catch(e) {}
+        }
+      });
+
     } catch(e) {
-      console.warn('OneSignal error:', e.message);
+      console.error('[PUSH] Error inicializando:', e.message);
+      PUSH.retryCount++;
+      if (PUSH.retryCount < PUSH.MAX_RETRIES) {
+        console.log('[PUSH] Reintentando en 3s... (intento', PUSH.retryCount, ')');
+        setTimeout(() => initPushNotifications(), 3000);
+      }
     }
   };
 
   // Si el SDK ya está inicializado usarlo directo, sino encolar
   if (window.OneSignal && typeof window.OneSignal.login === 'function') {
-    _doLogin(window.OneSignal);
+    _doInit(window.OneSignal);
   } else {
-    OneSignalDeferred.push(_doLogin);
+    OneSignalDeferred.push(_doInit);
+  }
+}
+
+// Mostrar notificación in-app (cuando la app está en foreground)
+function _showInAppNotif(title, body) {
+  // Reusar el sistema de toast si existe
+  const toast = document.getElementById('push-toast');
+  if (toast) {
+    toast.querySelector('.pt-title').textContent = title;
+    toast.querySelector('.pt-body').textContent  = body;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 5000);
+    return;
+  }
+
+  // Crear elemento de notificación in-app si no existe
+  const el = document.createElement('div');
+  el.id = 'push-toast';
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;">
+      <div style="font-size:20px;flex-shrink:0;">🔔</div>
+      <div style="flex:1;min-width:0;">
+        <div class="pt-title" style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:2px;">${title}</div>
+        <div class="pt-body"  style="font-size:12px;color:#475569;line-height:1.4;">${body}</div>
+      </div>
+      <button onclick="document.getElementById('push-toast').classList.remove('show')"
+        style="background:none;border:none;font-size:18px;color:#94A3B8;cursor:pointer;flex-shrink:0;padding:0;">×</button>
+    </div>`;
+  el.style.cssText = `
+    position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);
+    background:white;border-radius:14px;width:92%;max-width:380px;
+    box-shadow:0 8px 32px rgba(0,0,0,.15);
+    opacity:0;transition:opacity .3s,transform .3s;z-index:9999;
+    pointer-events:none;`;
+  document.body.appendChild(el);
+
+  // Forzar reflow y mostrar
+  requestAnimationFrame(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateX(-50%) translateY(0)';
+    el.style.pointerEvents = 'auto';
+    el.classList.add('show');
+  });
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(-20px)';
+    el.style.pointerEvents = 'none';
+  }, 5000);
+}
+
+// Desvincular al hacer logout (llamar al cerrar sesión)
+function logoutPushNotifications() {
+  if (!window.OneSignal || !PUSH.initialized) return;
+  try {
+    window.OneSignal.logout();
+    console.log('[PUSH] Usuario desvinculado de OneSignal');
+    PUSH.initialized = false;
+    PUSH.userId = null;
+  } catch(e) {
+    console.warn('[PUSH] Error al desloguear OneSignal:', e.message);
   }
 }
 
