@@ -6193,7 +6193,30 @@ function initPushNotifications() {
         PUSH.permissionGranted = true;
       }
 
-      // 3. Vincular external_id (el legajo) con este dispositivo
+      // 3. Logout previo para limpiar cualquier sesión conflictiva
+      // El error 409 Conflict ocurre cuando el external_id ya está vinculado
+      // a otro subscription_id — logout fuerza un estado limpio antes de login
+      try {
+        await OneSignal.logout();
+        console.log('[PUSH] Logout previo OK');
+      } catch(logoutErr) {
+        // Ignorar — puede no haber sesión previa
+      }
+
+      // 4. Asegurar que la suscripción push del browser esté activa
+      // Sin esto el usuario queda en OneSignal pero no recibe notificaciones
+      try {
+        const isPushEnabled = await OneSignal.User.PushSubscription.optedIn;
+        console.log('[PUSH] Push suscripción activa:', isPushEnabled);
+        if (!isPushEnabled) {
+          await OneSignal.User.PushSubscription.optIn();
+          console.log('[PUSH] Push re-suscripto OK');
+        }
+      } catch(subErr) {
+        console.warn('[PUSH] No se pudo verificar suscripción push:', subErr.message);
+      }
+
+      // 5. Vincular external_id (el legajo) con este dispositivo
       // Esto es lo que permite enviar notificaciones individuales
       await OneSignal.login(legajoId);
       console.log('[PUSH] ✅ Usuario vinculado en OneSignal:', legajoId);
