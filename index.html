@@ -3818,6 +3818,330 @@ input:focus-visible {
 .vs-msgs::-webkit-scrollbar, .cal-evts::-webkit-scrollbar { display: none; }
 .screen, .t-panel, .vs-msgs, .cal-evts { scrollbar-width: none; }
 
+/* ══════════════════════════════════════════════════════
+   ECOS · Rediseño visual de Inicio + Mi Perfil (ADITIVO)
+   No se modifica ninguna regla existente arriba.
+   ══════════════════════════════════════════════════════ */
+
+@keyframes ecosFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ecosFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Encabezado tipo "greeting" para Inicio */
+.inicio-greet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 2px 8px;
+  animation: ecosFadeUp .45s cubic-bezier(.4,0,.2,1);
+}
+.inicio-greet-txt { display: flex; flex-direction: column; gap: 2px; }
+.inicio-greet-hi {
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  color: var(--blue-deep);
+}
+.inicio-greet-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-transform: capitalize;
+}
+.inicio-greet-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, var(--blue), var(--blue-d));
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 6px 11px;
+  border-radius: var(--r-pill);
+  box-shadow: var(--sh-blue);
+}
+.inicio-greet-badge svg { flex-shrink: 0; }
+
+/* Rótulos de sección (Destacadas / Últimas noticias) */
+.section-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px 9px;
+}
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--gray-800);
+}
+.section-label .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-glow);
+}
+.section-label-tag {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+/* Chips de categoría (visual, sobre datos ya existentes en NOTICIAS) */
+.cat-chip-row {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 2px 2px 12px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.cat-chip-row::-webkit-scrollbar { display: none; }
+.cat-chip {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  padding: 7px 13px;
+  border-radius: var(--r-pill);
+  background: var(--gray-100);
+  color: var(--gray-600);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all .18s ease;
+  user-select: none;
+}
+.cat-chip.active {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: var(--sh-blue);
+}
+.cat-chip:active { transform: scale(.95); }
+
+/* Animación de entrada escalonada en tarjetas de noticias y carrusel */
+.nota-card {
+  animation: ecosFadeUp .5s cubic-bezier(.4,0,.2,1) backwards;
+  box-shadow: var(--sh-md);
+  border: 1px solid rgba(15,23,42,.04);
+  transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s ease, opacity .16s;
+}
+.nota-card:nth-child(1) { animation-delay: .02s; }
+.nota-card:nth-child(2) { animation-delay: .07s; }
+.nota-card:nth-child(3) { animation-delay: .12s; }
+.nota-card:nth-child(4) { animation-delay: .17s; }
+.nota-card:nth-child(5) { animation-delay: .22s; }
+.nota-card:nth-child(n+6) { animation-delay: .26s; }
+.nota-card:hover { box-shadow: var(--sh-lg); transform: translateY(-2px); }
+
+.carrusel { animation: ecosFadeIn .5s ease; }
+.ticker { animation: ecosFadeIn .6s ease; }
+
+/* ══════════════════════════════════════════════════════
+   MI PERFIL
+   ══════════════════════════════════════════════════════ */
+.perfil-hero {
+  margin: 4px 2px 14px;
+  padding: 18px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid) 60%, var(--blue-d));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  box-shadow: var(--sh-blue);
+  animation: ecosFadeUp .4s ease;
+}
+.perfil-hero-av {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,.25);
+}
+.perfil-hero-name { font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
+.perfil-hero-sub { font-size: 11px; opacity: .75; margin-top: 2px; }
+
+.perfil-tabs { display: flex; gap: 4px; padding: 0 2px 12px; }
+.perfil-tab {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 6px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 12px;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  border: none;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.perfil-tab.active {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: var(--sh-blue);
+}
+.perfil-tab:active { transform: scale(.97); }
+
+.perfil-view { display: none; }
+.perfil-view.active { display: block; animation: ecosFadeUp .3s ease; }
+
+.materia-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 14px 15px;
+  margin-bottom: 10px;
+  box-shadow: var(--sh-md);
+  border: 1px solid rgba(15,23,42,.04);
+  animation: ecosFadeUp .35s ease backwards;
+}
+.materia-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.materia-nombre { font-size: 14px; font-weight: 800; color: var(--gray-900); letter-spacing: -.01em; line-height: 1.25; }
+.materia-obs { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.materia-menu-btn {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gray-100); color: var(--gray-500);
+  border: none; cursor: pointer; flex-shrink: 0;
+}
+.materia-menu-btn:active { background: var(--gray-200); }
+
+.notas-grid-mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.nota-mini {
+  background: var(--gray-50);
+  border-radius: 10px;
+  padding: 7px 4px;
+  text-align: center;
+}
+.nota-mini-lbl { font-size: 8px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 3px; }
+.nota-mini-val { font-size: 15px; font-weight: 800; color: var(--gray-800); }
+.nota-mini-val.empty { color: var(--gray-300); }
+
+.materia-promedio {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 11px; padding-top: 11px;
+  border-top: 1px dashed var(--gray-200);
+}
+.promedio-lbl { font-size: 10.5px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .04em; }
+.promedio-val {
+  font-size: 17px; font-weight: 900; letter-spacing: -.02em;
+  padding: 3px 12px; border-radius: var(--r-pill);
+}
+.promedio-val.ok   { background: #DCFCE7; color: #15803D; }
+.promedio-val.warn { background: #FEF3C7; color: #B45309; }
+.promedio-val.bad  { background: #FEE2E2; color: #B91C1C; }
+.promedio-val.none { background: var(--gray-100); color: var(--gray-400); }
+
+/* Faltas */
+.falta-card { }
+.falta-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 12px;
+}
+.falta-info { flex: 1; min-width: 0; }
+.falta-nombre { font-size: 14px; font-weight: 800; color: var(--gray-900); letter-spacing: -.01em; }
+.falta-count-txt { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.falta-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.falta-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; font-size: 16px; font-weight: 900;
+  transition: transform .12s ease;
+}
+.falta-btn:active { transform: scale(.88); }
+.falta-btn.minus { background: var(--gray-100); color: var(--gray-600); }
+.falta-btn.plus  { background: var(--blue); color: #fff; box-shadow: var(--sh-blue); }
+.falta-num { font-size: 19px; font-weight: 900; color: var(--gray-900); min-width: 22px; text-align: center; }
+
+.falta-bar-track {
+  height: 8px; border-radius: 999px; background: var(--gray-100); overflow: hidden;
+}
+.falta-bar-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue), var(--blue-d));
+  transition: width .35s cubic-bezier(.4,0,.2,1), background .35s ease;
+}
+.falta-bar-fill.warn { background: linear-gradient(90deg, #F59E0B, #D97706); }
+.falta-bar-fill.bad  { background: linear-gradient(90deg, #EF4444, #B91C1C); }
+.falta-pct-txt { font-size: 10px; font-weight: 700; color: var(--gray-400); margin-top: 5px; text-align: right; }
+
+.perfil-add-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 13px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--gray-300);
+  background: transparent;
+  color: var(--blue);
+  font-size: 13px; font-weight: 800;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all .18s ease;
+  margin-top: 4px;
+}
+.perfil-add-btn:active { background: var(--blue-glow); transform: scale(.98); }
+
+.perfil-empty {
+  text-align: center;
+  padding: 34px 10px;
+  color: var(--gray-400);
+}
+.perfil-empty svg { opacity: .35; margin-bottom: 8px; }
+.perfil-empty p { font-size: 12.5px; font-weight: 600; }
+
+#perfil-modal, #perfil-menu-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+#perfil-modal.on, #perfil-menu-modal.on { display: flex; }
+
+.notas-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.perfil-menu-item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 13px 6px;
+  background: none; border: none;
+  font-family: var(--font);
+  font-size: 13.5px; font-weight: 700;
+  color: var(--gray-800);
+  cursor: pointer;
+  border-bottom: 1px solid var(--gray-100);
+}
+.perfil-menu-item:last-child { border-bottom: none; }
+.perfil-menu-item.danger { color: #DC2626; }
+.perfil-menu-item:active { background: var(--gray-50); }
+
 </style>
   <!-- OneSignal Push Notifications -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -3947,6 +4271,10 @@ input:focus-visible {
   <div class="us-name" id="us-name">—</div>
   <div class="us-legajo" id="us-legajo">—</div>
   <div class="us-divider"></div>
+  <button class="us-btn" onclick="closeUserSheet();goTo('perfil');">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Mi Perfil
+  </button>
   <button class="us-btn us-btn-logout" onclick="closeUserSheet();doLogout();">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     Cerrar sesión
@@ -4021,9 +4349,22 @@ input:focus-visible {
   </div>
   <div class="news-stripe"></div>
   <div class="sp">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 2px 2px;">
-      <div style="font-size:21px;font-weight:900;color:var(--blue-deep);letter-spacing:-.5px;">Noticias</div>
-      <div style="font-size:10px;font-weight:800;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase;"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--blue)" stroke="none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3" stroke="var(--blue)" stroke-width="2"/><line x1="12" y1="21" x2="12" y2="23" stroke="var(--blue)" stroke-width="2"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="var(--blue)" stroke-width="2"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="var(--blue)" stroke-width="2"/><line x1="1" y1="12" x2="3" y2="12" stroke="var(--blue)" stroke-width="2"/><line x1="21" y1="12" x2="23" y2="12" stroke="var(--blue)" stroke-width="2"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="var(--blue)" stroke-width="2"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="var(--blue)" stroke-width="2"/></svg></div>
+
+    <!-- GREETING -->
+    <div class="inicio-greet">
+      <div class="inicio-greet-txt">
+        <div class="inicio-greet-hi" id="inicio-greet-hi">Noticias</div>
+        <div class="inicio-greet-sub" id="inicio-greet-sub">Comunidad ECOS</div>
+      </div>
+      <div class="inicio-greet-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="5"/></svg>
+        En vivo
+      </div>
+    </div>
+
+    <div class="section-label-row">
+      <div class="section-label"><span class="dot"></span> Destacadas</div>
+      <div class="section-label-tag">Deslizá →</div>
     </div>
 
     <!-- CARRUSEL PRINCIPAL -->
@@ -4040,6 +4381,12 @@ input:focus-visible {
         <span>CONVOCATORIA</span><span>·</span><span>FRENTE DE MUJERES</span><span>·</span>
       </div>
     </div>
+
+    <div class="section-label-row" style="margin-top:6px;">
+      <div class="section-label"><span class="dot"></span> Últimas noticias</div>
+    </div>
+
+    <div class="cat-chip-row" id="cat-chips"></div>
 
     <div class="grid" id="noticias-grid">
       <div style="grid-column:1/-1;text-align:center;padding:24px 0;color:var(--gray-400);font-size:13px;">Cargando noticias...</div>
@@ -4393,6 +4740,122 @@ input:focus-visible {
       <div class="info-row"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></span><div><div class="lbl">Instagram</div><div class="val"><a href="https://www.instagram.com/ecosjursoc/" target="_blank">@ecosjursoc</a></div></div></div>
     </div>
     <button class="btn-confirm" style="background:var(--gray-800);" onclick="showInstall()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m8 12 4 4 4-4"/><path d="M2 18h20v2a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-2z"/></svg> Cómo instalar la app</button>
+  </div>
+</div>
+
+<!-- ── MI PERFIL ── -->
+<div class="screen" id="screen-perfil">
+  <div class="sp" style="padding-top:14px;">
+    <div class="perfil-hero">
+      <div class="perfil-hero-av" id="perfil-hero-av">?</div>
+      <div>
+        <div class="perfil-hero-name" id="perfil-hero-name">Mi Perfil</div>
+        <div class="perfil-hero-sub" id="perfil-hero-sub">Herramientas académicas</div>
+      </div>
+    </div>
+
+    <div class="perfil-tabs">
+      <button class="perfil-tab active" id="ptab-notas" onclick="perfilSwitchTab('notas')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Notas
+      </button>
+      <button class="perfil-tab" id="ptab-faltas" onclick="perfilSwitchTab('faltas')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Faltas
+      </button>
+    </div>
+
+    <!-- NOTAS -->
+    <div class="perfil-view active" id="pview-notas">
+      <div id="notas-lista"></div>
+      <button class="perfil-add-btn" onclick="abrirMateriaModal('notas')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar materia
+      </button>
+    </div>
+
+    <!-- FALTAS -->
+    <div class="perfil-view" id="pview-faltas">
+      <div id="faltas-lista"></div>
+      <button class="perfil-add-btn" onclick="abrirMateriaModal('faltas')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar materia
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: agregar/editar materia (notas o faltas) -->
+<div id="perfil-modal" onclick="if(event.target===this) cerrarMateriaModal()">
+  <div class="modal-sheet" style="max-width:480px;margin:0 auto;">
+    <div class="modal-title" id="perfil-modal-title">Nueva materia</div>
+
+    <div id="perfil-modal-campos-notas">
+      <div class="f-field">
+        <div class="f-lbl">Materia</div>
+        <input class="f-input" id="pm-nombre" placeholder="Ej: Derecho Civil I">
+      </div>
+      <div class="notas-form-grid">
+        <div class="f-field">
+          <div class="f-lbl">Parcial 1</div>
+          <input class="f-input" id="pm-p1" type="number" min="0" max="10" step="0.5" placeholder="—">
+        </div>
+        <div class="f-field">
+          <div class="f-lbl">Parcial 2</div>
+          <input class="f-input" id="pm-p2" type="number" min="0" max="10" step="0.5" placeholder="—">
+        </div>
+        <div class="f-field">
+          <div class="f-lbl">Recuperatorio</div>
+          <input class="f-input" id="pm-rec" type="number" min="0" max="10" step="0.5" placeholder="—">
+        </div>
+        <div class="f-field">
+          <div class="f-lbl">Trabajo práctico</div>
+          <input class="f-input" id="pm-tp" type="number" min="0" max="10" step="0.5" placeholder="—">
+        </div>
+      </div>
+      <div class="f-field">
+        <div class="f-lbl">Nota final</div>
+        <input class="f-input" id="pm-final" type="number" min="0" max="10" step="0.5" placeholder="—">
+      </div>
+      <div class="f-field">
+        <div class="f-lbl">Observaciones (opcional)</div>
+        <input class="f-input" id="pm-obs" placeholder="Ej: Rendir en marzo">
+      </div>
+    </div>
+
+    <div id="perfil-modal-campos-faltas" style="display:none;">
+      <div class="f-field">
+        <div class="f-lbl">Materia</div>
+        <input class="f-input" id="pf-nombre" placeholder="Ej: Derecho Civil I">
+      </div>
+      <div class="notas-form-grid">
+        <div class="f-field">
+          <div class="f-lbl">Faltas iniciales</div>
+          <input class="f-input" id="pf-faltas" type="number" min="0" placeholder="0">
+        </div>
+        <div class="f-field">
+          <div class="f-lbl">Total de clases</div>
+          <input class="f-input" id="pf-total" type="number" min="1" placeholder="Ej: 16">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-confirm" onclick="guardarMateria()">Guardar</button>
+    <button class="btn-outline" onclick="cerrarMateriaModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: menú de opciones por materia (editar / eliminar) -->
+<div id="perfil-menu-modal" onclick="if(event.target===this) cerrarMenuMateria()">
+  <div class="modal-sheet" style="max-width:480px;margin:0 auto;">
+    <button class="perfil-menu-item" onclick="editarMateriaDesdeMenu()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+      Editar
+    </button>
+    <button class="perfil-menu-item danger" onclick="eliminarMateriaDesdeMenu()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Eliminar
+    </button>
   </div>
 </div>
 
@@ -4793,7 +5256,7 @@ function actualizarFeed(docs) {
     const isMesita   = n.cat === 'MESITA';
 
     if (isMesita) {
-      html += `<div class="nota-card ${cls}" style="background:${bg};" onclick="abrirNota('${n.id}')">
+      html += `<div class="nota-card ${cls}" data-cat="${esc(n.cat||'')}" style="background:${bg};" onclick="abrirNota('${n.id}')">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <div class="nota-cat" style="background:${catBg};color:${catTxt};margin-bottom:8px;">${n.cat}</div>
@@ -4803,7 +5266,7 @@ function actualizarFeed(docs) {
         </div>
       </div>`;
     } else {
-      html += `<div class="nota-card ${cls}" style="background:${bg};" onclick="abrirNota('${n.id}')">
+      html += `<div class="nota-card ${cls}" data-cat="${esc(n.cat||'')}" style="background:${bg};" onclick="abrirNota('${n.id}')">
         <div class="nota-cat" style="background:${catBg};color:${catTxt};">${n.cat}</div>
         <div class="nota-title" style="color:${titleColor};font-size:${cls==='nota-half'?'13px':'14px'}">${esc(n.titulo)}</div>
         <div style="margin-top:auto;padding-top:8px;font-size:11px;color:${metaColor};">${esc(n.fecha)}</div>
@@ -4811,7 +5274,41 @@ function actualizarFeed(docs) {
     }
   });
   grid.innerHTML = html;
+  try { renderCatChips(noC); } catch(e) {}
 }
+
+/* ── ADITIVO: chips de categoría + saludo dinámico (no altera actualizarFeed original) ── */
+let _catActiva = null;
+function renderCatChips(docs) {
+  const cont = document.getElementById('cat-chips');
+  if (!cont) return;
+  const cats = [...new Set(docs.map(n => n.cat).filter(Boolean))];
+  if (!cats.length) { cont.innerHTML = ''; return; }
+  let html = `<div class="cat-chip${_catActiva===null?' active':''}" onclick="filtrarPorCategoria(null)">Todas</div>`;
+  cats.forEach(c => {
+    html += `<div class="cat-chip${_catActiva===c?' active':''}" onclick="filtrarPorCategoria('${c.replace(/'/g,"\\'")}')">${esc(c)}</div>`;
+  });
+  cont.innerHTML = html;
+}
+function filtrarPorCategoria(cat) {
+  _catActiva = cat;
+  document.querySelectorAll('#cat-chips .cat-chip').forEach(ch => ch.classList.remove('active'));
+  const idx = cat === null ? 0 : [...document.querySelectorAll('#cat-chips .cat-chip')].findIndex(ch => ch.textContent.trim() === cat);
+  const chips = document.querySelectorAll('#cat-chips .cat-chip');
+  if (chips[idx===-1?0:idx]) chips[idx===-1?0:idx].classList.add('active');
+  document.querySelectorAll('#noticias-grid .nota-card').forEach(card => {
+    card.style.display = (cat === null || card.getAttribute('data-cat') === cat) ? '' : 'none';
+  });
+}
+function actualizarSaludoInicio() {
+  const hi = document.getElementById('inicio-greet-hi');
+  const sub = document.getElementById('inicio-greet-sub');
+  if (!hi || !sub) return;
+  const h = new Date().getHours();
+  hi.textContent = h < 12 ? 'Buen día' : (h < 20 ? 'Buenas tardes' : 'Buenas noches');
+  sub.textContent = 'Comunidad ECOS';
+}
+try { actualizarSaludoInicio(); } catch(e) {}
 
 async function iniciarApp() {
   try {
@@ -5395,9 +5892,9 @@ let cart = {}, currentScreen = 'inicio', orderDone = false;
 let calYear, calMonth, calDiaSel, calTipoSel, calEventos = {}, calInited = false;
 
 // ── NAV ──
-const DEPTH = {inicio:0,apuntes:1,pedido:1,calendario:1,programas:1,nosotros:1,noticia:2,'vuelta-segura':2};
-const TITLES = {inicio:'Inicio',apuntes:'Tienda',pedido:'Mi pedido',calendario:'Mis fechas',programas:'Programas',nosotros:'Sobre ECOS','vuelta-segura':'Vuelta Segura',noticia:''};
-const NAVMAP = {'vuelta-segura':'programas',noticia:'inicio'};
+const DEPTH = {inicio:0,apuntes:1,pedido:1,calendario:1,programas:1,nosotros:1,perfil:1,noticia:2,'vuelta-segura':2};
+const TITLES = {inicio:'Inicio',apuntes:'Tienda',pedido:'Mi pedido',calendario:'Mis fechas',programas:'Programas',nosotros:'Sobre ECOS',perfil:'Mi Perfil','vuelta-segura':'Vuelta Segura',noticia:''};
+const NAVMAP = {'vuelta-segura':'programas',noticia:'inicio',perfil:'inicio'};
 
 function goTo(name, back=false){
   if (NAV_LOCK.isLocked) return;
@@ -5441,6 +5938,7 @@ function goTo(name, back=false){
   }
   if(name==='pedido'){ renderPedido(); cargarMisPedidos(); }
   if(name==='calendario'){if(!calInited){calInit();calInited=true;}else calRender();}
+  if(name==='perfil'){ perfilInit(); }
 }
 
 // ── LANDING ──
@@ -7233,6 +7731,261 @@ function customAgregarAlCarrito(){
     g.querySelectorAll('.f-radio-btn').forEach(function(b,i){ b.classList.toggle('selected',i===0); });
   });
   _customState.color='bn'; _customState.caras='doble'; _customState.tamano='A4';
+}
+</script>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ECOS · MI PERFIL — Marcador de notas + Contador de faltas
+   Módulo 100% aditivo. No modifica lógica, datos ni
+   pantallas existentes. Persiste en localStorage, scopeado
+   por legajo del usuario autenticado (misma convención que
+   _sanitizeLegajo ya usada en el resto de la app).
+   ══════════════════════════════════════════════════════ */
+
+let _perfilTab = 'notas';
+let _perfilMenuCtx = null; // {tipo, id}
+
+function _perfilKey(tipo) {
+  const legajoId = (typeof _sanitizeLegajo === 'function' ? _sanitizeLegajo(_currentUser?.legajo) : null) || 'anon';
+  return `ecos_perfil_${tipo}_${legajoId}`;
+}
+function _perfilLoad(tipo) {
+  try { return JSON.parse(localStorage.getItem(_perfilKey(tipo)) || '[]'); }
+  catch (e) { return []; }
+}
+function _perfilSave(tipo, arr) {
+  try { localStorage.setItem(_perfilKey(tipo), JSON.stringify(arr)); } catch (e) {}
+}
+function _perfilUid() {
+  return 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function perfilInit() {
+  const av = document.getElementById('perfil-hero-av');
+  const nm = document.getElementById('perfil-hero-name');
+  if (av && _currentUser) {
+    const nombre = _currentUser.nombre || _currentUser.legajo || '?';
+    av.textContent = nombre.trim().charAt(0).toUpperCase() || '?';
+  }
+  if (nm && _currentUser) {
+    nm.textContent = _currentUser.nombre || _currentUser.legajo || 'Mi Perfil';
+  }
+  perfilRenderNotas();
+  perfilRenderFaltas();
+}
+
+function perfilSwitchTab(tab) {
+  _perfilTab = tab;
+  document.getElementById('ptab-notas').classList.toggle('active', tab === 'notas');
+  document.getElementById('ptab-faltas').classList.toggle('active', tab === 'faltas');
+  document.getElementById('pview-notas').classList.toggle('active', tab === 'notas');
+  document.getElementById('pview-faltas').classList.toggle('active', tab === 'faltas');
+}
+
+/* ── NOTAS ── */
+function _calcPromedio(m) {
+  const vals = [m.p1, m.p2, m.rec, m.tp].filter(v => v !== null && v !== undefined && v !== '' && !isNaN(v)).map(Number);
+  if (m.final !== null && m.final !== undefined && m.final !== '' && !isNaN(m.final)) return Number(m.final);
+  if (!vals.length) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+function perfilRenderNotas() {
+  const cont = document.getElementById('notas-lista');
+  if (!cont) return;
+  const materias = _perfilLoad('notas');
+  if (!materias.length) {
+    cont.innerHTML = `<div class="perfil-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <p>Todavía no cargaste materias.<br>Agregá la primera para llevar tus notas.</p>
+    </div>`;
+    return;
+  }
+  let html = '';
+  materias.forEach((m, i) => {
+    const prom = _calcPromedio(m);
+    let cls = 'none', txt = '—';
+    if (prom !== null) {
+      txt = (Math.round(prom * 100) / 100).toString().replace('.', ',');
+      cls = prom >= 6 ? 'ok' : (prom >= 4 ? 'warn' : 'bad');
+    }
+    const mini = (lbl, val) => `<div class="nota-mini"><div class="nota-mini-lbl">${lbl}</div><div class="nota-mini-val${(val===null||val===undefined||val==='')?' empty':''}">${(val===null||val===undefined||val==='')?'—':val}</div></div>`;
+    html += `<div class="materia-card" style="animation-delay:${Math.min(i*.05,.3)}s">
+      <div class="materia-card-top">
+        <div>
+          <div class="materia-nombre">${esc(m.nombre)}</div>
+          ${m.obs ? `<div class="materia-obs">${esc(m.obs)}</div>` : ''}
+        </div>
+        <button class="materia-menu-btn" onclick="abrirMenuMateria('notas','${m.id}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+      </div>
+      <div class="notas-grid-mini">
+        ${mini('Parcial 1', m.p1)}
+        ${mini('Parcial 2', m.p2)}
+        ${mini('Recup.', m.rec)}
+        ${mini('T.P.', m.tp)}
+      </div>
+      <div class="materia-promedio">
+        <div class="promedio-lbl">Promedio</div>
+        <div class="promedio-val ${cls}">${txt}</div>
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = html;
+}
+
+/* ── FALTAS ── */
+function perfilRenderFaltas() {
+  const cont = document.getElementById('faltas-lista');
+  if (!cont) return;
+  const materias = _perfilLoad('faltas');
+  if (!materias.length) {
+    cont.innerHTML = `<div class="perfil-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <p>Todavía no cargaste materias.<br>Agregá la primera para controlar tus asistencias.</p>
+    </div>`;
+    return;
+  }
+  let html = '';
+  materias.forEach((m, i) => {
+    const total = Number(m.total) || 0;
+    const faltas = Number(m.faltas) || 0;
+    const pct = total > 0 ? Math.min(100, Math.round((faltas / total) * 100)) : 0;
+    const barCls = pct >= 100 ? 'bad' : (pct >= 70 ? 'warn' : '');
+    html += `<div class="materia-card falta-card" style="animation-delay:${Math.min(i*.05,.3)}s">
+      <div class="falta-top">
+        <div class="falta-info">
+          <div class="falta-nombre">${esc(m.nombre)}</div>
+          <div class="falta-count-txt">${total > 0 ? `Asistencias: ${Math.max(total - faltas, 0)} / ${total}` : 'Sin total de clases cargado'}</div>
+        </div>
+        <button class="materia-menu-btn" onclick="abrirMenuMateria('faltas','${m.id}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+      </div>
+      <div class="falta-controls" style="justify-content:center;margin-bottom:${total>0?'10':'2'}px;">
+        <button class="falta-btn minus" onclick="restarFalta('${m.id}')">−</button>
+        <div class="falta-num">${faltas}</div>
+        <button class="falta-btn plus" onclick="sumarFalta('${m.id}')">+</button>
+      </div>
+      ${total > 0 ? `
+      <div class="falta-bar-track"><div class="falta-bar-fill ${barCls}" style="width:${pct}%"></div></div>
+      <div class="falta-pct-txt">${pct}% de faltas utilizadas</div>` : ''}
+    </div>`;
+  });
+  cont.innerHTML = html;
+}
+function sumarFalta(id) {
+  const arr = _perfilLoad('faltas');
+  const m = arr.find(x => x.id === id);
+  if (!m) return;
+  m.faltas = (Number(m.faltas) || 0) + 1;
+  _perfilSave('faltas', arr);
+  perfilRenderFaltas();
+}
+function restarFalta(id) {
+  const arr = _perfilLoad('faltas');
+  const m = arr.find(x => x.id === id);
+  if (!m) return;
+  m.faltas = Math.max(0, (Number(m.faltas) || 0) - 1);
+  _perfilSave('faltas', arr);
+  perfilRenderFaltas();
+}
+
+/* ── MODAL agregar / editar materia ── */
+let _perfilModalTipo = 'notas';
+let _perfilModalEditId = null;
+function abrirMateriaModal(tipo, editId) {
+  _perfilModalTipo = tipo;
+  _perfilModalEditId = editId || null;
+  document.getElementById('perfil-modal-campos-notas').style.display = tipo === 'notas' ? 'block' : 'none';
+  document.getElementById('perfil-modal-campos-faltas').style.display = tipo === 'faltas' ? 'block' : 'none';
+  document.getElementById('perfil-modal-title').textContent = editId ? 'Editar materia' : 'Nueva materia';
+
+  if (tipo === 'notas') {
+    const m = editId ? _perfilLoad('notas').find(x => x.id === editId) : null;
+    document.getElementById('pm-nombre').value = m ? m.nombre : '';
+    document.getElementById('pm-p1').value = m && m.p1 != null ? m.p1 : '';
+    document.getElementById('pm-p2').value = m && m.p2 != null ? m.p2 : '';
+    document.getElementById('pm-rec').value = m && m.rec != null ? m.rec : '';
+    document.getElementById('pm-tp').value = m && m.tp != null ? m.tp : '';
+    document.getElementById('pm-final').value = m && m.final != null ? m.final : '';
+    document.getElementById('pm-obs').value = m && m.obs ? m.obs : '';
+  } else {
+    const m = editId ? _perfilLoad('faltas').find(x => x.id === editId) : null;
+    document.getElementById('pf-nombre').value = m ? m.nombre : '';
+    document.getElementById('pf-faltas').value = m && m.faltas != null ? m.faltas : '';
+    document.getElementById('pf-total').value = m && m.total != null ? m.total : '';
+  }
+  document.getElementById('perfil-modal').classList.add('on');
+}
+function cerrarMateriaModal() {
+  document.getElementById('perfil-modal').classList.remove('on');
+  _perfilModalEditId = null;
+}
+function guardarMateria() {
+  if (_perfilModalTipo === 'notas') {
+    const nombre = document.getElementById('pm-nombre').value.trim();
+    if (!nombre) { document.getElementById('pm-nombre').focus(); return; }
+    const arr = _perfilLoad('notas');
+    const num = (id) => { const v = document.getElementById(id).value; return v === '' ? null : Number(v); };
+    const data = {
+      nombre,
+      p1: num('pm-p1'), p2: num('pm-p2'), rec: num('pm-rec'), tp: num('pm-tp'), final: num('pm-final'),
+      obs: document.getElementById('pm-obs').value.trim()
+    };
+    if (_perfilModalEditId) {
+      const i = arr.findIndex(x => x.id === _perfilModalEditId);
+      if (i > -1) arr[i] = { ...arr[i], ...data };
+    } else {
+      arr.push({ id: _perfilUid(), ...data });
+    }
+    _perfilSave('notas', arr);
+    perfilRenderNotas();
+  } else {
+    const nombre = document.getElementById('pf-nombre').value.trim();
+    if (!nombre) { document.getElementById('pf-nombre').focus(); return; }
+    const arr = _perfilLoad('faltas');
+    const fVal = document.getElementById('pf-faltas').value;
+    const tVal = document.getElementById('pf-total').value;
+    const data = {
+      nombre,
+      faltas: fVal === '' ? 0 : Number(fVal),
+      total: tVal === '' ? null : Number(tVal)
+    };
+    if (_perfilModalEditId) {
+      const i = arr.findIndex(x => x.id === _perfilModalEditId);
+      if (i > -1) arr[i] = { ...arr[i], ...data };
+    } else {
+      arr.push({ id: _perfilUid(), ...data });
+    }
+    _perfilSave('faltas', arr);
+    perfilRenderFaltas();
+  }
+  cerrarMateriaModal();
+}
+
+/* ── Menú contextual (editar / eliminar) ── */
+function abrirMenuMateria(tipo, id) {
+  _perfilMenuCtx = { tipo, id };
+  document.getElementById('perfil-menu-modal').classList.add('on');
+}
+function cerrarMenuMateria() {
+  document.getElementById('perfil-menu-modal').classList.remove('on');
+}
+function editarMateriaDesdeMenu() {
+  if (!_perfilMenuCtx) return;
+  const { tipo, id } = _perfilMenuCtx;
+  cerrarMenuMateria();
+  abrirMateriaModal(tipo, id);
+}
+function eliminarMateriaDesdeMenu() {
+  if (!_perfilMenuCtx) return;
+  const { tipo, id } = _perfilMenuCtx;
+  const arr = _perfilLoad(tipo).filter(x => x.id !== id);
+  _perfilSave(tipo, arr);
+  cerrarMenuMateria();
+  if (tipo === 'notas') perfilRenderNotas(); else perfilRenderFaltas();
 }
 </script>
 </body>
