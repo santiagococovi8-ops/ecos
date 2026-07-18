@@ -4130,8 +4130,19 @@ input:focus-visible {
 .notas-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
+
+/* Espaciado propio del modal de Nueva/Editar materia (no afecta otros modales) */
+#perfil-modal .modal-title { margin-bottom: 20px; }
+#perfil-modal-campos-notas,
+#perfil-modal-campos-faltas {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+#perfil-modal .btn-confirm { margin-bottom: 10px; }
 
 .perfil-menu-item {
   display: flex; align-items: center; gap: 12px;
