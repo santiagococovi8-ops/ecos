@@ -4061,22 +4061,29 @@ input:focus-visible {
 .falta-card { }
 .falta-top {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 .falta-info { flex: 1; min-width: 0; }
 .falta-nombre { font-size: 15.5px; font-weight: 800; color: var(--gray-900); letter-spacing: -.01em; line-height: 1.35; }
 .falta-count-txt { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
-.falta-controls { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+
+.falta-stat-row {
+  display: flex; align-items: center; justify-content: center; gap: 22px;
+  margin-bottom: 18px;
+}
+.falta-stat-center { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 84px; }
 .falta-btn {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  border: none; cursor: pointer; font-size: 18px; font-weight: 900;
+  border: none; cursor: pointer; font-size: 19px; font-weight: 900;
+  flex-shrink: 0;
   transition: transform .12s ease;
 }
 .falta-btn:active { transform: scale(.88); }
 .falta-btn.minus { background: var(--gray-100); color: var(--gray-600); }
 .falta-btn.plus  { background: var(--blue); color: #fff; box-shadow: var(--sh-blue); }
-.falta-num { font-size: 21px; font-weight: 900; color: var(--gray-900); min-width: 26px; text-align: center; }
+.falta-num { font-size: 26px; font-weight: 900; color: var(--gray-900); text-align: center; line-height: 1; }
+.falta-stat-lbl { font-size: 10.5px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .04em; text-align: center; }
 
 .falta-bar-track {
   height: 9px; border-radius: 999px; background: var(--gray-100); overflow: hidden;
@@ -4088,7 +4095,7 @@ input:focus-visible {
 }
 .falta-bar-fill.warn { background: linear-gradient(90deg, #F59E0B, #D97706); }
 .falta-bar-fill.bad  { background: linear-gradient(90deg, #EF4444, #B91C1C); }
-.falta-pct-txt { font-size: 10.5px; font-weight: 700; color: var(--gray-400); margin-top: 8px; text-align: right; }
+.falta-pct-txt { font-size: 10.5px; font-weight: 700; color: var(--gray-400); margin-top: 8px; text-align: center; }
 
 .perfil-add-btn {
   width: 100%;
@@ -7972,20 +7979,23 @@ function perfilRenderFaltas() {
       <div class="falta-top">
         <div class="falta-info">
           <div class="falta-nombre">${esc(m.nombre)}</div>
-          <div class="falta-count-txt">${total > 0 ? `Asistencias: ${Math.max(total - faltas, 0)} / ${total}` : 'Sin total de clases cargado'}</div>
+          <div class="falta-count-txt">${total > 0 ? `Total de clases: ${total}` : 'Sin total de clases cargado'}</div>
         </div>
         <button class="materia-menu-btn" onclick="abrirMenuMateria('faltas','${m.id}')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
         </button>
       </div>
-      <div class="falta-controls" style="justify-content:center;margin-bottom:${total>0?'16':'4'}px;">
+      <div class="falta-stat-row">
         <button class="falta-btn minus" onclick="restarFalta('${m.id}')">−</button>
-        <div class="falta-num">${faltas}</div>
+        <div class="falta-stat-center">
+          <div class="falta-num">${faltas}</div>
+          <div class="falta-stat-lbl">${faltas === 1 ? 'falta utilizada' : 'faltas utilizadas'}</div>
+        </div>
         <button class="falta-btn plus" onclick="sumarFalta('${m.id}')">+</button>
       </div>
       ${total > 0 ? `
       <div class="falta-bar-track"><div class="falta-bar-fill ${barCls}" style="width:${pct}%"></div></div>
-      <div class="falta-pct-txt">${pct}% de faltas utilizadas</div>` : ''}
+      <div class="falta-pct-txt">${faltas} de ${total} clases · ${pct}% utilizado</div>` : ''}
     </div>`;
   });
   cont.innerHTML = html;
