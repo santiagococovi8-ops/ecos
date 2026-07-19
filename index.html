@@ -4133,6 +4133,9 @@ input:focus-visible {
   backdrop-filter: blur(4px);
 }
 #perfil-modal.on, #perfil-menu-modal.on, #tyc-modal.on { display: flex; }
+/* tyc-modal también se abre desde Registrarse (#auth-screen, z-index:9999),
+   así que necesita quedar por encima de esa pantalla para ser visible ahí. */
+#tyc-modal { z-index: 10000; }
 
 .notas-form-grid {
   display: grid;
