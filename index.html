@@ -4914,8 +4914,8 @@ input:focus-visible {
       </div>
       <div class="notas-form-grid">
         <div class="f-field">
-          <div class="f-lbl">Faltas iniciales</div>
-          <input class="f-input" id="pf-faltas" type="number" min="0" placeholder="0">
+          <div class="f-lbl">Faltas permitidas</div>
+          <input class="f-input" id="pf-faltas" type="number" min="0" placeholder="Ej: 4">
         </div>
         <div class="f-field">
           <div class="f-lbl">Total de clases</div>
@@ -7971,9 +7971,10 @@ function perfilRenderFaltas() {
   }
   let html = '';
   materias.forEach((m, i) => {
+    const { limite, usadas } = _faltasNormalizar(m);
     const total = Number(m.total) || 0;
-    const faltas = Number(m.faltas) || 0;
-    const pct = total > 0 ? Math.min(100, Math.round((faltas / total) * 100)) : 0;
+    const disponibles = Math.max(limite - usadas, 0);
+    const pct = limite > 0 ? Math.min(100, Math.round((usadas / limite) * 100)) : 0;
     const barCls = pct >= 100 ? 'bad' : (pct >= 70 ? 'warn' : '');
     html += `<div class="materia-card falta-card" style="animation-delay:${Math.min(i*.05,.3)}s">
       <div class="falta-top">
@@ -7988,23 +7989,34 @@ function perfilRenderFaltas() {
       <div class="falta-stat-row">
         <button class="falta-btn minus" onclick="restarFalta('${m.id}')">−</button>
         <div class="falta-stat-center">
-          <div class="falta-num">${faltas}</div>
-          <div class="falta-stat-lbl">${faltas === 1 ? 'falta utilizada' : 'faltas utilizadas'}</div>
+          <div class="falta-num">${limite > 0 ? disponibles : usadas}</div>
+          <div class="falta-stat-lbl">${limite > 0 ? (disponibles === 1 ? 'falta disponible' : 'faltas disponibles') : (usadas === 1 ? 'falta utilizada' : 'faltas utilizadas')}</div>
         </div>
         <button class="falta-btn plus" onclick="sumarFalta('${m.id}')">+</button>
       </div>
-      ${total > 0 ? `
+      ${limite > 0 ? `
       <div class="falta-bar-track"><div class="falta-bar-fill ${barCls}" style="width:${pct}%"></div></div>
-      <div class="falta-pct-txt">${faltas} de ${total} clases · ${pct}% utilizado</div>` : ''}
+      <div class="falta-pct-txt">${usadas} de ${limite} faltas utilizadas · ${pct}%</div>` : ''}
     </div>`;
   });
   cont.innerHTML = html;
+}
+/* Migración segura: materias guardadas antes de este cambio solo tenían
+   m.faltas (usadas, sin límite). Se interpretan como límite=0 (sin tope
+   cargado) y usadas = ese valor previo, sin perder el dato. */
+function _faltasNormalizar(m) {
+  const limite = (m.limite !== undefined && m.limite !== null) ? Number(m.limite) || 0 : 0;
+  const usadas = (m.usadas !== undefined && m.usadas !== null) ? Number(m.usadas) || 0 : (Number(m.faltas) || 0);
+  return { limite, usadas };
 }
 function sumarFalta(id) {
   const arr = _perfilLoad('faltas');
   const m = arr.find(x => x.id === id);
   if (!m) return;
-  m.faltas = (Number(m.faltas) || 0) + 1;
+  const { limite, usadas } = _faltasNormalizar(m);
+  m.limite = limite;
+  m.usadas = usadas + 1;
+  delete m.faltas;
   _perfilSave('faltas', arr);
   perfilRenderFaltas();
 }
@@ -8012,7 +8024,10 @@ function restarFalta(id) {
   const arr = _perfilLoad('faltas');
   const m = arr.find(x => x.id === id);
   if (!m) return;
-  m.faltas = Math.max(0, (Number(m.faltas) || 0) - 1);
+  const { limite, usadas } = _faltasNormalizar(m);
+  m.limite = limite;
+  m.usadas = Math.max(0, usadas - 1);
+  delete m.faltas;
   _perfilSave('faltas', arr);
   perfilRenderFaltas();
 }
@@ -8038,8 +8053,9 @@ function abrirMateriaModal(tipo, editId) {
     document.getElementById('pm-obs').value = m && m.obs ? m.obs : '';
   } else {
     const m = editId ? _perfilLoad('faltas').find(x => x.id === editId) : null;
+    const norm = m ? _faltasNormalizar(m) : null;
     document.getElementById('pf-nombre').value = m ? m.nombre : '';
-    document.getElementById('pf-faltas').value = m && m.faltas != null ? m.faltas : '';
+    document.getElementById('pf-faltas').value = norm && norm.limite ? norm.limite : '';
     document.getElementById('pf-total').value = m && m.total != null ? m.total : '';
   }
   document.getElementById('perfil-modal').classList.add('on');
@@ -8075,14 +8091,18 @@ function guardarMateria() {
     const tVal = document.getElementById('pf-total').value;
     const data = {
       nombre,
-      faltas: fVal === '' ? 0 : Number(fVal),
+      limite: fVal === '' ? 0 : Number(fVal),
       total: tVal === '' ? null : Number(tVal)
     };
     if (_perfilModalEditId) {
       const i = arr.findIndex(x => x.id === _perfilModalEditId);
-      if (i > -1) arr[i] = { ...arr[i], ...data };
+      if (i > -1) {
+        const prevUsadas = _faltasNormalizar(arr[i]).usadas;
+        arr[i] = { ...arr[i], ...data, usadas: prevUsadas };
+        delete arr[i].faltas;
+      }
     } else {
-      arr.push({ id: _perfilUid(), ...data });
+      arr.push({ id: _perfilUid(), ...data, usadas: 0 });
     }
     _perfilSave('faltas', arr);
     perfilRenderFaltas();
