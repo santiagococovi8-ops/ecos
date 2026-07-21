@@ -4530,7 +4530,7 @@ input:focus-visible {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" placeholder="Buscar libro o autor..." id="biblio-search-input" oninput="filtrarBiblio(this.value)">
         </div>
-        <div id="bibliografia-list"></div>
+        <div id="bibliografia-tree"></div>
       </div>
     </div>
   </div>
@@ -5329,7 +5329,7 @@ window._sbUnsubscribers = [];
 function normN(r){ return {...r, catBg:r.cat_bg||r.catBg||'#F59E0B', catTxt:r.cat_txt||r.catTxt||'#0F172A', heroBg:r.hero_bg||r.heroBg||'#0F172A', imgUrl:r.img_url||r.imgUrl||'', enCarrusel:r.en_carrusel!==undefined?r.en_carrusel:r.enCarrusel}; }
 function normA(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0, materia_id:r.materia_id||null}; }
 function normC(r){ return {...r, badgeBg:r.badge_bg||r.badgeBg, precio:Number(r.precio)||0, stock:r.stock===true||r.stock==='true'||r.stock===1}; }
-function normB(r){ return {...r, precio:Number(r.precio)||0, orden:Number(r.orden)||0}; }
+function normB(r){ return {...r, precio:Number(r.precio)||0, orden:Number(r.orden)||0, materia_id:r.materia_id||null}; }
 
 // ── SEED datos iniciales si las tablas están vacías ──
 async function seedSupabase() {
@@ -6608,11 +6608,11 @@ function filtrar(q){
     : _APUNTES;
   renderTree(filtered);
   if(q){
-    document.querySelectorAll('.year-materias').forEach(el=>{
+    document.querySelectorAll('#apuntes-tree .year-materias').forEach(el=>{
       el.classList.add('open');
       const ch=document.getElementById('chev-'+el.id); if(ch)ch.classList.add('open');
     });
-    document.querySelectorAll('.mat-apuntes').forEach(el=>{
+    document.querySelectorAll('#apuntes-tree .mat-apuntes').forEach(el=>{
       el.classList.add('open');
       const ch=document.getElementById('mchev-'+el.id); if(ch)ch.classList.add('open');
     });
@@ -6649,7 +6649,91 @@ function renderCodigos(){
   c.innerHTML=html;
 }
 
-// ── BIBLIOGRAFÍA — listado plano, independiente de Apuntes y ECódigos ──
+function renderTreeBib(lista){
+  const tree=document.getElementById('bibliografia-tree'); if(!tree) return;
+  const _ANIOS    = window.ANIOS    || [];
+  const _MATERIAS = window.MATERIAS || [];
+
+  // Si no hay años/materias cargados aún, fallback a listado plano (compatibilidad)
+  if(_ANIOS.length === 0){
+    tree.innerHTML = lista.length
+      ? `<div style="padding:2px 0;">${lista.map(b=>`<div style="padding:8px 0;">${_bibCard(b)}</div>`).join('')}</div>`
+      : '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin bibliografía disponible.</p>';
+    return;
+  }
+
+  // Modelo: año → materia → libros (misma organización que Apuntes, listado propio)
+  let html='';
+  const usados = new Set();
+
+  _ANIOS.forEach((anio, i)=>{
+    const color = YEAR_PALETTE[i % YEAR_PALETTE.length];
+    const yid   = 'yb-' + anio.id;
+    const materiasDesteAnio = _MATERIAS.filter(m => String(m.anio_id) === String(anio.id));
+
+    const librosDesteAnio = lista.filter(b =>
+      materiasDesteAnio.some(m => String(m.id) === String(b.materia_id))
+    );
+    if(librosDesteAnio.length === 0) return; // ocultar años sin bibliografía
+
+    html+=`<div class="year-folder">
+      <div class="year-header" onclick="toggleYear('${yid}')">
+        <div class="year-header-l">
+          <div class="year-badge" style="background:${color};">${esc(anio.nombre.charAt(0))}</div>
+          <div>
+            <div class="year-name">${esc(anio.nombre)}</div>
+            <div class="year-count">${materiasDesteAnio.length} materia${materiasDesteAnio.length!==1?'s':''} · ${librosDesteAnio.length} libro${librosDesteAnio.length!==1?'s':''}</div>
+          </div>
+        </div>
+        <span class="year-chevron" id="chev-${yid}">›</span>
+      </div>
+      <div class="year-materias" id="${yid}">`;
+
+    materiasDesteAnio.forEach(mat=>{
+      const mid = 'mb-' + mat.id;
+      const librosDeMat = lista.filter(b => String(b.materia_id) === String(mat.id));
+      if(librosDeMat.length === 0) return; // ocultar materias sin bibliografía
+      librosDeMat.forEach(b=>usados.add(String(b.id)));
+
+      html+=`<div class="mat-folder">
+        <div class="mat-header" onclick="toggleMat('${mid}')">
+          <span class="mat-name">${esc(mat.nombre)}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="mat-count">${librosDeMat.length} libro${librosDeMat.length!==1?'s':''}</span>
+            <span class="mat-chevron" id="mchev-${mid}">›</span>
+          </div>
+        </div>
+        <div class="mat-apuntes" id="${mid}">
+          ${librosDeMat.map(b => `<div style="padding:10px 14px 4px;">${_bibCard(b)}</div>`).join('')}
+        </div>
+      </div>`;
+    });
+
+    html+=`</div></div>`;
+  });
+
+  // Libros sin materia asignada (o materia inexistente): bucket aparte, sin perderlos
+  const sinClasificar = lista.filter(b => !usados.has(String(b.id)));
+  if(sinClasificar.length){
+    const yid='yb-sin-clasificar';
+    html+=`<div class="year-folder">
+      <div class="year-header" onclick="toggleYear('${yid}')">
+        <div class="year-header-l">
+          <div class="year-badge" style="background:#94A3B8;">?</div>
+          <div><div class="year-name">Sin clasificar</div><div class="year-count">${sinClasificar.length} libro${sinClasificar.length!==1?'s':''}</div></div>
+        </div>
+        <span class="year-chevron" id="chev-${yid}">›</span>
+      </div>
+      <div class="year-materias" id="${yid}">
+        ${sinClasificar.map(b=>`<div style="padding:10px 14px;">${_bibCard(b)}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  tree.innerHTML = html || '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin bibliografía disponible.</p>';
+}
+
+// ── BIBLIOGRAFÍA — organizada por año y materia (misma estructura que Apuntes), listado 100% independiente ──
 function _bibCard(b){
   const key='bib-'+b.id;
   const inCart=cart[key]?cart[key].qty:0;
@@ -6674,23 +6758,34 @@ function _bibCard(b){
 }
 
 function renderBibliografia(){
-  const c=document.getElementById('bibliografia-list'); if(!c) return;
   const _BIB=window.BIBLIOGRAFIA||BIBLIOGRAFIA||[];
-  c.innerHTML = _BIB.length
-    ? _BIB.map(_bibCard).join('')
-    : '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin bibliografía cargada.</p>';
+  renderTreeBib(_BIB);
 }
 
 function filtrarBiblio(q){
   const _BIB=window.BIBLIOGRAFIA||BIBLIOGRAFIA||[];
+  const _MATERIAS=window.MATERIAS||[];
+  const _ANIOS=window.ANIOS||[];
   const qq=(q||'').trim().toLowerCase();
-  const filtrada = !qq ? _BIB : _BIB.filter(b=>
-    (b.titulo||'').toLowerCase().includes(qq) || (b.autor||'').toLowerCase().includes(qq)
-  );
-  const c=document.getElementById('bibliografia-list'); if(!c) return;
-  c.innerHTML = filtrada.length
-    ? filtrada.map(_bibCard).join('')
-    : '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin resultados.</p>';
+  const filtrada = !qq ? _BIB : _BIB.filter(b=>{
+    const mat=_MATERIAS.find(m=>String(m.id)===String(b.materia_id));
+    const anio=mat?_ANIOS.find(a=>String(a.id)===String(mat.anio_id)):null;
+    return (b.titulo||'').toLowerCase().includes(qq)
+        || (b.autor||'').toLowerCase().includes(qq)
+        || (mat?.nombre||'').toLowerCase().includes(qq)
+        || (anio?.nombre||'').toLowerCase().includes(qq);
+  });
+  renderTreeBib(filtrada);
+  if(qq){
+    document.querySelectorAll('#bibliografia-tree .year-materias').forEach(el=>{
+      el.classList.add('open');
+      const ch=document.getElementById('chev-'+el.id); if(ch)ch.classList.add('open');
+    });
+    document.querySelectorAll('#bibliografia-tree .mat-apuntes').forEach(el=>{
+      el.classList.add('open');
+      const ch=document.getElementById('mchev-'+el.id); if(ch)ch.classList.add('open');
+    });
+  }
 }
 
 // Carrito de Bibliografía: precio fijo por libro, clave con prefijo 'bib-'
