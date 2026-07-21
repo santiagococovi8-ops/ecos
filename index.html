@@ -4489,23 +4489,49 @@ input:focus-visible {
   </div>
   <div id="panel-copyecos" class="t-panel">
     <div class="sp" style="padding-top:10px;">
-      <div class="t-hero" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);">
-        <div>
-          <div class="t-hero-tag">CopyECOS</div>
-          <div class="t-hero-title">Apuntes para<br>tus cursadas</div>
-          <div class="t-hero-sub">$55 por hoja doble faz · Retirá en mesita</div>
+      <!-- ── Sub-módulos independientes de CopyECOS: Apuntes / Bibliografía ── -->
+      <div class="f-radios" id="copy-subtabs">
+        <div class="f-radio-btn selected" id="csub-apuntes" style="flex:1;text-align:center;font-weight:800;" onclick="switchCopySub('apuntes')">📄 Apuntes</div>
+        <div class="f-radio-btn" id="csub-bibliografia" style="flex:1;text-align:center;font-weight:800;" onclick="switchCopySub('bibliografia')">📚 Bibliografía</div>
+      </div>
+
+      <!-- ── SUB-MÓDULO: APUNTES ── -->
+      <div id="copysub-apuntes">
+        <div class="t-hero" style="background:linear-gradient(135deg,#1E3A5F,#2563EB);">
+          <div>
+            <div class="t-hero-tag">CopyECOS</div>
+            <div class="t-hero-title">Apuntes para<br>tus cursadas</div>
+            <div class="t-hero-sub">$55 por hoja doble faz · Retirá en mesita</div>
+          </div>
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         </div>
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <div style="background:#EFF6FF;border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          <p style="font-size:12px;color:#1E40AF;line-height:1.5;"><strong>Precio por hojas:</strong> $55 cada hoja doble faz. El total se calcula automáticamente según las páginas del apunte.</p>
+        </div>
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Buscar materia..." id="search-input" oninput="filtrar(this.value)">
+        </div>
+        <div id="apuntes-tree"></div>
       </div>
-      <div style="background:#EFF6FF;border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-        <p style="font-size:12px;color:#1E40AF;line-height:1.5;"><strong>Precio por hojas:</strong> $55 cada hoja doble faz. El total se calcula automáticamente según las páginas del apunte.</p>
+
+      <!-- ── SUB-MÓDULO: BIBLIOGRAFÍA (independiente de Apuntes) ── -->
+      <div id="copysub-bibliografia" style="display:none;">
+        <div class="t-hero" style="background:linear-gradient(135deg,#1E3A5F,#0891B2);">
+          <div>
+            <div class="t-hero-tag">Bibliografía</div>
+            <div class="t-hero-title">Libros para<br>tu carrera</div>
+            <div class="t-hero-sub">Consultá precio y disponibilidad · Retirá en mesita</div>
+          </div>
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Buscar libro o autor..." id="biblio-search-input" oninput="filtrarBiblio(this.value)">
+        </div>
+        <div id="bibliografia-list"></div>
       </div>
-      <div class="search-box">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Buscar materia..." id="search-input" oninput="filtrar(this.value)">
-      </div>
-      <div id="apuntes-tree"></div>
     </div>
   </div>
   <div id="panel-ecodigos" class="t-panel" style="display:none;">
@@ -5303,13 +5329,15 @@ window._sbUnsubscribers = [];
 function normN(r){ return {...r, catBg:r.cat_bg||r.catBg||'#F59E0B', catTxt:r.cat_txt||r.catTxt||'#0F172A', heroBg:r.hero_bg||r.heroBg||'#0F172A', imgUrl:r.img_url||r.imgUrl||'', enCarrusel:r.en_carrusel!==undefined?r.en_carrusel:r.enCarrusel}; }
 function normA(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0, materia_id:r.materia_id||null}; }
 function normC(r){ return {...r, badgeBg:r.badge_bg||r.badgeBg, precio:Number(r.precio)||0, stock:r.stock===true||r.stock==='true'||r.stock===1}; }
+function normB(r){ return {...r, precio:Number(r.precio)||0, orden:Number(r.orden)||0}; }
 
 // ── SEED datos iniciales si las tablas están vacías ──
 async function seedSupabase() {
-  const [n,a,c] = await Promise.all([
+  const [n,a,c,b] = await Promise.all([
     SB.select('noticias','select=id&limit=1'),
     SB.select('apuntes','select=id&limit=1'),
     SB.select('codigos','select=id&limit=1'),
+    SB.select('bibliografia','select=id&limit=1').catch(()=>[]),
   ]);
   if (n.length === 0) {
     await SB.upsert('noticias',[
@@ -5343,6 +5371,14 @@ async function seedSupabase() {
       {id:'102',nombre:'Código Penal',subtitulo:'de la Nación Argentina',badge:'CP',badge_bg:'#FEF2F2',edicion:'Edición 2024 · Tapa blanda',descripcion:'Texto oficial con todas las reformas vigentes.',precio:6500,stock:true},
       {id:'103',nombre:'Constitución Nacional',subtitulo:'Argentina',badge:'CN',badge_bg:'#ECFDF5',edicion:'Edición 2024 · Formato bolsillo',descripcion:'Texto completo con la reforma de 1994.',precio:3500,stock:true},
     ]);
+  }
+  if (b.length === 0) {
+    // Bibliografía: módulo 100% independiente de Apuntes. Sin año/materia, listado plano.
+    await SB.upsert('bibliografia',[
+      {id:'301',orden:1,titulo:'Tratado de Derecho Civil — Parte General',autor:'Julio César Rivera',edicion:'Edición 2023 · Tapa dura',descripcion:'Manual de referencia para Derecho Civil I y II.',precio:12000,drive:''},
+      {id:'302',orden:2,titulo:'Manual de Derecho Constitucional',autor:'Néstor Pedro Sagüés',edicion:'Edición 2022',descripcion:'Bibliografía obligatoria para Derecho Constitucional.',precio:9500,drive:''},
+      {id:'303',orden:3,titulo:'Derecho Penal — Parte General',autor:'Eugenio Raúl Zaffaroni',edicion:'Edición 2021',descripcion:'Texto de cátedra para Derecho Penal I.',precio:11000,drive:''},
+    ]).catch(()=>{});
   }
 }
 
@@ -5481,6 +5517,21 @@ async function iniciarApp() {
   } catch(err) {
     console.warn('Supabase no disponible, usando datos locales:', err.message);
     window._sbListo = false;
+  }
+
+  // ── BIBLIOGRAFÍA: carga independiente (no debe afectar Apuntes/Códigos/Noticias) ──
+  try {
+    const bibs = await SB.select('bibliografia','order=orden.asc,id.asc');
+    window.BIBLIOGRAFIA = bibs.map(normB);
+    if (window._appLista) renderBibliografia();
+    const _uB = SB.subscribe('bibliografia',()=>SB.select('bibliografia','order=orden.asc,id.asc').then(r=>{
+      window.BIBLIOGRAFIA = r.map(normB);
+      if (window._appLista) renderBibliografia();
+    }));
+    window._sbUnsubscribers = (window._sbUnsubscribers||[]).concat([_uB]);
+  } catch(errB) {
+    console.warn('Bibliografía no disponible aún (¿falta crear la tabla en Supabase?):', errB.message);
+    window.BIBLIOGRAFIA = window.BIBLIOGRAFIA || [];
   }
 }
 // El seed corre solo desde el Admin. Nunca en produccion.
@@ -5924,6 +5975,12 @@ const CODIGOS = [
   { id:101, nombre:'Código Civil y Comercial', subtitulo:'de la Nación', badge:'CC', badgeBg:'#EFF6FF', edicion:'Edición 2024 · Tapa blanda', descripcion:'Indispensable para Derecho Civil, Comercial y Sucesiones. Incluye fe de erratas y normas complementarias actualizadas.', precio:8500 },
   { id:102, nombre:'Código Penal',             subtitulo:'de la Nación Argentina', badge:'CP', badgeBg:'#FEF2F2', edicion:'Edición 2024 · Tapa blanda', descripcion:'Texto oficial con todas las reformas vigentes. Necesario para Derecho Penal I y II y Procesal Penal.', precio:6500 },
   { id:103, nombre:'Constitución Nacional',    subtitulo:'Argentina', badge:'CN', badgeBg:'#ECFDF5', edicion:'Edición 2024 · Formato bolsillo', descripcion:'Texto completo con la reforma de 1994. Útil desde primer año para todas las materias del programa.', precio:3500 },
+];
+
+const BIBLIOGRAFIA = [
+  { id:301, orden:1, titulo:'Tratado de Derecho Civil — Parte General', autor:'Julio César Rivera', edicion:'Edición 2023 · Tapa dura', descripcion:'Manual de referencia para Derecho Civil I y II.', precio:12000, drive:'' },
+  { id:302, orden:2, titulo:'Manual de Derecho Constitucional', autor:'Néstor Pedro Sagüés', edicion:'Edición 2022', descripcion:'Bibliografía obligatoria para Derecho Constitucional.', precio:9500, drive:'' },
+  { id:303, orden:3, titulo:'Derecho Penal — Parte General', autor:'Eugenio Raúl Zaffaroni', edicion:'Edición 2021', descripcion:'Texto de cátedra para Derecho Penal I.', precio:11000, drive:'' },
 ];
 
 const NOTICIAS = [
@@ -6592,6 +6649,78 @@ function renderCodigos(){
   c.innerHTML=html;
 }
 
+// ── BIBLIOGRAFÍA — listado plano, independiente de Apuntes y ECódigos ──
+function _bibCard(b){
+  const key='bib-'+b.id;
+  const inCart=cart[key]?cart[key].qty:0;
+  return `<div class="codigo-card">
+    <div class="codigo-header">
+      <div class="codigo-badge" style="background:#ECFEFF;color:#0891B2;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+      <div><div class="codigo-name">${esc(b.titulo)}</div><div class="codigo-sub">${esc(b.autor||'')}</div><div class="codigo-ed">${esc(b.edicion||'')}</div></div>
+    </div>
+    ${b.descripcion?`<div class="codigo-desc">${esc(b.descripcion)}</div>`:''}
+    <div class="codigo-footer">
+      <div><div class="codigo-price">$${(b.precio||0).toLocaleString('es-AR')}</div><div class="codigo-price-lbl">Precio ECOS</div></div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        ${b.drive?`<button class="btn-ver" onclick="window.open('${esc(b.drive)}','_blank')">Ver</button>`:''}
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button id="qtm-${key}" class="qty-btn" style="width:26px;height:26px;font-size:14px;${inCart===0?'opacity:.35;cursor:default;':''}" onclick="chgQtyBib('${b.id}',-1)" ${inCart===0?'disabled':''}>−</button>
+          <span id="qts-${key}" style="font-size:13px;font-weight:700;min-width:18px;text-align:center;color:${inCart>0?'var(--blue)':'var(--gray-400)'};">${inCart}</span>
+          <button id="qtp-${key}" class="qty-btn" style="width:26px;height:26px;font-size:14px;background:var(--blue);border-color:var(--blue);color:white;" onclick="chgQtyBib('${b.id}',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBibliografia(){
+  const c=document.getElementById('bibliografia-list'); if(!c) return;
+  const _BIB=window.BIBLIOGRAFIA||BIBLIOGRAFIA||[];
+  c.innerHTML = _BIB.length
+    ? _BIB.map(_bibCard).join('')
+    : '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin bibliografía cargada.</p>';
+}
+
+function filtrarBiblio(q){
+  const _BIB=window.BIBLIOGRAFIA||BIBLIOGRAFIA||[];
+  const qq=(q||'').trim().toLowerCase();
+  const filtrada = !qq ? _BIB : _BIB.filter(b=>
+    (b.titulo||'').toLowerCase().includes(qq) || (b.autor||'').toLowerCase().includes(qq)
+  );
+  const c=document.getElementById('bibliografia-list'); if(!c) return;
+  c.innerHTML = filtrada.length
+    ? filtrada.map(_bibCard).join('')
+    : '<p style="text-align:center;color:#94A3B8;padding:24px;">Sin resultados.</p>';
+}
+
+// Carrito de Bibliografía: precio fijo por libro, clave con prefijo 'bib-'
+// para nunca colisionar con ids de Apuntes o ECódigos en el mismo carrito.
+function chgQtyBib(id,d){
+  const key='bib-'+id;
+  if(!cart[key]){
+    if(d<=0) return;
+    const _BIB=window.BIBLIOGRAFIA||BIBLIOGRAFIA||[];
+    const item=_BIB.find(b=>String(b.id)===String(id));
+    if(!item) return;
+    cart[key]={id:key, nombre:item.titulo+(item.autor?' — '+item.autor:''),
+               precio:item.precio||0, qty:1, paginas:null, esCod:true, esLibro:true};
+  } else {
+    cart[key].qty+=d;
+    if(cart[key].qty<=0){delete cart[key];}
+  }
+  updateCartUI();
+  const qty=cart[key]?cart[key].qty:0;
+  const qtySpan=document.getElementById('qts-'+key);
+  const btnMinus=document.getElementById('qtm-'+key);
+  if(qtySpan){ qtySpan.textContent=qty; qtySpan.style.color=qty>0?'var(--blue)':'var(--gray-400)'; }
+  if(btnMinus){
+    btnMinus.disabled=qty<=0;
+    btnMinus.style.opacity=qty<=0?'.35':'1';
+    btnMinus.style.cursor=qty<=0?'default':'pointer';
+  }
+  renderPedido();
+}
+
 function switchTab(tab){
   document.querySelectorAll('.t-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
@@ -6599,6 +6728,22 @@ function switchTab(tab){
   document.getElementById('panel-ecodigos').style.display=tab==='ecodigos'?'block':'none';
   document.getElementById('panel-personalizado').style.display=tab==='personalizado'?'block':'none';
   if(tab==='ecodigos')renderCodigos();
+}
+
+// ── Sub-módulos independientes dentro de CopyECOS: Apuntes / Bibliografía ──
+// IMPORTANTE: esto NO mezcla los datos ni las listas; sólo alterna qué bloque se ve.
+function switchCopySub(sub){
+  const btnA=document.getElementById('csub-apuntes');
+  const btnB=document.getElementById('csub-bibliografia');
+  const panA=document.getElementById('copysub-apuntes');
+  const panB=document.getElementById('copysub-bibliografia');
+  if(!btnA||!btnB||!panA||!panB) return;
+  const esBib = sub==='bibliografia';
+  btnA.classList.toggle('selected', !esBib);
+  btnB.classList.toggle('selected', esBib);
+  panA.style.display = esBib ? 'none' : '';
+  panB.style.display = esBib ? '' : 'none';
+  if(esBib) renderBibliografia();
 }
 
 // ── CART ──
