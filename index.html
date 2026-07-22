@@ -627,6 +627,14 @@ html, body {
 
 .auth-form.hidden { display: none; }
 
+.auth-link {
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .auth-field {
   display: flex;
   flex-direction: column;
@@ -4272,7 +4280,8 @@ input:focus-visible {
     <div class="auth-tagline">Tu agrupación estudiantil · UNLP</div>
   </div>
   <div class="auth-card">
-    <div class="auth-tabs">
+    <div id="auth-msg" style="display:none;font-size:13px;color:#059669;font-weight:700;background:#ECFDF5;border-radius:10px;padding:10px 12px;line-height:1.5;margin-bottom:14px;"></div>
+    <div class="auth-tabs" id="auth-tabs-row">
       <button class="auth-tab active" onclick="authTab('login')" id="tab-login">Iniciar sesión</button>
       <button class="auth-tab" onclick="authTab('reg')" id="tab-reg">Registrarse</button>
     </div>
@@ -4287,6 +4296,9 @@ input:focus-visible {
       <div class="auth-field">
         <label class="auth-label">Contraseña</label>
         <input class="auth-input" id="li-pass" type="password" placeholder="Tu contraseña" autocomplete="current-password">
+      </div>
+      <div style="text-align:right;margin-top:-6px;">
+        <span class="auth-link" onclick="abrirRecover()">¿Olvidaste tu contraseña?</span>
       </div>
       <div class="auth-err" id="li-err"></div>
       <button class="btn-auth" id="li-btn" onclick="doLogin()">Ingresar</button>
@@ -4323,6 +4335,40 @@ input:focus-visible {
       </div>
       <div class="auth-err" id="ri-tyc-err"></div>
       <button class="btn-auth" id="ri-btn" onclick="doRegister()">Crear cuenta</button>
+    </form>
+
+    <!-- RECUPERAR CONTRASEÑA -->
+    <form class="auth-form hidden" id="form-recover" onsubmit="return false;">
+      <div style="font-size:13px;color:var(--gray-600);line-height:1.5;">
+        Ingresá tu legajo y te enviamos un link a tu email para restablecer la contraseña.
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Legajo</label>
+        <input class="auth-input" id="rec-legajo" type="text" inputmode="numeric" placeholder="Solo los 7 dígitos" maxlength="8" autocomplete="username" oninput="fmtLegajo(this)">
+      </div>
+      <div class="auth-err" id="rec-err"></div>
+      <div id="rec-ok" style="display:none;font-size:13px;color:#059669;font-weight:700;background:#ECFDF5;border-radius:10px;padding:10px 12px;line-height:1.5;"></div>
+      <button class="btn-auth" id="rec-btn" onclick="doRecover()">Enviar link de recuperación</button>
+      <div style="text-align:center;">
+        <span class="auth-link" onclick="cerrarRecover()">Volver a iniciar sesión</span>
+      </div>
+    </form>
+
+    <!-- ESTABLECER NUEVA CONTRASEÑA (llega desde el link del email) -->
+    <form class="auth-form hidden" id="form-reset" onsubmit="return false;">
+      <div style="font-size:13px;color:var(--gray-600);line-height:1.5;">
+        Ingresá tu nueva contraseña para tu cuenta de ECOS.
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Nueva contraseña</label>
+        <input class="auth-input" id="rp-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Confirmar contraseña</label>
+        <input class="auth-input" id="rp-pass2" type="password" placeholder="Repetí la contraseña" autocomplete="new-password">
+      </div>
+      <div class="auth-err" id="rp-err"></div>
+      <button class="btn-auth" id="rp-btn" onclick="doResetPassword()">Guardar nueva contraseña</button>
     </form>
   </div>
 </div>
@@ -5212,6 +5258,38 @@ const SB = {
     localStorage.removeItem('sb_email');
   },
 
+  // Solicitar email de recuperación de contraseña. Supabase redirige de vuelta
+  // a redirectTo con #access_token=...&type=recovery en el hash de la URL.
+  async recoverPassword(email, redirectTo) {
+    const url = SUPABASE_URL + '/auth/v1/recover'
+      + (redirectTo ? '?redirect_to=' + encodeURIComponent(redirectTo) : '');
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    // Supabase siempre responde 200 acá, exista o no el email (por seguridad).
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      throw new Error(e.error_description || e.msg || 'No se pudo enviar el email de recuperación');
+    }
+    return true;
+  },
+
+  // Actualizar contraseña usando el access_token temporal que llega en el link de recuperación.
+  async updatePasswordWithToken(accessToken, newPassword) {
+    const res = await fetch(SUPABASE_URL + '/auth/v1/user', {
+      method: 'PUT',
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: newPassword }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok) {
+      throw new Error(data.error_description || data.msg || 'No se pudo actualizar la contraseña');
+    }
+    return data;
+  },
+
   getToken() {
     return localStorage.getItem('sb_token');
   },
@@ -5558,6 +5636,120 @@ function authTab(tab) {
   document.getElementById('tab-reg').classList.toggle('active', tab === 'reg');
   document.getElementById('li-err').textContent = '';
   document.getElementById('ri-err').textContent = '';
+  const authMsg = document.getElementById('auth-msg');
+  if (authMsg) authMsg.style.display = 'none';
+}
+
+// ── Recuperación de contraseña ──
+function abrirRecover() {
+  document.getElementById('auth-msg').style.display = 'none';
+  document.getElementById('auth-tabs-row').style.display = 'none';
+  document.getElementById('form-login').classList.add('hidden');
+  document.getElementById('form-reg').classList.add('hidden');
+  document.getElementById('form-reset').classList.add('hidden');
+  document.getElementById('form-recover').classList.remove('hidden');
+  document.getElementById('rec-legajo').classList.remove('err');
+  document.getElementById('rec-err').textContent = '';
+  document.getElementById('rec-ok').style.display = 'none';
+  const liLegajo = document.getElementById('li-legajo').value;
+  if (liLegajo) document.getElementById('rec-legajo').value = liLegajo;
+  document.getElementById('rec-btn').disabled = false;
+  document.getElementById('rec-btn').textContent = 'Enviar link de recuperación';
+}
+
+function cerrarRecover() {
+  document.getElementById('form-recover').classList.add('hidden');
+  document.getElementById('auth-tabs-row').style.display = '';
+  authTab('login');
+}
+
+async function doRecover() {
+  const legajo = document.getElementById('rec-legajo').value.trim();
+  const errEl  = document.getElementById('rec-err');
+  const okEl   = document.getElementById('rec-ok');
+  const btn    = document.getElementById('rec-btn');
+  errEl.textContent = '';
+  okEl.style.display = 'none';
+
+  if (!legajo || !isLegajoValido(legajo)) {
+    document.getElementById('rec-legajo').classList.add('err');
+    errEl.textContent = 'El legajo debe tener el formato 000000/0.';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    let rows = [];
+    try { rows = await SB.select('usuarios', `legajo=eq.${encodeURIComponent(legajo)}&limit=1`); } catch(e2){}
+    const userRow = rows.length ? rows[0] : null;
+    const email = (userRow && userRow.email) ? userRow.email : legajoToEmail(legajo);
+    const redirectTo = window.location.origin + window.location.pathname;
+    await SB.recoverPassword(email, redirectTo);
+  } catch(e) {
+    // No revelamos si el legajo existe o no en la base: por seguridad,
+    // mostramos el mismo mensaje de éxito haya o no una cuenta asociada.
+  }
+  okEl.textContent = 'Listo. Si el legajo está registrado, te enviamos un email con el link para restablecer tu contraseña.';
+  okEl.style.display = 'block';
+  btn.disabled = true; btn.textContent = 'Enviado ✓';
+}
+
+// ── Establecer nueva contraseña (desde el link de recuperación) ──
+let _recoveryToken = null;
+
+function mostrarResetScreen() {
+  const authScreen = document.getElementById('auth-screen');
+  authScreen.classList.remove('out');
+  authScreen.style.display = 'flex';
+  const verifyScreen = document.getElementById('verify-screen');
+  if (verifyScreen) verifyScreen.style.display = 'none';
+  document.getElementById('auth-tabs-row').style.display = 'none';
+  document.getElementById('form-login').classList.add('hidden');
+  document.getElementById('form-reg').classList.add('hidden');
+  document.getElementById('form-recover').classList.add('hidden');
+  document.getElementById('form-reset').classList.remove('hidden');
+}
+
+async function doResetPassword() {
+  const p1 = document.getElementById('rp-pass').value;
+  const p2 = document.getElementById('rp-pass2').value;
+  const errEl = document.getElementById('rp-err');
+  const btn = document.getElementById('rp-btn');
+  errEl.textContent = '';
+  document.getElementById('rp-pass').classList.remove('err');
+  document.getElementById('rp-pass2').classList.remove('err');
+
+  if (!p1 || p1.length < 6) {
+    document.getElementById('rp-pass').classList.add('err');
+    errEl.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+    return;
+  }
+  if (p1 !== p2) {
+    document.getElementById('rp-pass2').classList.add('err');
+    errEl.textContent = 'Las contraseñas no coinciden.';
+    return;
+  }
+  if (!_recoveryToken) {
+    errEl.textContent = 'El link de recuperación expiró o no es válido. Solicitá uno nuevo desde "¿Olvidaste tu contraseña?".';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    await SB.updatePasswordWithToken(_recoveryToken, p1);
+    // Limpiar el token de la URL para que no quede reutilizable
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    _recoveryToken = null;
+    document.getElementById('form-reset').classList.add('hidden');
+    document.getElementById('auth-tabs-row').style.display = '';
+    authTab('login');
+    const msgEl = document.getElementById('auth-msg');
+    msgEl.textContent = 'Contraseña actualizada. Ya podés ingresar con tu nueva contraseña.';
+    msgEl.style.display = 'block';
+  } catch(e) {
+    errEl.textContent = e.message || 'No se pudo actualizar la contraseña. Pedí un nuevo link.';
+    btn.disabled = false; btn.textContent = 'Guardar nueva contraseña';
+  }
 }
 
 // Formatear campo legajo: solo acepta dígitos, inserta / automáticamente
@@ -5944,9 +6136,22 @@ function doLogout() {
   if (landing) landing.style.display = 'none';
 }
 
+// RECUPERACIÓN DE CONTRASEÑA: Supabase redirige acá con
+// #access_token=...&type=recovery en el hash de la URL tras tocar el link del email.
+(function checkRecoveryLink() {
+  const hash = window.location.hash;
+  if (!hash || hash.indexOf('type=recovery') === -1) return;
+  const params = new URLSearchParams(hash.replace(/^#/, ''));
+  const token = params.get('access_token');
+  if (!token) return;
+  _recoveryToken = token;
+  mostrarResetScreen();
+})();
+
 // SEGURIDAD: valida el token contra Supabase antes de restaurar sesion.
 (async function checkSession() {
   try {
+    if (_recoveryToken) return; // estamos en flujo de recuperación, no restaurar sesión
     const token = localStorage.getItem('sb_token');
     const saved = localStorage.getItem('ecos_user');
     if (!token || !saved) return;
