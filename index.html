@@ -4796,45 +4796,8 @@ input:focus-visible {
         <div class="prog-hero-s">Servicios y espacios para la comunidad estudiantil.</div>
       </div>
     </div>
-    <div class="prog-card">
-      <div class="prog-ch">
-        <div class="prog-badge" style="background:#EFF6FF;color:#2563EB;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
-        <div><div class="prog-name">CopyECOS</div><div class="prog-tag">Fotocopiadora estudiantil</div></div>
-      </div>
-      <div class="prog-body">Imprimimos y fotocopiamos a precios accesibles. Pasá por la mesita y consultanos.</div>
-      <div class="prog-action" style="color:var(--blue);">
-        <span>Consultar en mesita</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-    </div>
-    <div class="prog-card" onclick="goTo('apuntes')">
-      <div class="prog-ch">
-        <div class="prog-badge" style="background:#ECFDF5;color:#059669;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></div>
-        <div><div class="prog-name">ECódigos</div><div class="prog-tag">Códigos civiles y comerciales</div></div>
-      </div>
-      <div class="prog-body">Códigos a precios solidarios. Civil, Penal y Constitución Nacional en stock.</div>
-      <div class="prog-action" style="color:var(--green);">
-        <span>Ver en Tienda</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </div>
-    </div>
-    <div class="prog-card">
-      <div class="prog-ch">
-        <div class="prog-badge" style="background:#FFFBEB;color:#D97706;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-        <div><div class="prog-name">EConsultas</div><div class="prog-tag">Charlas y consultoría estudiantil</div></div>
-      </div>
-      <div class="prog-body">Charlas con estudiantes avanzados y graduados para dudas sobre materias, inscripciones y más.</div>
-      <div class="prog-action" style="color:var(--yellow-d);" onclick="window.open('https://www.instagram.com/ecosjursoc/','_blank')">
-        <span>Ver fechas en IG</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-      </div>
-    </div>
-    <div class="prog-card" onclick="goTo('vuelta-segura')">
-      <div class="prog-ch">
-        <div class="prog-badge" style="background:#EDE9FE;color:#7C3AED;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <div><div class="prog-name">Frente de Mujeres</div><div class="prog-tag">Espacio feminista de ECOS</div></div>
-      </div>
-      <div class="prog-body">Trabajamos por la igualdad y la seguridad. Vuelta Segura disponible todas las noches.</div>
-      <div class="prog-action" style="color:#6D28D9;background:#EDE9FE;">
-        <span>Vuelta Segura</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </div>
+    <div id="programas-cards" style="display:flex;flex-direction:column;gap:12px;">
+      <div style="text-align:center;padding:24px 0;color:var(--gray-400);font-size:13px;">Cargando programas...</div>
     </div>
   </div>
 </div>
@@ -5409,6 +5372,67 @@ window._sbUnsubscribers = [];
 <script>
 // ── SUPABASE: normalizar filas (snake_case → camelCase) ──
 function normN(r){ return {...r, catBg:r.cat_bg||r.catBg||'#F59E0B', catTxt:r.cat_txt||r.catTxt||'#0F172A', heroBg:r.hero_bg||r.heroBg||'#0F172A', imgUrl:r.img_url||r.imgUrl||'', enCarrusel:r.en_carrusel!==undefined?r.en_carrusel:r.enCarrusel}; }
+function normP(r){
+  return {
+    ...r,
+    imgUrl: r.img_url || r.imgUrl || '',
+    color: r.color || '#2563EB',
+    colorBg: r.color_bg || r.colorBg || '#EFF6FF',
+    accionTipo: r.accion_tipo || r.accionTipo || 'ninguna',
+    accionValor: r.accion_valor || r.accionValor || '',
+    accionLabel: r.accion_label || r.accionLabel || '',
+    activo: r.activo !== false && r.activo !== 'false' && r.activo !== 0,
+    orden: Number(r.orden) || 0,
+  };
+}
+// Mismos íconos que ofrece el panel de Administración para Programas
+const ICONS_PROGRAMAS = {
+  copy:      '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+  balanza:   '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+  mensaje:   '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  corazon:   '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  estrella:  '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  megafono:  '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  calendario:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  maletin:   '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+};
+const ICON_FLECHA = '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>';
+function renderProgramasApp(lista) {
+  const cont = document.getElementById('programas-cards');
+  if (!cont) return;
+  const activos = (lista||[]).filter(p => p.activo).sort((a,b)=>(a.orden||0)-(b.orden||0));
+  if (!activos.length) {
+    cont.innerHTML = '<div style="text-align:center;padding:24px 0;color:var(--gray-400);font-size:13px;">Todavía no hay programas cargados.</div>';
+    return;
+  }
+  cont.innerHTML = activos.map(p => {
+    const clickable = p.accionTipo === 'pantalla' || p.accionTipo === 'link';
+    const onclick = p.accionTipo === 'pantalla' ? `goTo('${p.accionValor}')`
+                   : p.accionTipo === 'link' ? `window.open('${p.accionValor.replace(/'/g,"\\'")}','_blank')`
+                   : '';
+    const iconSvg = ICONS_PROGRAMAS[p.icono] || ICONS_PROGRAMAS.estrella;
+    const badge = p.imgUrl
+      ? `<img src="${p.imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`
+      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>`;
+    const accionRow = p.accionLabel
+      ? (clickable
+          ? `<div class="prog-action" style="color:${p.color};" ${p.accionTipo==='link'?`onclick="event.stopPropagation();${onclick}"`:''}>
+               <span>${esc(p.accionLabel)}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON_FLECHA}</svg>
+             </div>`
+          : `<div class="prog-action" style="color:${p.color};">
+               <span>${esc(p.accionLabel)}</span>
+             </div>`)
+      : '';
+    return `<div class="prog-card" ${clickable?`onclick="${onclick}"`:'style="cursor:default;"'}>
+      <div class="prog-ch">
+        <div class="prog-badge" style="background:${p.colorBg};color:${p.color};overflow:hidden;">${badge}</div>
+        <div><div class="prog-name">${esc(p.nombre)}</div><div class="prog-tag">${esc(p.tag||'')}</div></div>
+      </div>
+      ${p.descripcion ? `<div class="prog-body">${esc(p.descripcion)}</div>` : ''}
+      ${accionRow}
+    </div>`;
+  }).join('');
+}
 function normA(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0, materia_id:r.materia_id||null}; }
 function normC(r){ return {...r, badgeBg:r.badge_bg||r.badgeBg, precio:Number(r.precio)||0, stock:r.stock===true||r.stock==='true'||r.stock===1}; }
 function normB(r){ return {...r, año:r.anio||r.año, precio:Number(r.precio)||0, paginas:Number(r.paginas)||0, materia_id:r.materia_id||null, autor:r.autor||''}; }
@@ -5614,6 +5638,22 @@ async function iniciarApp() {
   } catch(errB) {
     console.warn('Bibliografía no disponible aún (¿falta crear la tabla en Supabase?):', errB.message);
     window.BIBLIOGRAFIA = window.BIBLIOGRAFIA || [];
+  }
+
+  // ── PROGRAMAS: carga independiente y 100% administrable (no afecta el resto) ──
+  try {
+    const progs = await SB.select('programas','order=orden.asc');
+    window.PROGRAMAS = progs.map(normP);
+    renderProgramasApp(window.PROGRAMAS);
+    const _uP = SB.subscribe('programas', () => SB.select('programas','order=orden.asc').then(r => {
+      window.PROGRAMAS = r.map(normP);
+      renderProgramasApp(window.PROGRAMAS);
+    }));
+    window._sbUnsubscribers = (window._sbUnsubscribers||[]).concat([_uP]);
+  } catch(errP) {
+    console.warn('Programas no disponible aún (¿falta crear la tabla en Supabase?):', errP.message);
+    window.PROGRAMAS = window.PROGRAMAS || [];
+    renderProgramasApp(window.PROGRAMAS);
   }
 }
 // El seed corre solo desde el Admin. Nunca en produccion.
